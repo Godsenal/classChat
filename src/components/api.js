@@ -1,11 +1,11 @@
 import axios from 'axios';
 
-export const fetchPost = postId => {
-  return axios.get(`/api/${postId}`)
+export const addPost = (post) => {
+  return axios.post('/api/notices',post)
           .then(resp => resp.data);
 };
 
 export const fetchNoticeList = () => {
   return axios.get('/api/notices')
-          .then(resp => resp.data);
+          .then(resp => resp.data.post);
 };
