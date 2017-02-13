@@ -1,13 +1,13 @@
 import React,{Component, PropTypes} from 'react';
 import ListPreview from './ListPreview';
-class NoticeList extends React.Component {
+class PostList extends React.Component {
   constructor(){
     super();
   }
   render () {
     return(
       <div>
-        {this.props.notices.map(post => {
+        {this.props.posts.map(post => {
           return <ListPreview key={post._id} {...post} />;
         })}
       </div>
@@ -15,7 +15,7 @@ class NoticeList extends React.Component {
   }
 }
 
-NoticeList.propTypes = {
-  notices : PropTypes.array.isRequired,
+PostList.propTypes = {
+  posts : PropTypes.array.isRequired,
 };
-export default NoticeList;
+export default PostList;

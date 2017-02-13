@@ -1,7 +1,6 @@
-import React,{Component,PropTypes} from 'react';
-import {Button} from 'react-materialize';
+import React, { PropTypes } from 'react'
 
-class Post extends Component {
+class EditPost extends React.Component {
   constructor(){
     super();
     this.state={
@@ -11,6 +10,14 @@ class Post extends Component {
     this.handleTitleChange = this.handleTitleChange.bind(this);
     this.handleContentsChange = this.handleContentsChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+  }
+  componentDidMount(){
+    if(this.props.title)
+      this.setState({title: this.props.title});
+
+    if(this.props.contents)
+      this.setState({contents: this.props.contents});
+
   }
   handleTitleChange(e){
     this.setState({
@@ -24,11 +31,12 @@ class Post extends Component {
   }
   handleSubmit(){
     const post = {
+      _id: this.props._id,
       title : this.state.title,
       contents : this.state.contents
     };
 
-    this.props.handlePost(post);
+    this.props.handleEdit(post);
 
     this.setState({
       title : '',
@@ -40,13 +48,11 @@ class Post extends Component {
       <div>
         <input value={this.state.title} onChange={this.handleTitleChange}/>
         <textarea value={this.state.contents} onChange={this.handleContentsChange}/>
-        <Button onClick={this.handleSubmit}>SUBMIT</Button>
+        <button onClick={this.handleSubmit}>submit</button>
       </div>
     );
   }
 }
+}
 
-Post.propTypes = {
-  handlePost : PropTypes.func.isRequired,
-};
-export default Post;
+export default EditPost;
