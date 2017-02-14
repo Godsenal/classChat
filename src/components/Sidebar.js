@@ -11,12 +11,15 @@ class Sidebar extends React.Component {
     let signout = null;
     if(this.props.isSignedIn){
       userView = <h3 className='black-text'><i className="medium material-icons">perm_identity</i>{this.props.currentUserNickname}</h3>;
-      signout = <a className='text-right pink-text' onClick={this.props.handleSignout} style = {{'textDecoration' : 'none'}}>sign out</a>;
+      signout = <a className='text-right pink-text' onClick={this.props.handleSignout} style = {{'textDecoration' : 'none', 'cursor':'pointer'}}>sign out</a>;
     }
     return(
       <ul id="slide-out" className="side-nav fixed grey darken-3">
         <li><div className="userView white-text">
-          <h2>Taehee Lee</h2>
+          <Link className='white-text'
+                style = {{'textDecoration' : 'none', 'cursor':'pointer'}}
+                to='/'><h2>Taehee Lee</h2>
+          </Link>
         </div></li>
         <li><div className="userView">
           {userView}
@@ -47,5 +50,9 @@ class Sidebar extends React.Component {
     );
   }
 }
-
+Sidebar.propTypes = {
+  isSignedIn : PropTypes.bool.isRequired,
+  currentUserNickname : PropTypes.string.isRequired,
+  handleSignout : PropTypes.func.isRequired,
+};
 export default Sidebar;

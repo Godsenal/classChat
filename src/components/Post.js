@@ -12,6 +12,12 @@ class Post extends Component {
     this.handleContentsChange = this.handleContentsChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
+  componentDidMount() {
+    this.setState({
+      title : this.props.title,
+      contents : this.props.contents
+    });
+  }
   handleTitleChange(e){
     this.setState({
       title:e.target.value
@@ -23,12 +29,22 @@ class Post extends Component {
     });
   }
   handleSubmit(){
-    const post = {
-      title : this.state.title,
-      contents : this.state.contents
-    };
-
-    this.props.handlePost(post);
+    if(this.props.mode === 'POST'){
+      let post = {
+        author: this.props.currentUser,
+        authorNickname: this.props.currentUserNickname,
+        title : this.state.title,
+        contents : this.state.contents
+      };
+      this.props.handlePost(post);
+    }
+    else if(this.props.mode === 'EDIT'){
+      let post = {
+        title : this.state.title,
+        contents : this.state.contents
+      };
+      this.props.handleEdit(post);
+    }
 
     this.setState({
       title : '',
@@ -47,6 +63,21 @@ class Post extends Component {
 }
 
 Post.propTypes = {
+  mode : PropTypes.string.isRequired,
+  title : PropTypes.string.isRequired,
+  contents : PropTypes.string.isRequired,
+  handleEdit : PropTypes.func.isRequired,
   handlePost : PropTypes.func.isRequired,
+  currentUser : PropTypes.string.isRequired,
+  currentUserNickname : PropTypes.string.isRequired,
+};
+
+Post.defaultProps = {
+  title : '',
+  contents : '',
+  currentUser : '',
+  currentUserNickname : '',
+  handleEdit : () => {console.log('Invalid redirect');},
+  handlePost : () => {console.log('Invalid redirect');},
 };
 export default Post;

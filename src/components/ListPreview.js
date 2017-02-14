@@ -1,6 +1,8 @@
-import React, { PropTypes } from 'react'
+import React, { Component, PropTypes } from 'react';
 import {Link} from 'react-router';
-class ListPreview extends React.Component {
+import moment from 'moment';
+
+class ListPreview extends Component {
   render () {
     return(
       <div className="col s6">
@@ -8,9 +10,11 @@ class ListPreview extends React.Component {
           <div className="card hoverable white darken-1">
             <div className="card-content black-text ">
               <span className="card-title" ><h3 >{this.props.title}</h3></span>
-              <p>{this.props.contents.substr(0,100).length==100?this.props.contents.substr(0,100)+'...':this.props.contents.substr(0,100)}</p>
+              <p>{this.props.contents.substr(0,50).length==50?this.props.contents.substr(0,50)+'...':this.props.contents.substr(0,50)}</p>
             </div>
             <div className="card-action">
+              <span className= 'black-text'>{moment(this.props.published_date).format('MMMM Do YYYY')}</span>
+              <span className='right'>by {this.props.authorNickname}</span>
             </div>
           </div>
           </Link>
@@ -21,6 +25,8 @@ class ListPreview extends React.Component {
 ListPreview.propTypes = {
   _id:PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
-  contents: PropTypes.string.isRequired
+  contents: PropTypes.string.isRequired,
+  published_date: PropTypes.string.isRequired,
+  authorNickname: PropTypes.string.isRequired,
 };
 export default ListPreview;

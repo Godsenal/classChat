@@ -23,6 +23,13 @@ router.post('/signup', (req, res) => {
       code: 1
     });
   }
+    // CHECK NICKNAME FORMAT
+  if(!idForm.test(req.body.nickname)) {
+    return res.status(400).json({
+      err: 'BAD NICKNAME',
+      code: 3
+    });
+  }
 
     // CHECK PASS LENGTH
   if(req.body.password.length < 4 || typeof req.body.password !== 'string') {
@@ -38,7 +45,7 @@ router.post('/signup', (req, res) => {
     if(find){
       return res.status(409).json({
         err: 'ID EXISTS',
-        code: 3
+        code: 4
       });
     }
 

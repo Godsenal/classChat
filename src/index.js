@@ -7,12 +7,7 @@ import { createStore, applyMiddleware } from 'redux';
 
 import thunk from 'redux-thunk';
 
-import App from './components/App';
-import Home from './components/Home';
-import Notice from './components/Notice';
-import PostView from './components/PostView';
-import Signin from './components/Signin';
-import Signup from './components/Signup';
+import {App, Home, ListView, PostView, Signin, Signup} from './containers';
 
 import reducers from './reducers';
 
@@ -22,11 +17,11 @@ ReactDOM.render(
   <Provider store={store}>
     <Router history={browserHistory}>
       <Route path="/" component={App}>
-        <IndexRoute component={Home}/>
-        <Route path="signin" component={Signin}/>
-        <Route path="signup" component={Signup}/>
-        <Route path="notice" component={Notice}/>
-        <Route path=":postId" component={PostView}/>
+        <IndexRoute component={Home} />
+        <Route path="signin" component={Signin} />
+        <Route path="signup" component={Signup} />
+        <Route path="notice" component={ListView} />
+        <Route path=":postId" component={PostView} />
       </Route>
     </Router>
   </Provider>
