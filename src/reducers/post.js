@@ -23,7 +23,12 @@ const initialState = {
   delete: {
     status: 'INIT',
     err: -1,
+  },
+  comment:{
+    status: 'INIT',
+    err: -1,
   }
+
 };
 
 export default function post(state, action) {
@@ -106,23 +111,24 @@ export default function post(state, action) {
       }
     });
   case types.POST_EDIT_SUCCESS:
-    var editIndex = state.list.posts.indexOf({_id: action.postId});
+    var editIndex = state.list.posts.indexOf({_id: action.post._id});
     return update(state, {
       edit: {
         status: { $set: 'SUCCESS' }
-      },
-      view: {
-        post: { $set: action.post }
       },
       list: {
         posts: {
           [editIndex]: { $set: action.post }
         }
-      }
+      },
+      view: {
+        post: { $set: action.post }
+      },
+
     });
   case types.POST_EDIT_FAILURE:
     return update(state, {
-      view: {
+      edit: {
         status: { $set: 'FAILURE' },
         err: { $set: action.err }
       }
@@ -150,6 +156,32 @@ export default function post(state, action) {
     return update(state, {
       delete: {
         status: {$set: 'WAITING'}
+      }
+    });
+  case types.COMMENT_CHANGE:
+    return update(state, {
+      comment: {
+        status: { $set: 'WAITING'}
+      }
+    });
+  case types.COMMENT_CHANGE_SUCCESS:
+    var changeIndex = state.list.posts.indexOf({_id: action.post._id});
+    return update(state, {
+      comment: {
+        status: { $set: 'SUCCESS'}
+      },
+      list: {
+        [changeIndex]: { $set: action.post}
+      },
+      view: {
+        post: { $set: action.post }
+      },
+    });
+  case types.COMMENT_CHANGE_FAILURE:
+    return update(state, {
+      comment: {
+        status: { $set: 'FAILURE' },
+        err: { $set: action.err}
       }
     });
   default:

@@ -14,6 +14,9 @@ import {
   POST_DELETE,
   POST_DELETE_SUCCESS,
   POST_DELETE_FAILURE,
+  COMMENT_CHANGE,
+  COMMENT_CHANGE_SUCCESS,
+  COMMENT_CHANGE_FAILURE,
 } from './ActionTypes';
 
 import axios from 'axios';
@@ -34,7 +37,7 @@ export function listPost(type){
   return (dispatch) => {
     dispatch({type: POST_LIST});
     let url = '/api/post/home';
-    
+
     if(type === 'notice')
       url = '/api/post/notice';
 
@@ -81,6 +84,43 @@ export const deletePost = (postId) => {
               dispatch({type: POST_DELETE_SUCCESS, postId});
             }).catch((err) => {
               dispatch({type: POST_DELETE_FAILURE, err});
+            });
+  };
+};
+
+/*** COMMENT ***/
+export function addComment(postId, comment){
+  return (dispatch) => {
+    dispatch({type: COMMENT_CHANGE});
+    return axios.post(`/api/comment/${postId}`,comment)
+            .then((res) => {
+              dispatch({type: COMMENT_CHANGE_SUCCESS, post: res.data.post});
+            }).catch((err) => {
+              dispatch({type:COMMENT_CHANGE_FAILURE, err});
+            });
+  };
+}
+export const editComment = (postId, commentId, comment) => {
+  return (dispatch) => {
+    dispatch({type: COMMENT_CHANGE});
+
+    return axios.put(`/api/comment/${postId}/${commentId}`, comment)
+      .then((res) => {
+        dispatch({type: COMMENT_CHANGE_SUCCESS, post: res.data.post});
+      }).catch((err) => {
+        dispatch({type: COMMENT_CHANGE_FAILURE, err});
+      });
+  };
+};
+
+export const deleteComment = (postId, commentId) => {
+  return (dispatch) => {
+    dispatch({type: COMMENT_CHANGE});
+    return axios.delete(`/api/comment/${postId}/${commentId}`)
+            .then((res) => {
+              dispatch({type: COMMENT_CHANGE_SUCCESS, post: res.data.post});
+            }).catch((err) => {
+              dispatch({type: COMMENT_CHANGE_FAILURE, err});
             });
   };
 };
