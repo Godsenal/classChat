@@ -13,6 +13,7 @@ import {
 
 import axios from 'axios';
 
+/* dispatch안에는 action 객체가 들어가고 state 는 redux에서 알아서 관리 */
 export function signinRequest(id, password) {
   return (dispatch) => {
     dispatch({type: AUTH_SIGNIN});

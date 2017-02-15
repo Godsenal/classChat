@@ -4,7 +4,7 @@ import {connect} from 'react-redux';
 import moment from 'moment';
 
 import {Post} from '../components';
-import {viewPost, deletePost, editPost} from '../actions/post';
+import {viewPost, deletePost, editPost, addComment, editComment, deleteComment} from '../actions/post';
 
 class PostView extends Component {
   constructor(){
@@ -13,10 +13,13 @@ class PostView extends Component {
       mode : 'VIEW',
       post : {},
       success : false,
+      comment : '',
     };
     this.handleEdit = this.handleEdit.bind(this);
     this.handleDelete = this.handleDelete.bind(this);
     this.toggleEdit = this.toggleEdit.bind(this);
+    this.handleComment = this.handleComment.bind(this);
+    this.handleChange = this.handleChange.bind(this);
   }
   componentDidMount(){
     this.props.viewPost(this.props.params.postId)
@@ -46,7 +49,7 @@ class PostView extends Component {
     };
     this.props.editPost(this.state.post._id, post)
       .then(() => { //for initialize post
-        this.setState({post :{...this.state.post, title : post.title, contents : post.contents, }, mode : 'VIEW'});
+        this.setState({post: this.props.view.post , mode : 'VIEW'});
       });
   }
   toggleEdit(){
@@ -62,6 +65,24 @@ class PostView extends Component {
       });
     }
   }
+  /* TEMP */
+  handleComment(){
+    let comment = {
+      author: this.props.currentUser,
+      authorNickname : this.props.currentUser,
+      comment : this.state.comment,
+    };
+    this.props.addComment(this.state.post._id, comment )
+      .then(() => {
+        this.setState({ post: this.props.view.post, comment : ''});
+      });
+  }
+  handleChange(e){
+    this.setState({
+      comment : e.target.value,
+    });
+  }
+  /* TEMP */
   render () { /* NOTE -Never change states in return statement. */
     const viewMode = (
       <div className="col s12">
@@ -88,8 +109,12 @@ class PostView extends Component {
       <p className="flow-text" >{this.state.post.contents}</p>
       <div className="divider"></div>
       <div className='section'>
-        <input className='col s10'/>
-        <button className='btn waves-effect waves-light black col s2'>Submit</button>
+        <input className='col s10' name= 'id' type="text" value={this.state.comment} onChange={this.handleChange}/>
+        <button className='btn waves-effect waves-light black col s2' onClick={this.handleComment}>Submit</button>
+          {this.state.post.comments!== undefined?
+            this.state.post.comments.map((comment) => { return <button key={comment._id}>{comment.comment}</button>;})
+            :<div>hi</div>
+          }
       </div>
     </div>);
     const postMode = (<Post mode = 'EDIT'
@@ -131,6 +156,15 @@ const mapDispatchToProps = (dispatch) => {
     },
     editPost: (postId, post) => {
       return dispatch(editPost(postId, post));
+    },
+    addComment: (postId, comment) => {
+      return dispatch(addComment(postId, comment));
+    },
+    editComment: (postId, commentId, comment) => {
+      return dispatch(editComment(postId, commentId, comment));
+    },
+    deleteComment: (postId, commentId) => {
+      return dispatch(deleteComment(postId, commentId));
     }
   };
 };

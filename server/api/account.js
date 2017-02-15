@@ -1,18 +1,8 @@
-import mongoose from 'mongoose';
+import accounts from '../models/accounts';
 import express from 'express';
 
 const router = express.Router();
 
-var Schema = mongoose.Schema;
-
-var accountSchema = new Schema({
-  id: String,
-  password: String,
-  nickname: String,
-  created: { type: Date, default: Date.now }
-});
-
-var accounts = mongoose.model('account', accountSchema);
 
 router.post('/signup', (req, res) => {
     // CHECK USERNAME FORMAT
