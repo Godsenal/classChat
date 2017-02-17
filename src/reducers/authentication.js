@@ -4,15 +4,20 @@ import update from 'react-addons-update';
 const initialState = {
   signin: {
     status: 'INIT',
-    err: -1,
+    err: 'ERROR',
+    errCode: -1,
   },
   signup: {
     status: 'INIT',
-    err: -1,
+    err: 'ERROR',
+    errCode: -1,
   },
   status: {
+    err: 'ERROR',
+    errCode: -1,
     valid: false,
     isSignedIn: false,
+    isAdmin: false,
     currentUser: '',
     currentUserNickname: '',
   },
@@ -39,6 +44,7 @@ export default function authentication(state, action) {
       },
       status: {
         isSignedIn: { $set: true },
+        isAdmin: { $set: action.isAdmin},
         currentUser: { $set: action.id },
         currentUserNickname: { $set: action.nickname}
       }
@@ -47,7 +53,8 @@ export default function authentication(state, action) {
     return update(state, {
       signin: {
         status: { $set: 'FAILURE' },
-        err: { $set: action.err}
+        err: { $set: action.err},
+        errCode: { $set: action.code}
       }
     });
 
@@ -68,7 +75,8 @@ export default function authentication(state, action) {
     return update(state, {
       signup: {
         status: { $set: 'FAILURE' },
-        err: { $set: action.err }
+        err: { $set: action.err },
+        errCode: { $set: action.code}
       }
     });
 
@@ -83,6 +91,7 @@ export default function authentication(state, action) {
     return update(state, {
       status: {
         valid: { $set: true },
+        isAdmin: { $set: action.isAdmin},
         currentUser: { $set: action.id },
         currentUserNickname: { $set: action.nickname}
       }
@@ -91,7 +100,9 @@ export default function authentication(state, action) {
     return update(state, {
       status: {
         valid: { $set: false },
-        isSignedIn: { $set: false }
+        isAdmin:{ $set: false},
+        isSignedIn: { $set: false },
+        err: { $set: action.err}
       }
     });
 
@@ -99,6 +110,7 @@ export default function authentication(state, action) {
   case types.AUTH_SIGNOUT:
     return update(state, {
       status: {
+        isAdmin:{ $set: false},
         isSignedIn: { $set: false },
         currentUser: { $set: '' },
         currentUserNickname: { $set: ''}

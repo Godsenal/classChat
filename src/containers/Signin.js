@@ -1,7 +1,7 @@
 import React, {Component, PropTypes} from 'react';
 import { connect } from 'react-redux';
 import { browserHistory, Link } from 'react-router';
-
+import {Grid, Header, Divider, Icon} from 'semantic-ui-react';
 import { signinRequest } from '../actions/authentication';
 
 
@@ -44,44 +44,42 @@ class Signin extends Component{
       });
   }
   render(){
-    return(<div className = 'container'>
-            <div className = 'row'>
-              <div className="col s12 push-s3 center">
-                <Link to = '/'><h3>HOME</h3></Link>
-              </div>
-            </div>
-            <div className = 'row'>
-              <div className="col s12 push-s3 center">
-                <h1 className = 'pink-text'>WELCOME!</h1>
-              </div>
-            </div>
-            <div className = 'row'>
-              <div className="input-field col s6 push-s6 center">
-                <input name= 'id' ref='id' type="text" className="validate" value={this.state.id} onChange={this.handleChange}/>
-              </div>
-              <label htmlFor='id'>ID</label>
-            </div>
-            <div className = 'row'>
-              <div className="input-field col s6 push-s6 center">
-                <input name= 'pw' ref='pw' type="password" className="validate" value={this.state.pw} onChange={this.handleChange}/>
-              </div>
-              <label htmlFor='pw'>PASSWORD</label>
-            </div>
-            <div className = 'row'>
-              <div className="col s6 push-s6 center">
+    return(<Grid centered>
+            <Grid.Row centered>
+              <Header size='huge'><Link to = '/'><Icon name='home'/>HOME</Link></Header>
+            </Grid.Row>
+            <Grid.Row centered>
+              <Header size='huge'>WELCOME</Header>
+            </Grid.Row>
+            <Grid.Row centered>
+              <Grid.Column width={6}>
+                <div className="input-field">
+                  <label htmlFor='id'>ID</label>
+                  <input name= 'id' ref='id' type="text" className="validate" value={this.state.id} onChange={this.handleChange}/>
+                </div>
+              </Grid.Column>
+            </Grid.Row>
+            <Grid.Row centered>
+              <Grid.Column width={6}>
+                <div className="input-field">
+                  <label htmlFor='pw'>PASSWORD</label>
+                  <input name= 'pw' ref='pw' type="password" className="validate" value={this.state.pw} onChange={this.handleChange}/>
+                </div>
+              </Grid.Column>
+            </Grid.Row>
+            <Grid.Row centered>
                 <button className="btn waves-effect waves-light pink" type="submit" name="action" onClick={this.handleSignin}>Sign In
                   <i className="material-icons right">vpn_key</i>
                 </button>
-              </div>
-            </div>
-            <div className = 'row'>
-              <div className = 'col s6 push-s6 center'>
-                <Link to='/signup'><button className="btn waves-effect waves-light black">Sign up
-                  <i className="material-icons right">person_pin</i>
-                </button></Link>
-              </div>
-            </div>
-          </div>
+            </Grid.Row>
+            <Grid.Row centered>
+              <Divider />
+              <h3>or</h3>
+            </Grid.Row>
+            <Grid.Row centered>
+                <Link to='/signup'><h1>Create a New Account</h1></Link>
+            </Grid.Row>
+          </Grid>
 
     );
   }

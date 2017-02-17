@@ -7,20 +7,29 @@ const router = express.Router();
 
 router.get('/home', (req, res)=> {
   posts.find({},null, {sort: {published_date: -1}},(err, post) => {
-    if(err) return res.status(500).send({error: 'database failure'});
+    if(err) return res.status(500).json({
+      error: 'DATABASE FAILURE',
+      code: 1
+    });
     res.json({post});
   });
 });
 router.get('/notice',(req, res) => {
   posts.find({'type': 'notice'},null, {sort: {published_date: -1}},(err, post) => {
-    if(err) return res.status(500).send({error: 'database failure'});
+    if(err) return res.status(500).json({
+      error: 'DATABASE FAILURE',
+      code: 1
+    });
 
     res.json({post});
   });
 });
 router.get('/:postId',(req, res) =>{
   posts.findOne({_id:req.params.postId},(err, post) =>{
-    if(err) return res.status(500).send({error: 'database failure'});
+    if(err) return res.status(500).json({
+      error: 'DATABASE FAILURE',
+      code: 1
+    });
     res.json({post});
   });
 });
@@ -29,7 +38,7 @@ router.get('/:postId',(req, res) =>{
 router.put('/:postId',(req, res) =>{
   posts.findById(req.params.postId, (err, post) => {
     if(req.session.loginInfo === undefined){
-      return res.status(403).json({err : 'No Authorization!',});
+      return res.status(403).json({error : 'No Authorization!',});
     }
 
     post.title = req.body.title;
@@ -44,7 +53,10 @@ router.put('/:postId',(req, res) =>{
 
 router.delete('/:postId',(req, res) => {
   posts.remove({_id:req.params.postId},(err) => {
-    if(err) return res.status(500).send({error: 'database failure'});
+    if(err) return res.status(500).json({
+      error: 'DATABASE FAILURE',
+      code: 1
+    });
     return res.json({success: true});
   });
 });

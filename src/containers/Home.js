@@ -25,7 +25,7 @@ class Home extends Component{
           <h2 className='center'>HOME</h2>
         </div>
         <div className="row">
-          <div className="container col s12">
+          <div className="col s12">
             <PostList posts={this.state.posts} />
           </div>
         </div>

@@ -19,7 +19,6 @@ class ListView extends Component {
     let type = this.props.location.pathname.replace('/','');
     this.props.listPost(type)
       .then(() => {
-        console.log(type);
         this.setState({posts: this.props.posts, type});
       });
 
@@ -67,10 +66,10 @@ class ListView extends Component {
   render () {
     const listMode =
      (<div className="row">
-        <div className="container col s12">
+        <div className=" col s12">
           <PostList posts={this.state.posts} />
         </div>
-        {this.state.type !== 'home'?
+        {this.props.isAdmin?
         <div className="col s1">
           <div className="fixed-action-btn">
             <a className="btn-floating btn-large waves-effect waves-light right red" onClick={this.handleClick}>
@@ -105,6 +104,7 @@ ListView.propTypes = {
   posts : PropTypes.array.isRequired,
   status : PropTypes.string.isRequired,
   isSignedIn : PropTypes.bool.isRequired,
+  isAdmin : PropTypes.bool.isRequired,
   currentUser : PropTypes.string.isRequired,
   currentUserNickname : PropTypes.string.isRequired,
 };
@@ -113,6 +113,7 @@ const mapStateToProps = (state) => {
     posts: state.post.list.posts,
     status: state.post.list.status,
     isSignedIn: state.authentication.status.isSignedIn,
+    isAdmin: state.authentication.status.isAdmin,
     currentUser: state.authentication.status.currentUser,
     currentUserNickname: state.authentication.status.currentUserNickname,
   };

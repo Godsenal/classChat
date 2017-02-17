@@ -28,7 +28,7 @@ export function addPost(type, post){
             .then((res) => {
               dispatch({type: POST_ADD_SUCCESS, post: res.data.post});
             }).catch((err) => {
-              dispatch({type: POST_ADD_FAILURE, err});
+              dispatch({type: POST_ADD_FAILURE, err: err.response.data.error, code: err.response.data.code});
             });
   };
 }
@@ -45,7 +45,7 @@ export function listPost(type){
             .then((res) => {
               dispatch({type: POST_LIST_SUCCESS, posts: res.data.post});
             }).catch((err) => {
-              dispatch({type: POST_LIST_FAILURE, err});
+              dispatch({type: POST_LIST_FAILURE, err: err.response.data.error, code: err.response.data.code});
             });
   };
 }
@@ -58,7 +58,7 @@ export const viewPost = (postId) => {
             .then((res) => {
               dispatch({type: POST_VIEW_SUCCESS, post: res.data.post});
             }).catch((err) => {
-              dispatch({type: POST_VIEW_FAILURE, err});
+              dispatch({type: POST_VIEW_FAILURE, err: err.response.data.error, code: err.response.data.code});
             });
   };
 };
@@ -71,7 +71,7 @@ export const editPost = (postId, post) => {
       .then((res) => {
         dispatch({type: POST_EDIT_SUCCESS, post: res.data.post});
       }).catch((err) => {
-        dispatch({type: POST_EDIT_FAILURE, err});
+        dispatch({type: POST_EDIT_FAILURE, err: err.response.data.error, code: err.response.data.code});
       });
   };
 };
@@ -83,7 +83,7 @@ export const deletePost = (postId) => {
             .then((res) => {
               dispatch({type: POST_DELETE_SUCCESS, postId});
             }).catch((err) => {
-              dispatch({type: POST_DELETE_FAILURE, err});
+              dispatch({type: POST_DELETE_FAILURE, err: err.response.data.error, code: err.response.data.code});
             });
   };
 };
@@ -96,7 +96,7 @@ export function addComment(postId, comment){
             .then((res) => {
               dispatch({type: COMMENT_CHANGE_SUCCESS, post: res.data.post});
             }).catch((err) => {
-              dispatch({type:COMMENT_CHANGE_FAILURE, err});
+              dispatch({type:COMMENT_CHANGE_FAILURE, err: err.response.data.error, code: err.response.data.code});
             });
   };
 }
@@ -108,7 +108,7 @@ export const editComment = (postId, commentId, comment) => {
       .then((res) => {
         dispatch({type: COMMENT_CHANGE_SUCCESS, post: res.data.post});
       }).catch((err) => {
-        dispatch({type: COMMENT_CHANGE_FAILURE, err});
+        dispatch({type: COMMENT_CHANGE_FAILURE, err: err.response.data.error, code: err.response.data.code});
       });
   };
 };
@@ -120,7 +120,7 @@ export const deleteComment = (postId, commentId) => {
             .then((res) => {
               dispatch({type: COMMENT_CHANGE_SUCCESS, post: res.data.post});
             }).catch((err) => {
-              dispatch({type: COMMENT_CHANGE_FAILURE, err});
+              dispatch({type: COMMENT_CHANGE_FAILURE, err: err.response.data.error, code: err.response.data.code});
             });
   };
 };
