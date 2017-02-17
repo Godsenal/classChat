@@ -5,7 +5,6 @@ class Sidebar extends React.Component {
   constructor(){
     super();
   }
-
   render () {
     let userView = <Link to='/signin' className='pink-text' style={{'textDecoration' : 'none'}}><h3>Sign in</h3></Link>;
     let signout = null;
@@ -14,7 +13,7 @@ class Sidebar extends React.Component {
       signout = <a className='text-right pink-text' onClick={this.props.handleSignout} style = {{'textDecoration' : 'none', 'cursor':'pointer'}}>sign out</a>;
     }
     return(
-      <ul id="slide-out" className="side-nav fixed grey darken-3">
+      <ul id='slide-out' className="side-nav fixed grey darken-3">
         <li><div className="userView white-text">
           <Link className='white-text'
                 style = {{'textDecoration' : 'none', 'cursor':'pointer'}}

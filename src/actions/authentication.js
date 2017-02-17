@@ -13,16 +13,18 @@ import {
 
 import axios from 'axios';
 
-/* dispatch안에는 action 객체가 들어가고 state 는 redux에서 알아서 관리 */
+/* dispatch안에는 action 객체가 들어가고 state 는 redux에서 알아서 관리
+   err말고 error을 쓰는 이유는, 기본 err과 겹치는 것을  피하기 위해 */
+
 export function signinRequest(id, password) {
   return (dispatch) => {
     dispatch({type: AUTH_SIGNIN});
 
     return axios.post('/api/account/signin', { id, password })
             .then((res) => {
-              dispatch({type: AUTH_SIGNIN_SUCCESS, id, nickname: res.data.nickname});
+              dispatch({type: AUTH_SIGNIN_SUCCESS, id, nickname: res.data.nickname, isAdmin: res.data.isAdmin });
             }).catch((err) => {
-              dispatch({type: AUTH_SIGNIN_FAILURE, err});
+              dispatch({type: AUTH_SIGNIN_FAILURE, err: err.response.data.error, code: err.response.data.code});
             });
   };
 }
@@ -36,7 +38,7 @@ export function signupRequest(id, password, nickname) {
             .then((res) => {
               dispatch({type: AUTH_SIGNUP_SUCCESS});
             }).catch((err) => {
-              dispatch({type: AUTH_SIGNUP_FAILURE,err});
+              dispatch({type: AUTH_SIGNUP_FAILURE, err: err.response.data.error, code: err.response.data.code});
             });
   };
 }
@@ -48,9 +50,9 @@ export function getStatusRequest() {
     dispatch({type: AUTH_GET_STATUS});
     return axios.get('/api/account/getinfo')
             .then((res) => {
-              dispatch({type: AUTH_GET_STATUS_SUCCESS, id: res.data.info.id, nickname: res.data.info.nickname});
+              dispatch({type: AUTH_GET_STATUS_SUCCESS, id: res.data.info.id, nickname: res.data.info.nickname, isAdmin: res.data.info.isAdmin});
             }).catch((err) => {
-              dispatch({type: AUTH_GET_STATUS_FAILURE,err});
+              dispatch({type: AUTH_GET_STATUS_FAILURE, err: err.response.data.error});
             });
   };
 }

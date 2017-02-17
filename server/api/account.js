@@ -6,17 +6,17 @@ const router = express.Router();
 
 router.post('/signup', (req, res) => {
     // CHECK USERNAME FORMAT
-  let idForm = /^[a-z0-9]+$/;
-  if(!idForm.test(req.body.id)) {
+  let idForm = /^[a-zA-Z0-9]+$/;
+  if(!idForm.test(req.body.id) || req.body.id < 4) {
     return res.status(400).json({
-      err: 'BAD ID',
+      error: 'BAD ID',
       code: 1
     });
   }
     // CHECK NICKNAME FORMAT
   if(!idForm.test(req.body.nickname)) {
     return res.status(400).json({
-      err: 'BAD NICKNAME',
+      error: 'BAD NICKNAME',
       code: 3
     });
   }
@@ -24,35 +24,42 @@ router.post('/signup', (req, res) => {
     // CHECK PASS LENGTH
   if(req.body.password.length < 4 || typeof req.body.password !== 'string') {
     return res.status(400).json({
-      err: 'BAD PASSWORD',
+      error: 'BAD PASSWORD',
       code: 2
     });
   }
 
-    // CHECK USER EXISTANCE
+    // CHECK USER EXISTANCE. if findOne finished, router finished too. <- Need to put save function inside the findOne function.
   accounts.findOne({ id: req.body.id }, (err, find) => {
     if (err) throw err;
     if(find){
       return res.status(409).json({
-        err: 'ID EXISTS',
+        error: 'ID EXISTS',
         code: 4
       });
     }
-
-        // CREATE ACCOUNT
-    let account = new accounts({
-      id: req.body.id,
-      password: req.body.password,
-      nickname: req.body.nickname
-    });
-
-
-        // SAVE IN THE DATABASE
-    account.save( err => {
+    accounts.findOne({ nickname : req.body.nickname}, (err, find) => {
       if(err) throw err;
-      return res.json({ success: true });
-    });
+      if(find){
+        return res.status(409).json({
+          error: 'NICKNAME EXISTS',
+          code: 5
+        });
+      }
+            // CREATE ACCOUNT
+      let account = new accounts({
+        id: req.body.id,
+        password: req.body.password,
+        nickname: req.body.nickname
+      });
 
+
+            // SAVE IN THE DATABASE
+      account.save( err => {
+        if(err) throw err;
+        return res.json({ success: true });
+      });
+    });
   });
 });
 
@@ -65,7 +72,7 @@ router.post('/signup', (req, res) => {
 router.post('/signin', (req, res) => {
   if(typeof req.body.password !== 'string') {
     return res.status(401).json({
-      err: 'SIGNIN FAILED',
+      error: 'SIGNIN FAILED',
       code: 1
     });
   }
@@ -77,7 +84,7 @@ router.post('/signin', (req, res) => {
         // CHECK ACCOUNT EXISTANCY
     if(!account) {
       return res.status(401).json({
-        err: 'SIGNIN FAILED',
+        error: 'SIGNIN FAILED',
         code: 1
       });
     }
@@ -85,23 +92,28 @@ router.post('/signin', (req, res) => {
         // CHECK WHETHER THE PASSWORD IS VALID
     if(account.password !== req.body.password) {
       return res.status(401).json({
-        err: 'SIGNIN FAILED',
+        error: 'SIGNIN FAILED',
         code: 1
       });
     }
+    var isAdmin = false;
 
+    if(account.isAdmin === true)
+      isAdmin = true;
         // ALTER SESSION
     let session = req.session;
     session.loginInfo = {
       _id: account._id,
       id: account.id,
-      nickname: account.nickname
+      nickname: account.nickname,
+      isAdmin: isAdmin
     };
 
         // RETURN SUCCESS
     return res.json({
       success: true,
       nickname: account.nickname,
+      isAdmin: isAdmin,
     });
   });
 });
@@ -112,7 +124,8 @@ router.post('/signin', (req, res) => {
 router.get('/getinfo', (req, res) => {
   if(typeof req.session.loginInfo === 'undefined') {
     return res.status(401).json({
-      err: 1
+      error: 'NOT SIGNED IN',
+      code : 1,
     });
   }
 

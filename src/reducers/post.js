@@ -4,29 +4,35 @@ import update from 'react-addons-update';
 const initialState = {
   add: {
     status: 'INIT',
-    err: -1,
+    err: 'ERROR',
+    errCode: -1,
   },
   list: {
     status: 'INIT',
     posts: [],
-    err: -1,
+    err: 'ERROR',
+    errCode: -1,
   },
   view: {
     status: 'INIT',
     post: {},
-    err: -1,
+    err: 'ERROR',
+    errCode: -1,
   },
   edit: {
     status: 'INIT',
-    err: -1,
+    err: 'ERROR',
+    errCode: -1,
   },
   delete: {
     status: 'INIT',
-    err: -1,
+    err: 'ERROR',
+    errCode: -1,
   },
   comment:{
     status: 'INIT',
-    err: -1,
+    err: 'ERROR',
+    errCode: -1,
   }
 
 };
@@ -57,7 +63,8 @@ export default function post(state, action) {
     return update(state, {
       add: {
         status: { $set: 'FAILURE' },
-        err: { $set: action.err}
+        err: { $set: action.err},
+        errCode: { $set: action.code}
       }
     });
 
@@ -78,7 +85,9 @@ export default function post(state, action) {
   case types.POST_LIST_FAILURE:
     return update(state, {
       list: {
-        status: { $set: 'FAILURE' }
+        status: { $set: 'FAILURE' },
+        err: { $set: action.err},
+        errCode: { $set: action.code}
       }
     });
 
@@ -100,7 +109,8 @@ export default function post(state, action) {
     return update(state, {
       view: {
         status: { $set: 'FAILURE' },
-        err: { $set: action.err }
+        err: { $set: action.err},
+        errCode: { $set: action.code}
       }
     });
 
@@ -130,7 +140,8 @@ export default function post(state, action) {
     return update(state, {
       edit: {
         status: { $set: 'FAILURE' },
-        err: { $set: action.err }
+        err: { $set: action.err},
+        errCode: { $set: action.code}
       }
     });
 
@@ -181,7 +192,8 @@ export default function post(state, action) {
     return update(state, {
       comment: {
         status: { $set: 'FAILURE' },
-        err: { $set: action.err}
+        err: { $set: action.err},
+        errCode: { $set: action.code}
       }
     });
   default:
