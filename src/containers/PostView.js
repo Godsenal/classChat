@@ -206,7 +206,7 @@ class PostView extends Component {
                             title={this.state.post.title}
                             contents={this.state.post.contents} />);
     return(
-      <div>
+      <div style = {{'height':'100vh'}}>
         {this.state.mode ==='EDIT'?postMode:viewMode}
       </div>
     );

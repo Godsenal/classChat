@@ -44,7 +44,7 @@ class Signin extends Component{
       });
   }
   render(){
-    return(<Grid centered>
+    return(<Grid centered style = {{'height':'100vh'}}>
             <Grid.Row centered>
               <Header size='huge'><Link to = '/'><Icon name='home'/>HOME</Link></Header>
             </Grid.Row>

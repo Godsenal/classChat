@@ -1,5 +1,5 @@
 import React,{Component, PropTypes} from 'react';
-import { Sidebar, Segment, Button, Menu, Icon, Header, Dropdown } from 'semantic-ui-react';
+import { Sidebar, Segment, Menu, Icon, Input, Search} from 'semantic-ui-react';
 import {connect} from 'react-redux';
 import {Link} from 'react-router';
 import { getStatusRequest, signoutRequest} from '../actions/authentication';
@@ -89,7 +89,7 @@ class App extends Component{
     const { width } = this.state;
     const isMobile = width <= 600;
     const marginContent = ((!isMobile&&!isAuth)?150:0);
-    const side = ((this.state.side||!isMobile&&!isAuth)?true:false);
+    const side = ((this.state.side||!isMobile)&&!isAuth?true:false);
     //const sideAnim = (isMobile?'slide along':'overlay');
     /* Mobile Setting */
     const userInfo = (this.props.status.isSignedIn?
@@ -101,13 +101,17 @@ class App extends Component{
                                                       <Menu.Item><a href='' onClick={this.handleSignout}><Icon name='sign out' />Sign out</a></Menu.Item>
                                                     </Menu.Menu>
                                                   </Menu.Item>
-                                                  :<Menu.Menu>
+                                                  :
                                                   <Menu.Item>
-                                                    <a><Link to='/signin'><span><Icon name='sign in' />Sign in</span></Link></a>
-                                                   </Menu.Item>
-                                                   <Menu.Item>
-                                                    <a><Link to='/signup'><span><Icon name='signup' />Sign up</span></Link></a>
-                                                   </Menu.Item></Menu.Menu>);
+                                                    <Menu.Menu>
+                                                      <Menu.Item>
+                                                        <Link to='/signin' onClick={this.toggleSide}><span><Icon name='sign in' />Sign in</span></Link>
+                                                      </Menu.Item>
+                                                      <Menu.Item>
+                                                        <Link to='/signup' onClick={this.toggleSide}><span><Icon name='signup' />Sign up</span></Link>
+                                                      </Menu.Item>
+                                                    </Menu.Menu>
+                                                  </Menu.Item>);
 
     const header = (isAuth?null:
                             <div className='navbar-fixed'>
@@ -117,9 +121,7 @@ class App extends Component{
                                   <ul id="nav-mobile" className="left">
                                     <a onClick={this.toggleSide}><i className="material-icons">reorder</i></a>
                                   </ul>:null)}
-                                  <Link to='/'
-                                        className="brand-logo right"
-                                        style={{'textDecoration' : 'none'}}>TAEHEE LEE</Link>
+                                  <Link to='/' className="brand-logo center" style={{'textDecoration' : 'none'}}>TAEHEE LEE</Link>
                                 </div>
                               </nav>
                             </div>);
@@ -178,6 +180,9 @@ class App extends Component{
               </Menu.Menu>
             </Menu.Item>
             {userInfo}
+            <Menu.Item>
+              <Link to ='/search' onClick={this.toggleSide}><span><Icon name='search' />Search</span></Link>
+            </Menu.Item>
           </Sidebar>
           <Sidebar.Pusher>
             <Segment padded style={{'marginLeft' : marginContent}}>

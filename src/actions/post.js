@@ -14,6 +14,9 @@ import {
   POST_DELETE,
   POST_DELETE_SUCCESS,
   POST_DELETE_FAILURE,
+  POST_SEARCH,
+  POST_SEARCH_SUCCESS,
+  POST_SEARCH_FAILURE,
   COMMENT_CHANGE,
   COMMENT_CHANGE_SUCCESS,
   COMMENT_CHANGE_FAILURE,
@@ -21,6 +24,8 @@ import {
 
 import axios from 'axios';
 
+/* THUNK는 return 에서 다른 dispatch를 return하게 해줌으로써 비동기를 도와줌.
+   예를 들어 dispatch하기전에 setTimeout을 쓴다던가.. */
 export function addPost(type, post){
   return (dispatch) => {
     dispatch({type: POST_ADD});
@@ -84,6 +89,18 @@ export const deletePost = (postId) => {
               dispatch({type: POST_DELETE_SUCCESS, postId});
             }).catch((err) => {
               dispatch({type: POST_DELETE_FAILURE, err: err.response.data.error, code: err.response.data.code});
+            });
+  };
+};
+
+export const searchPost = (searchWord) => {
+  return(dispatch) => {
+    dispatch({type: POST_SEARCH});
+    return axios.get(`/api/post/search/${searchWord}`)
+            .then((res) => {
+              dispatch({type: POST_SEARCH_SUCCESS, posts: res.data.posts});
+            }).catch((err) => {
+              dispatch({type: POST_SEARCH_FAILURE, err: err.response.data.error, code: err.response.data.code});
             });
   };
 };

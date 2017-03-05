@@ -29,6 +29,11 @@ const initialState = {
     err: 'ERROR',
     errCode: -1,
   },
+  search: {
+    status: 'INIT',
+    err: 'ERROR',
+    errCode: -1,
+  },
   comment:{
     status: 'INIT',
     err: 'ERROR',
@@ -156,7 +161,7 @@ export default function post(state, action) {
     var deleteIndex = state.list.posts.indexOf({_id: action.postId});
     return update(state, {
       delete: {
-        status: {$set: 'WAITING'}
+        status: {$set: 'SUCCESS'}
       },
       list: {
         posts: {$splice: [[deleteIndex, 1]]
@@ -166,9 +171,35 @@ export default function post(state, action) {
   case types.POST_DELETE_FAILURE:
     return update(state, {
       delete: {
+        status: {$set: 'FAILURE'}
+      }
+    });
+    /* SEARCH */
+  case types.POST_SEARCH:
+    return update(state, {
+      search: {
         status: {$set: 'WAITING'}
       }
     });
+  case types.POST_SEARCH_SUCCESS:
+    return update(state, {
+      search: {
+        status: {$set: 'SUCCESS'}
+      },
+      list: {
+        posts: {$set: action.posts}
+      }
+    });
+  case types.POST_SEARCH_FAILURE:
+    return update(state, {
+      search: {
+        status: {$set: 'FAILURE'}
+      },
+      list: {
+        posts: {$set: []}
+      }
+    });
+   /* COMMENT */
   case types.COMMENT_CHANGE:
     return update(state, {
       comment: {
