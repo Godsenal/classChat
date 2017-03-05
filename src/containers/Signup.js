@@ -51,7 +51,7 @@ class Signup extends Component{
       } );
   }
   render(){
-    return( <div>
+    return( <div style = {{'height':'100vh'}}>
               <div className = 'row'>
                 <Header size='huge'><Link to = '/'><Icon name='home'/>HOME</Link></Header>
               </div>

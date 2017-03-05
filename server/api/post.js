@@ -77,5 +77,23 @@ router.post('/:type',(req, res) => {
 
 });
 
+router.get('/search/:searchWord',(req, res) => {
+  posts.find({$or:[{'title': {$regex : req.params.searchWord, $options: 'i'}},
+     {'contents': {$regex : req.params.searchWord, $options : 'i'}}]},
+      null,
+      {sort: {published_date: -1}},
+      (err, posts) => {
+        if(err) throw err;
+
+        if(!posts)
+          return res.status(404).json({
+            error: 'NO RESOURCE',
+            code: 1
+          });
+        return res.json({posts});
+      }
+  );
+});
+
 
 export default router;

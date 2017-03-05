@@ -7,7 +7,7 @@ import { createStore, applyMiddleware } from 'redux';
 
 import thunk from 'redux-thunk';
 
-import {App, Home, ListView, PostView, Signin, Signup} from './containers';
+import {App, Home, ListView, PostView, Signin, Signup, SearchView} from './containers';
 
 import reducers from './reducers';
 
@@ -20,6 +20,7 @@ ReactDOM.render(
         <IndexRoute component={Home} />
         <Route path="signin" component={Signin} />
         <Route path="signup" component={Signup} />
+        <Route path="search" component={SearchView} />
         <Route path="notice" component={ListView} />
         <Route path=":postId" component={PostView} />
       </Route>

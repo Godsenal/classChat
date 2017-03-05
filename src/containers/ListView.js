@@ -1,6 +1,6 @@
 import React, {Component, PropTypes} from 'react';
 import { connect } from 'react-redux';
-
+import {Segment} from 'semantic-ui-react';
 
 import { addPost, listPost } from '../actions/post';
 import {PostList, Post} from '../components';
@@ -38,14 +38,12 @@ class ListView extends Component {
     else {
       Materialize.toast('Please Sign in First!', 2000);
     }
-  }
+  }/*
   currentStatus(){
     if(this.state.status == 'List'){
       return(
-        <div className="row">
-          <div className="container col s12">
-            <PostList posts={this.state.posts} />
-          </div>
+      <Segment color='grey'>
+          <PostList posts={this.state.posts} />
           {this.state.type !== 'home'?
           <div className="col s1">
             <div className="fixed-action-btn">
@@ -54,7 +52,7 @@ class ListView extends Component {
               </a>
             </div>
           </div>:null}
-        </div>
+      </Segment>
       );
     }
     else if(this.state.status == 'Post'){
@@ -62,7 +60,7 @@ class ListView extends Component {
         <Post mode='POST' handlePost={this.handlePost} currentUser={this.props.currentUser} currentUserNickname={this.props.currentUserNickname} />
       );
     }
-  }
+  }*/
   render () {
     const listMode =
      (<div className="row">
@@ -88,7 +86,7 @@ class ListView extends Component {
 
 
     return(
-      <div>
+      <div style = {{'height':'100vh'}}>
         <div className='row'>
           <h2 className='center'>{this.state.type.toUpperCase()}</h2>
         </div>
