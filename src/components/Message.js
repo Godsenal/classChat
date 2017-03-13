@@ -12,7 +12,7 @@ class Message extends Component {
     return(
         <div className={styles.flexMessage}>
           <div className={styles.messageImg}>
-          <img src='http://semantic-ui.com/images/avatar/small/matt.jpg'/>
+          <img src='https://semantic-ui.com/images/avatar/small/matt.jpg'/>
           </div>
           <div className={styles.messageContents}>
             <span style={{'fontWeight':'bold'}}>{this.props.userName}</span>

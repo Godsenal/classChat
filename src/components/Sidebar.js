@@ -12,16 +12,6 @@ class Sidebar extends React.Component {
       activeChannelItem :'public',
     };
   }
-  /* Do this function in Chat container.
-  componentDidMount(){
-    this.props.getStatusRequest().then(() => {
-      if(this.props.status.isSignedIn){
-        this.props.listChannel(this.props.status.currentUser).then(()=>{
-        });
-      }
-    });
-
-  }*/
   handleChannelClick = (channel) => {
 
     this.setState({

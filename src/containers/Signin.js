@@ -2,7 +2,7 @@ import React, {Component, PropTypes} from 'react';
 import { connect } from 'react-redux';
 import { browserHistory, Link } from 'react-router';
 import {Grid, Header, Divider, Icon} from 'semantic-ui-react';
-import { signinRequest } from '../actions/authentication';
+import { signinRequest, getStatusRequest } from '../actions/authentication';
 
 
 class Signin extends Component{
@@ -72,7 +72,7 @@ class Signin extends Component{
             </Grid.Row>
             <Grid.Row centered>
                 <button className="btn waves-effect waves-light pink" type="submit" name="action" onClick={this.handleSignin}>Sign In
-                  <i className="material-icons right">vpn_key</i>
+                  <Icon name='privacy' />
                 </button>
             </Grid.Row>
             <Grid.Row centered>
@@ -98,7 +98,6 @@ Signin.propTypes = {
 const mapStateToProps = (state) => {
   return {
     status: state.authentication.signin.status,
-    nickname: state.authentication.status.nickname
   };
 };
 
@@ -106,6 +105,9 @@ const mapDispatchToProps = (dispatch) => {
   return {
     signinRequest: (id, pw) => {
       return dispatch(signinRequest(id,pw));
+    },
+    getStatusRequest: () => {
+      return dispatch(getStatusRequest());
     }
   };
 };

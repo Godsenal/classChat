@@ -132,7 +132,6 @@ router.post('/signin', function (req, res) {
     GET CURRENT USER INFO GET /api/account/getInfo
 */
 router.get('/getinfo', function (req, res) {
-  console.log(req.session.loginInfo);
   if (typeof req.session.loginInfo === 'undefined') {
     return res.status(401).json({
       error: 'NOT SIGNED IN',

@@ -6,8 +6,8 @@ import {Message} from './';
 class MessageList extends Component {
   constructor(){
     super();
-    this.scrollToBottom = this.scrollToBottom.bind(this);
-  }
+    //this.scrollToBottom = this.scrollToBottom.bind(this);
+  }/*
   scrollToBottom = () => {
     const messagesContainer = this.messagesContainer;
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
@@ -17,7 +17,7 @@ class MessageList extends Component {
   }
   componentDidUpdate() {
     this.scrollToBottom();
-  }
+  }*/
   render () {
     return(
       <div style={{'height':'80vh','overflowY':'auto', 'overflowX':'hidden'}}  >

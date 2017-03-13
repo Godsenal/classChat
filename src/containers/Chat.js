@@ -19,6 +19,8 @@ class Chat extends React.Component {
     super();
     this.state={
       searchModal: false,
+      channels: [],
+      messages: [],
     };
     this.handleSignout = this.handleSignout.bind(this);
     this.addMessage = this.addMessage.bind(this);
@@ -29,8 +31,8 @@ class Chat extends React.Component {
   }
   //App 에서의 getStatusRequest가 ComponentDidMount에서 실행이 되어야 여기서 sign data를 사용이 가능..
   componentWillMount(){
-    this.props.getStatusRequest().then(() => {
-      if(!this.props.status.valid){
+    this.props.getStatusRequest().then(()=>{
+      if(!this.props.status.isSignedIn){
 
         browserHistory.push('/signin');
       }
@@ -40,6 +42,7 @@ class Chat extends React.Component {
   }
   componentDidMount() {
     /*direct connect without signin*/
+
       socket.emit('chat mounted');
       socket.emit('join channel',this.props.activeChannel);
       socket.on('new bc message', message =>
@@ -111,6 +114,7 @@ class Chat extends React.Component {
     const isMobile = (screenWidth<600 && screenWidth>1)?true:false;
     const layoutStyle = isMobile?styles.flexLayoutMobile:styles.flexLayout;
     const sidebarStyle = isMobile?styles.chatSidebarMobile:styles.chatSidebar;
+
     return(
       <div className={layoutStyle} style={{'height':{screenHeight}}}>
         <SearchModal isOpen={this.state.searchModal}
@@ -125,10 +129,11 @@ class Chat extends React.Component {
                    status={this.props.status}
                    handleSignout={this.handleSignout}
                    handleSearchClick={this.handleSearchClick}
-                   isMobile={isMobile}/>
+                   isMobile={isMobile}
+                   listChannel={this.props.listChannel}/>
         </div>
         <div className={styles.chatView}>
-            <ChatView activeChannel={this.props.activeChannel} messages={this.props.messages} addMessage={this.addMessage} currentUser={this.props.status.currentUser}/>
+            <ChatView activeChannel={this.props.activeChannel} listMessage={this.props.listMessage} getStatusRequest={this.props.getStatusRequest} messages={this.props.messages} addMessage={this.addMessage} currentUser={this.props.status.currentUser}/>
         </div>
       </div>
     );

@@ -118198,7 +118198,7 @@ var Message = function (_Component) {
         _react2.default.createElement(
           'div',
           { className: _Style2.default.messageImg },
-          _react2.default.createElement('img', { src: 'http://semantic-ui.com/images/avatar/small/matt.jpg' })
+          _react2.default.createElement('img', { src: 'https://semantic-ui.com/images/avatar/small/matt.jpg' })
         ),
         _react2.default.createElement(
           'div',
@@ -118270,28 +118270,22 @@ var MessageList = function (_Component) {
   function MessageList() {
     _classCallCheck(this, MessageList);
 
-    var _this = _possibleConstructorReturn(this, (MessageList.__proto__ || Object.getPrototypeOf(MessageList)).call(this));
-
-    _this.scrollToBottom = function () {
-      var messagesContainer = _this.messagesContainer;
-      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    return _possibleConstructorReturn(this, (MessageList.__proto__ || Object.getPrototypeOf(MessageList)).call(this));
+    //this.scrollToBottom = this.scrollToBottom.bind(this);
+  } /*
+    scrollToBottom = () => {
+     const messagesContainer = this.messagesContainer;
+     messagesContainer.scrollTop = messagesContainer.scrollHeight;
     };
+    componentDidMount() {
+     this.scrollToBottom();
+    }
+    componentDidUpdate() {
+     this.scrollToBottom();
+    }*/
 
-    _this.scrollToBottom = _this.scrollToBottom.bind(_this);
-    return _this;
-  }
 
   _createClass(MessageList, [{
-    key: 'componentDidMount',
-    value: function componentDidMount() {
-      this.scrollToBottom();
-    }
-  }, {
-    key: 'componentDidUpdate',
-    value: function componentDidUpdate() {
-      this.scrollToBottom();
-    }
-  }, {
     key: 'render',
     value: function render() {
       var _this2 = this;
@@ -118704,16 +118698,6 @@ var Sidebar = function (_React$Component) {
     };
     return _this;
   }
-  /* Do this function in Chat container.
-  componentDidMount(){
-    this.props.getStatusRequest().then(() => {
-      if(this.props.status.isSignedIn){
-        this.props.listChannel(this.props.status.currentUser).then(()=>{
-        });
-      }
-    });
-   }*/
-
 
   _createClass(Sidebar, [{
     key: 'render',
@@ -119333,7 +119317,9 @@ var Chat = function (_React$Component) {
     var _this = _possibleConstructorReturn(this, (Chat.__proto__ || Object.getPrototypeOf(Chat)).call(this));
 
     _this.state = {
-      searchModal: false
+      searchModal: false,
+      channels: [],
+      messages: []
     };
     _this.handleSignout = _this.handleSignout.bind(_this);
     _this.addMessage = _this.addMessage.bind(_this);
@@ -119352,7 +119338,7 @@ var Chat = function (_React$Component) {
       var _this2 = this;
 
       this.props.getStatusRequest().then(function () {
-        if (!_this2.props.status.valid) {
+        if (!_this2.props.status.isSignedIn) {
 
           _reactRouter.browserHistory.push('/signin');
         }
@@ -119366,6 +119352,7 @@ var Chat = function (_React$Component) {
       var _this3 = this;
 
       /*direct connect without signin*/
+
       socket.emit('chat mounted');
       socket.emit('join channel', this.props.activeChannel);
       socket.on('new bc message', function (message) {
@@ -119453,6 +119440,7 @@ var Chat = function (_React$Component) {
       var isMobile = screenWidth < 600 && screenWidth > 1 ? true : false;
       var layoutStyle = isMobile ? _Style2.default.flexLayoutMobile : _Style2.default.flexLayout;
       var sidebarStyle = isMobile ? _Style2.default.chatSidebarMobile : _Style2.default.chatSidebar;
+
       return _react2.default.createElement(
         'div',
         { className: layoutStyle, style: { 'height': { screenHeight: screenHeight } } },
@@ -119470,12 +119458,13 @@ var Chat = function (_React$Component) {
             status: this.props.status,
             handleSignout: this.handleSignout,
             handleSearchClick: this.handleSearchClick,
-            isMobile: isMobile })
+            isMobile: isMobile,
+            listChannel: this.props.listChannel })
         ),
         _react2.default.createElement(
           'div',
           { className: _Style2.default.chatView },
-          _react2.default.createElement(_.ChatView, { activeChannel: this.props.activeChannel, messages: this.props.messages, addMessage: this.addMessage, currentUser: this.props.status.currentUser })
+          _react2.default.createElement(_.ChatView, { activeChannel: this.props.activeChannel, listMessage: this.props.listMessage, getStatusRequest: this.props.getStatusRequest, messages: this.props.messages, addMessage: this.addMessage, currentUser: this.props.status.currentUser })
         )
       );
     }
@@ -120549,11 +120538,7 @@ var Signin = function (_Component) {
             'button',
             { className: 'btn waves-effect waves-light pink', type: 'submit', name: 'action', onClick: this.handleSignin },
             'Sign In',
-            _react2.default.createElement(
-              'i',
-              { className: 'material-icons right' },
-              'vpn_key'
-            )
+            _react2.default.createElement(_semanticUiReact.Icon, { name: 'privacy' })
           )
         ),
         _react2.default.createElement(
@@ -120596,8 +120581,7 @@ Signin.propTypes = {
 };
 var mapStateToProps = function mapStateToProps(state) {
   return {
-    status: state.authentication.signin.status,
-    nickname: state.authentication.status.nickname
+    status: state.authentication.signin.status
   };
 };
 
@@ -120605,6 +120589,9 @@ var mapDispatchToProps = function mapDispatchToProps(dispatch) {
   return {
     signinRequest: function signinRequest(id, pw) {
       return dispatch((0, _authentication.signinRequest)(id, pw));
+    },
+    getStatusRequest: function getStatusRequest() {
+      return dispatch((0, _authentication.getStatusRequest)());
     }
   };
 };
