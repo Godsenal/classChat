@@ -9,15 +9,14 @@ class MessageList extends Component {
     this.scrollToBottom = this.scrollToBottom.bind(this);
   }
   scrollToBottom = () => {
-    const messagesContainer = ReactDOM.findDOMNode(this.messagesContainer);
+    const messagesContainer = this.messagesContainer;
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
   };
   componentDidMount() {
     this.scrollToBottom();
   }
-  componentDidUpdate(prevProps, prevState) {
-    if(prevProps!==prevState)
-      this.scrollToBottom();
+  componentDidUpdate() {
+    this.scrollToBottom();
   }
   render () {
     return(

@@ -1,10 +1,12 @@
 {
-  "name": "reactWeb",
+  "name": "reactweb",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node ./server/server.js",
+    "clean": "rm -rf build public/bundle.js",
+    "build": "babel server --out-dir build --presets=es2015 && webpack",
+    "start": "node ./build/server.js",
     "dev": "webpack -wd"
   },
   "author": "",
