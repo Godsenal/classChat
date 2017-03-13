@@ -10,5 +10,5 @@ export default {
     return `http://${this.host}:${this.port}`;
   },
   //dbUrl : 'mongodb://localhost:27017/dbTest',
-  dbUrl : env.MONGODB_URI
+  dbUrl : 'mongodb://godsenal:xogmltjdrhd77@ds129600.mlab.com:29600/heroku_k4k7hk8l'
 };
