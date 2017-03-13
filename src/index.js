@@ -7,7 +7,7 @@ import { createStore, applyMiddleware } from 'redux';
 
 import thunk from 'redux-thunk';
 
-import {App, Home, ListView, PostView, Signin, Signup, SearchView} from './containers';
+import {App, Home, ListView, PostView, Signin, Signup, SearchView, Chat} from './containers';
 
 import reducers from './reducers';
 
@@ -15,16 +15,19 @@ const store = createStore(reducers, applyMiddleware(thunk)); // thunk가 mapDisp
 
 ReactDOM.render(
   <Provider store={store}>
-    <Router history={browserHistory}>
-      <Route path="/" component={App}>
-        <IndexRoute component={Home} />
-        <Route path="signin" component={Signin} />
-        <Route path="signup" component={Signup} />
-        <Route path="search" component={SearchView} />
-        <Route path="notice" component={ListView} />
-        <Route path=":postId" component={PostView} />
-      </Route>
-    </Router>
+      <Router history={browserHistory}>
+        <Route path="/" component={App}>
+          <IndexRoute component={Home} />
+          <Route path="signin" component={Signin} />
+          <Route path="signup" component={Signup} />
+          <Route path="search" component={SearchView} />
+          <Route path="notice" component={ListView} />
+          <Route path="channel" component={Chat} >
+            <Route path=":channelName" component={Chat} />
+          </Route>
+          <Route path=":postId" component={PostView} />
+        </Route>
+      </Router>
   </Provider>
   ,
   document.getElementById('root')

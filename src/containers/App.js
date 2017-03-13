@@ -1,10 +1,10 @@
 import React,{Component, PropTypes} from 'react';
-import { Sidebar, Segment, Menu, Icon, Input, Search} from 'semantic-ui-react';
+import { Menu, Icon, Grid} from 'semantic-ui-react';
 import {connect} from 'react-redux';
 import {Link} from 'react-router';
 import { getStatusRequest, signoutRequest} from '../actions/authentication';
-
-//import {Sidebar} from '../components';
+import { initEnvironment } from '../actions/environment';
+import {Sidebar} from '../components';
 
 
 class App extends Component{
@@ -13,35 +13,37 @@ class App extends Component{
     this.state={
       side : false,
       width: window.innerWidth,
+      activeItem: 'home',
+      getChannel: false,
     };
     this.handleSignout = this.handleSignout.bind(this);
   }
   componentWillMount() {
-    window.addEventListener('resize', this.handleWindowSizeChange);
+    this.props.initEnvironment();
+    //window.addEventListener('resize', this.handleWindowSizeChange);
   }
-  handleWindowSizeChange = () => {
-    this.setState({ width: window.innerWidth });
-  };
+  /*handleWindowSizeChange = () => {
+    this.props.initEnvironment();
+  };*/
   toggleSide = () => {
     this.setState({
       side : !this.state.side,
     });
   }
-  getCookie(name){
-    var value = '; '+ document.cookie;
-    var parts = value.split('; ' + name + '=');
-    if (parts.length == 2) return parts.pop().split(';').shift();
-  }
   componentDidMount() {
         // get login data from cookie
-    let signinData = this.getCookie('key');
+    function getCookie(name){
+      var value = '; '+ document.cookie;
+      var parts = value.split('; ' + name + '=');
+      if (parts.length == 2) return parts.pop().split(';').shift();
+    }
+    let signinData = getCookie('key');
 
         // if loginData is undefined, do nothing
     if(typeof signinData === 'undefined') return;
 
         // decode base64 & parse json
     signinData = JSON.parse(atob(signinData));
-
         // if not logged in, do nothing
     if(!signinData.isSignedIn) return;
 
@@ -81,18 +83,20 @@ class App extends Component{
       }
     );
   }
+  handleItemClick = (e, { name }) => this.setState({ activeItem: name })
   render(){
-
+    const { activeItem } = this.state;
     const re = /(signin|signup)/;
     const isAuth = re.test(this.props.location.pathname); // test current location is whether signin or signup
     /* Mobile Setting */
     const { width } = this.state;
-    const isMobile = width <= 600;
+    //const isMobile = width <= 600;
     const marginContent = ((!isMobile&&!isAuth)?150:0);
     const side = ((this.state.side||!isMobile)&&!isAuth?true:false);
+    const {screenHeight, isMobile, screenWidth} = this.props.environment;
     //const sideAnim = (isMobile?'slide along':'overlay');
     /* Mobile Setting */
-    const userInfo = (this.props.status.isSignedIn?
+    /*const userInfo = (this.props.status.isSignedIn?
                                                   <Menu.Item>
                                                     <Menu.Header>
                                                       <a><Icon name='user' />{this.props.status.currentUserNickname}</a>
@@ -100,6 +104,9 @@ class App extends Component{
                                                     <Menu.Menu>
                                                       <Menu.Item><a href='' onClick={this.handleSignout}><Icon name='sign out' />Sign out</a></Menu.Item>
                                                     </Menu.Menu>
+                                                    <Menu.Item>
+                                                      <Link to='/channel' onClick={this.toggleSide}><span><Icon name='chain' />Channel</span></Link>
+                                                    </Menu.Item>
                                                   </Menu.Item>
                                                   :
                                                   <Menu.Item>
@@ -110,8 +117,11 @@ class App extends Component{
                                                       <Menu.Item>
                                                         <Link to='/signup' onClick={this.toggleSide}><span><Icon name='signup' />Sign up</span></Link>
                                                       </Menu.Item>
+                                                      <Menu.Item>
+                                                        <Link to='/channel' onClick={this.toggleSide}><span><Icon name='chain' />Channel</span></Link>
+                                                      </Menu.Item>
                                                     </Menu.Menu>
-                                                  </Menu.Item>);
+                                                  </Menu.Item>);*/
 
     const header = (isAuth?null:
                             <div className='navbar-fixed'>
@@ -126,71 +136,11 @@ class App extends Component{
                               </nav>
                             </div>);
 
+
     return(
       <div>
-        {header}
-        <Sidebar.Pushable as={Segment}>
-          <Sidebar as={Menu} animation='overlay' width='thin' visible={side} icon='labeled' vertical inverted>
-            <Menu.Item name='home'>
-              <Link to='/' onClick={this.toggleSide}>
-                <Icon name='home' />
-                HOME
-              </Link>
-            </Menu.Item>
-            <Menu.Item name='tech'>
-              <Link to='notice' onClick={this.toggleSide}>
-                <Menu.Header>
-                  <Menu.Item>
-                  <Icon name='computer' />
-                  TECH
-                  </Menu.Item>
-                </Menu.Header>
-              </Link>
-              <Menu.Menu>
-                <Menu.Item name='react' >
-                  <Link to='/'>
-                    <Icon name='computer' />
-                    REACT
-                  </Link>
-                </Menu.Item>
-                <Menu.Item name='react' >
-                  <Link to='/'>
-                    <Icon name='computer' />
-                    REACT
-                  </Link>
-                </Menu.Item>
-              </Menu.Menu>
-            </Menu.Item>
-            <Menu.Item name='camera'>
-              <Icon name='camera' />
-              Channels
-            </Menu.Item>
-            <Menu.Item>
-              <Menu.Header>Products</Menu.Header>
-              <Menu.Menu>
-                <Menu.Item name='enterprise'  />
-                <Menu.Item name='consumer'/>
-              </Menu.Menu>
-            </Menu.Item>
-            <Menu.Item>
-              <Menu.Header>Products</Menu.Header>
-              <Menu.Menu>
-                <Menu.Item name='enterprise'  />
-                <Menu.Item name='consumer'/>
-              </Menu.Menu>
-            </Menu.Item>
-            {userInfo}
-            <Menu.Item>
-              <Link to ='/search' onClick={this.toggleSide}><span><Icon name='search' />Search</span></Link>
-            </Menu.Item>
-          </Sidebar>
-          <Sidebar.Pusher>
-            <Segment padded style={{'marginLeft' : marginContent}}>
-              {this.props.children}
-            </Segment>
-          </Sidebar.Pusher>
-        </Sidebar.Pushable>
-        </div>
+        {this.props.children}
+      </div>
     );
   }
 
@@ -200,10 +150,13 @@ App.propTypes = {
   getStatusRequest : PropTypes.func.isRequired,
   signoutRequest : PropTypes.func.isRequired,
   status : PropTypes.object.isRequired,
+  environment : PropTypes.object.isRequired,
+  initEnvironment : PropTypes.func.isRequired,
 };
 const mapStateToProps = (state) => {
   return {
     status: state.authentication.status,
+    environment: state.environment
   };
 };
 const mapDispatchToProps = (dispatch) => {
@@ -214,6 +167,9 @@ const mapDispatchToProps = (dispatch) => {
     signoutRequest: () => {
       return dispatch(signoutRequest());
     },
+    initEnvironment: () => {
+      return dispatch(initEnvironment());
+    }
   };
 };
 

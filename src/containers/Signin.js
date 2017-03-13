@@ -31,15 +31,19 @@ class Signin extends Component{
           let signinData = {
             isSignedIn: true,
             id: id,
-            nickname: this.props.nickname
+            nickname: this.props.nickname,
+            isAdmin: false,
           };
+          console.log(signinData);
           document.cookie = 'key=' + btoa(JSON.stringify(signinData));
           Materialize.toast('Welcome ' + id + '!', 2000);
-          browserHistory.push('/');
+          browserHistory.push('/channel');
+          return true;
         }
         else{
           Materialize.toast('Incorrect username or password', 2000);
           this.setState({pw : ''});
+          return false;
         }
       });
   }

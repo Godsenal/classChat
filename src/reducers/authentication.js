@@ -116,6 +116,12 @@ export default function authentication(state, action) {
         currentUserNickname: { $set: ''}
       }
     });
+  case types.AUTH_SOCKET_RECEIVE:
+    return update(state, {
+      status: {
+        socketID:{$set: action.socketID}
+      },
+    });
   default:
     return state;
   }

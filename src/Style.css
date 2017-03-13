@@ -1,0 +1,89 @@
+.flexLayout{
+  display: -webkit-flex;
+  display:flex;
+}
+.flexLayoutMobile{
+  display: -webkit-flex;
+  display: flex;
+  flex-direction: column;
+}
+.chatSidebar{
+  flex-basis: 100px;
+  -webkit-filter: invert(100%); /* Safari 6.0 - 9.0 */
+  filter: invert(100%);
+}
+.chatSidebarMobile{
+  flex-basis: 2rem;
+  width: 100%;
+  -webkit-filter: invert(100%); /* Safari 6.0 - 9.0 */
+  filter: invert(100%);
+}
+.chatView{
+  -webkit-flex: 1;
+  flex:1;
+}
+.flexMessage{
+  display: -webkit-flex;
+  display:flex;
+  margin-top: 20px;
+  margin-left: 30px;
+}
+.flexMyMessage{
+  display: -webkit-flex;
+  display:flex;
+  flex-direction: row-reverse;
+  margin-top: 20px;
+  margin-left: 30px;
+}
+.messageImg{
+  flex-basis: 10px;
+}
+.messageContents{
+  margin-left: 1rem;
+  flex: 1;
+}
+.chatHeader{
+  display: -webkit-flex;
+  display: flex;
+  margin-top: 10px;
+}
+.chatHeaderName{
+  font-size: 2rem;
+  margin-left: 30px;
+  flex: 1;
+}
+.chatHeaderSearch{
+  flex: 1;
+  align-self: flex-end;
+}
+.messageInputContainer{
+  margin-top: 1rem;
+  width:100%;
+  bottom:0px;
+}
+.messageInput{
+  overflow: hidden;
+    margin: 0;
+    width: 100%;
+    min-height: 2.625rem;
+    height: 40px;
+    max-height: 11.25rem;
+    padding-top: .5625rem;
+    padding-right: 1.875rem;
+    padding-left: 1.5rem;
+    padding-bottom: .625rem;
+    border: 2px solid #E0E0E0;
+    border-radius: .375rem;
+    outline: 0;
+    background: #fff;
+    resize: none;
+    box-shadow: none;
+    color: #3D3C40;
+    font-family: sans-serif;
+    font-size: 1.2rem;
+    line-height: 1.2rem;
+    -webkit-user-select: auto;
+    -moz-user-select: auto;
+    -ms-user-select: auto;
+    user-select: auto;
+}

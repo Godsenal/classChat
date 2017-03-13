@@ -6,4 +6,8 @@ import SearchView from './SearchView';
 import Signin from './Signin';
 import Signup from './Signup';
 
-export {App, Home, ListView, PostView, SearchView, Signin, Signup};
+import ChannelView from './ChannelView';
+import ChatView from './ChatView';
+import Chat from './Chat';
+
+export {App, Home, ListView, PostView, SearchView, Signin, Signup, ChannelView, ChatView, Chat};
