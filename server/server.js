@@ -57,7 +57,7 @@ app.get('*', (req,res)=>{
 
 
 
-let server = app.listen(config.port, config.host, () => {
+let server = app.listen(config.port, () => {
   console.info('Express listening on port', config.port);
 });
 
