@@ -12,7 +12,7 @@ import {Sidebar, SearchModal} from '../components';
 import {ChatView} from './';
 import styles from '../Style.css';
 
-const socket = io('http://localhost:8080');
+const socket = io.connect();
 
 class Chat extends React.Component {
   constructor(){
