@@ -64080,11 +64080,22 @@ var ChatView = function (_Component) {
 
     // div 바로 다음. <ChannelList channels={this.props.channels} changeActiveChannel={this.changeActiveChannel} />
     value: function render() {
+      var loadingView = (this.props.messageListStatus || this.props.channelListStatus) === ('WAITING' || 'INIT') ? _react2.default.createElement(
+        _semanticUiReact.Dimmer,
+        { active: true },
+        _react2.default.createElement(
+          _semanticUiReact.Loader,
+          { indeterminate: true },
+          'Preparing Messages'
+        )
+      ) : null;
+
       return _react2.default.createElement(
         'div',
         null,
+        loadingView,
         _react2.default.createElement(_components.ChatHeader, this.props.activeChannel),
-        _react2.default.createElement(_components.MessageList, { messages: this.props.messages, currentUser: this.props.currentUser }),
+        _react2.default.createElement(_components.MessageList, { messages: this.props.messages, currentUser: this.props.currentUser, messageListStatus: this.props.messageListStatus }),
         _react2.default.createElement(
           'div',
           { className: _Style2.default.messageInputContainer },
@@ -118270,34 +118281,49 @@ var MessageList = function (_Component) {
   function MessageList() {
     _classCallCheck(this, MessageList);
 
-    return _possibleConstructorReturn(this, (MessageList.__proto__ || Object.getPrototypeOf(MessageList)).call(this));
-    //this.scrollToBottom = this.scrollToBottom.bind(this);
-  } /*
-    scrollToBottom = () => {
-     const messagesContainer = this.messagesContainer;
-     messagesContainer.scrollTop = messagesContainer.scrollHeight;
-    };
-    componentDidMount() {
-     this.scrollToBottom();
-    }
-    componentDidUpdate() {
-     this.scrollToBottom();
-    }*/
+    var _this = _possibleConstructorReturn(this, (MessageList.__proto__ || Object.getPrototypeOf(MessageList)).call(this));
 
+    _this.scrollToBottom = function () {
+      var messagesContainer = _this.refs.messagesContainer;
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    };
+
+    _this.scrollToBottom = _this.scrollToBottom.bind(_this);
+    return _this;
+  }
 
   _createClass(MessageList, [{
+    key: 'componentDidMount',
+    value: function componentDidMount() {
+      this.scrollToBottom();
+    }
+  }, {
+    key: 'componentDidUpdate',
+    value: function componentDidUpdate() {
+      this.scrollToBottom();
+    }
+  }, {
     key: 'render',
     value: function render() {
       var _this2 = this;
 
+      var messageList = this.props.messages.length === 0 && this.props.messageListStatus !== ('WAITING' || 'INIT') ? _react2.default.createElement(
+        _semanticUiReact.Header,
+        { textAlign: 'center', size: 'huge', as: 'h1', icon: true },
+        _react2.default.createElement(_semanticUiReact.Icon, { name: 'frown' }),
+        '\uC544\uC9C1 \uBA54\uC2DC\uC9C0\uAC00 \uC5C6\uC2B5\uB2C8\uB2E4.',
+        _react2.default.createElement(
+          _semanticUiReact.Header.Subheader,
+          null,
+          '\uC0C8 \uBA54\uC2DC\uC9C0\uB97C \uB0A8\uACA8\uBCF4\uC138\uC694!'
+        )
+      ) : this.props.messages.map(function (message) {
+        return _react2.default.createElement(_.Message, _extends({ key: message.id, currentUser: _this2.props.currentUser }, message));
+      });
       return _react2.default.createElement(
         'div',
-        { style: { 'height': '80vh', 'overflowY': 'auto', 'overflowX': 'hidden' } },
-        this.props.messages.map(function (message) {
-          return _react2.default.createElement(_.Message, _extends({ key: message.id, ref: function ref(el) {
-              _this2.messagesContainer = el;
-            }, currentUser: _this2.props.currentUser }, message));
-        })
+        { style: { 'height': '80vh', 'overflowY': 'auto', 'overflowX': 'hidden' }, ref: 'messagesContainer' },
+        messageList
       );
     }
   }]);
@@ -119464,7 +119490,13 @@ var Chat = function (_React$Component) {
         _react2.default.createElement(
           'div',
           { className: _Style2.default.chatView },
-          _react2.default.createElement(_.ChatView, { activeChannel: this.props.activeChannel, listMessage: this.props.listMessage, getStatusRequest: this.props.getStatusRequest, messages: this.props.messages, addMessage: this.addMessage, currentUser: this.props.status.currentUser })
+          _react2.default.createElement(_.ChatView, { activeChannel: this.props.activeChannel,
+            messageListStatus: this.props.messageListStatus,
+            channelListStatus: this.props.channelListStatus,
+            listMessage: this.props.listMessage,
+            messages: this.props.messages,
+            addMessage: this.addMessage,
+            currentUser: this.props.status.currentUser })
         )
       );
     }
@@ -119477,7 +119509,9 @@ var mapStateToProps = function mapStateToProps(state) {
   return {
     activeChannel: state.channel.activeChannel,
     channels: state.channel.list.channels,
+    channelListStatus: state.channel.list.status,
     messages: state.message.list.messages,
+    messageListStatus: state.message.list.status,
     status: state.authentication.status,
     isAdmin: state.authentication.status.isAdmin,
     search: state.channel.search,

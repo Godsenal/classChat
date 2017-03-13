@@ -133,7 +133,13 @@ class Chat extends React.Component {
                    listChannel={this.props.listChannel}/>
         </div>
         <div className={styles.chatView}>
-            <ChatView activeChannel={this.props.activeChannel} listMessage={this.props.listMessage} getStatusRequest={this.props.getStatusRequest} messages={this.props.messages} addMessage={this.addMessage} currentUser={this.props.status.currentUser}/>
+            <ChatView activeChannel={this.props.activeChannel}
+                      messageListStatus={this.props.messageListStatus}
+                      channelListStatus={this.props.channelListStatus}
+                      listMessage={this.props.listMessage}
+                      messages={this.props.messages}
+                      addMessage={this.addMessage}
+                      currentUser={this.props.status.currentUser}/>
         </div>
       </div>
     );
@@ -144,7 +150,9 @@ const mapStateToProps = (state) => {
   return {
     activeChannel: state.channel.activeChannel,
     channels: state.channel.list.channels,
+    channelListStatus: state.channel.list.status,
     messages: state.message.list.messages,
+    messageListStatus: state.message.list.status,
     status: state.authentication.status,
     isAdmin : state.authentication.status.isAdmin,
     search : state.channel.search,

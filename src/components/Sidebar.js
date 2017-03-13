@@ -1,7 +1,7 @@
 import React, { PropTypes } from 'react';
 import {connect} from 'react-redux';
 import {Link, browserHistory} from 'react-router';
-import {Menu, Dropdown, Icon, Input} from 'semantic-ui-react';
+import {Menu, Dropdown, Icon, Input, Loader, Dimmer} from 'semantic-ui-react';
 
 
 class Sidebar extends React.Component {
@@ -87,8 +87,8 @@ class Sidebar extends React.Component {
     </Menu>);
     return(
       <div>
-      {mobileView}
-    </div>
+        {mobileView}
+      </div>
     );
   }
 }

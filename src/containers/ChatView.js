@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react'
-import {Form, Button,} from 'semantic-ui-react';
+import {Form, Button, Dimmer, Loader, } from 'semantic-ui-react';
 
 
 import {MessageList, ChatHeader} from '../components';
@@ -38,10 +38,16 @@ class ChatView extends Component{
   }
   // div 바로 다음. <ChannelList channels={this.props.channels} changeActiveChannel={this.changeActiveChannel} />
   render(){
+    const loadingView = ((this.props.messageListStatus||this.props.channelListStatus)===('WAITING'||'INIT')?
+      <Dimmer active>
+        <Loader indeterminate>Preparing Messages</Loader>
+      </Dimmer>:null);
+
     return(
       <div>
+        {loadingView}
         <ChatHeader {...this.props.activeChannel} />
-        <MessageList messages={this.props.messages} currentUser={this.props.currentUser}/>
+        <MessageList messages={this.props.messages} currentUser={this.props.currentUser} messageListStatus={this.props.messageListStatus}/>
         <div className={styles.messageInputContainer}>
           <textArea className={styles.messageInput} type ='text' value={this.state.message} onChange={this.handleChange} onKeyPress={this.handleKeyPress}/>
         </div>
