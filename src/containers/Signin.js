@@ -34,7 +34,6 @@ class Signin extends Component{
             nickname: this.props.nickname,
             isAdmin: false,
           };
-          console.log(signinData);
           document.cookie = 'key=' + btoa(JSON.stringify(signinData));
           Materialize.toast('Welcome ' + id + '!', 2000);
           browserHistory.push('/channel');
