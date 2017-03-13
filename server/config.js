@@ -9,5 +9,6 @@ export default {
   get serverUrl() {
     return `http://${this.host}:${this.port}`;
   },
-  dbUrl : 'mongodb://localhost:27017/dbTest',
+  //dbUrl : 'mongodb://localhost:27017/dbTest',
+  dbUrl : env.MONGODB_URI
 };
