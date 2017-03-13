@@ -118273,7 +118273,7 @@ var MessageList = function (_Component) {
     var _this = _possibleConstructorReturn(this, (MessageList.__proto__ || Object.getPrototypeOf(MessageList)).call(this));
 
     _this.scrollToBottom = function () {
-      var messagesContainer = _reactDom2.default.findDOMNode(_this.messagesContainer);
+      var messagesContainer = _this.messagesContainer;
       messagesContainer.scrollTop = messagesContainer.scrollHeight;
     };
 
@@ -118288,8 +118288,8 @@ var MessageList = function (_Component) {
     }
   }, {
     key: 'componentDidUpdate',
-    value: function componentDidUpdate(prevProps, prevState) {
-      if (prevProps !== prevState) this.scrollToBottom();
+    value: function componentDidUpdate() {
+      this.scrollToBottom();
     }
   }, {
     key: 'render',
