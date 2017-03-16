@@ -3,6 +3,7 @@
   display:flex;
 }
 .flexLayoutMobile{
+  height: 100vh;
   display: -webkit-flex;
   display: flex;
   flex-direction: column;
@@ -25,8 +26,8 @@
 .flexMessage{
   display: -webkit-flex;
   display:flex;
-  margin-top: 20px;
-  margin-left: 30px;
+  margin : 2rem;
+  vertical-align: top;
 }
 .flexMyMessage{
   display: -webkit-flex;
@@ -36,7 +37,9 @@
   margin-left: 30px;
 }
 .messageImg{
-  flex-basis: 10px;
+  flex-basis: 2.25rem;
+  width: 2.25rem;
+  height: 2.25rem;
 }
 .messageContents{
   margin-left: 1rem;
@@ -45,21 +48,44 @@
 .chatHeader{
   display: -webkit-flex;
   display: flex;
+  align-items: center;
   margin-top: 10px;
+  font-size: 1rem;
 }
 .chatHeaderName{
   font-size: 2rem;
   margin-left: 30px;
-  flex: 1;
+  flex: 2;
+}
+.chatHeaderSetting{
 }
 .chatHeaderSearch{
-  flex: 1;
+  flex: 2;
   align-self: flex-end;
 }
+.messageListContainer{
+  height: 80vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.messageListContainerMobile{
+  height: 70vh;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
 .messageInputContainer{
-  margin-top: 1rem;
-  width:100%;
-  bottom:0px;
+  position: relative;
+  margin: 0 1.25rem;
+}
+.messageInputButton{
+  position: absolute;
+  min-height: 2.625rem;
+  height: 40px;
+  max-height: 11.25rem;
+  padding-top: .5625rem;
+  padding-right: 1.875rem;
+  padding-left: 1.5rem;
+  padding-bottom: .5625rem;
 }
 .messageInput{
   overflow: hidden;
@@ -70,7 +96,7 @@
     max-height: 11.25rem;
     padding-top: .5625rem;
     padding-right: 1.875rem;
-    padding-left: 1.5rem;
+    padding-left: 3rem;
     padding-bottom: .625rem;
     border: 2px solid #E0E0E0;
     border-radius: .375rem;
@@ -86,4 +112,16 @@
     -moz-user-select: auto;
     -ms-user-select: auto;
     user-select: auto;
+}
+.chatImg{
+  width: 100%;
+  height: auto;
+}
+.emptyChat{
+  text-align: center;
+  position: relative;
+  top: 50%;
+  -webkit-transform: translateY(-50%);
+  -ms-transform: translateY(-50%);
+  transform: translateY(-50%);
 }

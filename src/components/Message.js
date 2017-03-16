@@ -1,5 +1,5 @@
 import React,{Component, PropTypes} from 'react';
-import {Label, Image, Segment,Grid } from 'semantic-ui-react';
+import { } from 'semantic-ui-react';
 import moment from 'moment';
 import styles from '../Style.css';
 
@@ -12,7 +12,7 @@ class Message extends Component {
     return(
         <div className={styles.flexMessage}>
           <div className={styles.messageImg}>
-          <img src='https://semantic-ui.com/images/avatar/small/matt.jpg'/>
+            <img className={styles.messageImg} src='https://semantic-ui.com/images/avatar/small/matt.jpg'/>
           </div>
           <div className={styles.messageContents}>
             <span style={{'fontWeight':'bold'}}>{this.props.userName}</span>

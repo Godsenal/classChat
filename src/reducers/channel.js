@@ -3,8 +3,11 @@ import update from 'react-addons-update';
 
 const initialState = {
   activeChannel: {
+    _id: '',
     name: 'public',
     id: '1',
+    private: false,
+    participants: [],
   },
   add:{
     status: 'INIT',
@@ -108,10 +111,7 @@ export default function channel(state, action) {
         /* CHAGNE CHANNEL */
   case types.CHANNEL_CHANGE:
     return update(state, {
-      activeChannel: {
-        name: { $set: action.channel.name },
-        id: { $set: action.channel.id }
-      }
+      activeChannel: { $set: action.channel }
     });
     /* SEARCH CHANNEL */
   case types.CHANNEL_SEARCH:

@@ -26,7 +26,7 @@ class Sidebar extends React.Component {
     const {activeItem} = this.state;
     const {activeChannelItem} = this.state;
     const mobileView = (this.props.isMobile?
-      <Menu stackable>
+      <Menu>
           <Menu.Item >
             <Dropdown item text='MENU'>
               <Dropdown.Menu>
@@ -37,12 +37,6 @@ class Sidebar extends React.Component {
                 <Dropdown.Item onClick={this.props.handleSignout}>Sign out</Dropdown.Item>
                 <Dropdown.Divider/>
                 <Dropdown.Header content='Channel'/>
-                  <Dropdown.Item name='public'
-                             active={activeChannelItem === 'public'}
-                             key={'1'}
-                             onClick={()=>{
-                               let channel ={name:'public', id:'1'};
-                               this.handleChannelClick(channel);}}>#public</Dropdown.Item>
                   {this.props.channels.map((channel)=>{
                     return(<Dropdown.Item name={channel.name} active={activeChannelItem === channel.name} key={channel.id} onClick={()=>this.handleChannelClick(channel)}>#{channel.name}</Dropdown.Item>);
                   })}
@@ -67,12 +61,6 @@ class Sidebar extends React.Component {
       <Menu.Item>
         <Menu.Header>CHANNELS</Menu.Header>
         <Menu.Menu>
-          <Menu.Item name='public'
-                     active={activeChannelItem === 'public'}
-                     key={'1'}
-                     onClick={()=>{
-                       let channel ={name:'public', id:'1'};
-                       this.handleChannelClick(channel);}}>#public</Menu.Item>
           {this.props.channels.map((channel)=>{
             return(<Menu.Item name={channel.name} active={activeChannelItem === channel.name} key={channel.id} onClick={()=>this.handleChannelClick(channel)}>#{channel.name}</Menu.Item>);
           })}

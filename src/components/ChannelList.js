@@ -9,7 +9,7 @@ class ChannelList extends React.Component {
     return(
       <div>
         {this.props.channels.map((channel) => {
-          return <Channel key={channel._id} changeActiveChannel={this.props.changeActiveChannel} {...channel} />
+          return <Channel key={channel._id} changeActiveChannel={this.props.changeActiveChannel} channel={channel} />
         })}
       </div>
     );

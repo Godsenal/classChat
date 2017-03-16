@@ -6,15 +6,11 @@ class Channel extends React.Component {
     this.handleClick = this.handleClick.bind(this);
   }
   handleClick(){
-    let channel = {
-      name : this.props.name,
-      id : this.props.id,
-    };
-    this.props.changeActiveChannel(channel);
+    this.props.changeActiveChannel(this.props.channel);
   }
   render () {
     return(
-      <a onClick={this.handleClick}>{this.props.name}</a>
+      <a onClick={this.handleClick}>{this.props.channel.name}</a>
     );
   }
 }

@@ -72,7 +72,6 @@ class Signin extends Component{
             </Grid.Row>
             <Grid.Row centered>
                 <button className="btn waves-effect waves-light pink" type="submit" name="action" onClick={this.handleSignin}>Sign In
-                  <Icon name='privacy' />
                 </button>
             </Grid.Row>
             <Grid.Row centered>

@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react'
-import {Form, Button, Dimmer, Loader, } from 'semantic-ui-react';
+import {Form, Button, Icon, Dimmer, Loader, Image } from 'semantic-ui-react';
 
 
 import {MessageList, ChatHeader} from '../components';
@@ -38,19 +38,21 @@ class ChatView extends Component{
   }
   // div 바로 다음. <ChannelList channels={this.props.channels} changeActiveChannel={this.changeActiveChannel} />
   render(){
-    const loadingView = ((this.props.messageListStatus||this.props.channelListStatus)===('WAITING'||'INIT')?
-      <Dimmer active>
+    const loadingView = (((this.props.messageListStatus)===('WAITING'||'INIT'))?
+      <Dimmer active >
         <Loader indeterminate>Preparing Messages</Loader>
-      </Dimmer>:null);
+      </Dimmer>:<div><ChatHeader {...this.props.activeChannel} />
+      <MessageList isMobile={this.props.isMobile} messages={this.props.messages} currentUser={this.props.currentUser} messageListStatus={this.props.messageListStatus}/>
+      <div className={styles.messageInputContainer}>
+        <Button className={styles.messageInputButton} icon>
+          <Icon name='plus' />
+        </Button>
+        <textArea className={styles.messageInput} type ='text' value={this.state.message} onChange={this.handleChange} onKeyPress={this.handleKeyPress}/>
+      </div></div>);
 
     return(
       <div>
         {loadingView}
-        <ChatHeader {...this.props.activeChannel} />
-        <MessageList messages={this.props.messages} currentUser={this.props.currentUser} messageListStatus={this.props.messageListStatus}/>
-        <div className={styles.messageInputContainer}>
-          <textArea className={styles.messageInput} type ='text' value={this.state.message} onChange={this.handleChange} onKeyPress={this.handleKeyPress}/>
-        </div>
       </div>
     );
   }

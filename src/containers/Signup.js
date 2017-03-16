@@ -1,10 +1,11 @@
 import React, {Component, PropTypes} from 'react';
 import { connect } from 'react-redux';
 import { browserHistory, Link } from 'react-router';
-import {Grid, Header, Divider, Icon} from 'semantic-ui-react';
+import { Button, Checkbox, Icon, Message, Input, Form, Select} from 'semantic-ui-react';
 import { signupRequest } from '../actions/authentication';
+import styles from '../Style.css'
 
-
+const channelOptions = [{key: '1', value: '1', text: '자료구조'},{key: '2', value: '2', text: '알고리즘'}];
 class Signup extends Component{
   constructor(){
     super();
@@ -12,21 +13,38 @@ class Signup extends Component{
       id: '',
       pw: '',
       nickname: '',
+      idValid: false,
+      pwValid: false,
+      nicknameValid: false,
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleSignup = this.handleSignup.bind(this);
   }
+  //[`${e.target.name}`]: e.target.value
+  handleValid = () =>{
+    if(this.state.id.length < 4)
+      this.setState({idValid : false});
+    else
+      this.setState({idValid : true});
+
+    if(this.state.pw.length < 4)
+      this.setState({pwValid : false});
+    else
+      this.setState({pwValid : true});
+
+    if(this.state.nickname.length < 4)
+      this.setState({nicknameValid : false});
+    else
+      this.setState({nicknameValid : true});
+  }
+  handleIdValid = () => {
+    if(this.state.id.length < 4)
+      return 'error';
+    else
+      return 'success';
+  }
   handleChange(e){
-    switch(e.target.name){
-    case 'id':
-      this.setState({id: e.target.value});
-      break;
-    case 'pw':
-      this.setState({pw: e.target.value});
-      break;
-    case 'nickname':
-      this.setState({nickname: e.target.value});
-    }
+    this.setState({[`${e.target.name}`]: e.target.value});
   }
   handleSignup(){
     let id = this.state.id;
@@ -50,38 +68,33 @@ class Signup extends Component{
         }
       } );
   }
+  selectedItem = (e, data) => {
+    console.log(data.value);
+  }
   render(){
-    return( <div style = {{'height':'100vh'}}>
-              <div className = 'row'>
-                <Header size='huge'><Link to = '/'><Icon name='home'/>HOME</Link></Header>
-              </div>
-              <div className = 'row'>
-                  <Header size='huge'>SIGN UP</Header>
-              </div>
-              <div className = 'row'>
-                <div className="input-field">
-                  <input name= 'id' type="text" className="validate" value={this.state.id} onChange={this.handleChange}/>
-                  <label htmlFor='id'>ID</label>
-                </div>
-              </div>
-              <div className = 'row'>
-                <div className="input-field">
-                  <input name= 'pw' type="password" className="validate" value={this.state.pw} onChange={this.handleChange}/>
-                  <label htmlFor='pw'>PASSWORD</label>
-                </div>
-              </div>
-              <div className = 'row'>
-                <div className="input-field">
-                  <input name= 'nickname' type="text" className="validate" value={this.state.nickname} onChange={this.handleChange}/>
-                  <label htmlFor='nickname'>NICKNAME</label>
-                </div>
-              </div>
-              <div className = 'row'>
-                  <button className="btn waves-effect waves-light black" type="submit" name="action" onClick={this.handleSignup}>SIGN UP
-                    <i className="material-icons right">person_pin</i>
-                  </button>
-              </div>
-            </div>
+    const {idValid, pwValid, nicknameValid} = this.state;
+    return(
+      <div style = {{'height':'100vh', 'alignItems' : 'center'}}>
+        <Message
+          attached
+          header='Welcome to our site!'
+          content='Fill out the form below to sign-up for a new account'
+        />
+        <Form className='attached fluid segment'>
+          <Form.Group widths='equal'>
+            <Form.Input name='id' label='ID' placeholder='id' type='text' onChange={this.handleChange}/>
+            <Form.Input name='pw' label='Password' placeholder='password' type='password' onChange={this.handleChange}/>
+          </Form.Group>
+          <Form.Input label='Username' placeholder='username' type='text' />
+          <Form.Select multiple selection search label='Channel' placeholder='Select your channel' options={channelOptions} onChange={this.selectedItem}/>
+          <Form.Checkbox inline label='I agree to the terms and conditions' />
+          <Button color='blue'>Submit</Button>
+        </Form>
+        <Message attached='bottom' warning>
+          <Icon name='help' />
+          Already signed up?&nbsp;<Link to='/signin'>Sign in here</Link>&nbsp;instead.
+        </Message>
+      </div>
     );
   }
 }

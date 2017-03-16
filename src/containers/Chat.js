@@ -19,8 +19,6 @@ class Chat extends React.Component {
     super();
     this.state={
       searchModal: false,
-      channels: [],
-      messages: [],
     };
     this.handleSignout = this.handleSignout.bind(this);
     this.addMessage = this.addMessage.bind(this);
@@ -36,7 +34,11 @@ class Chat extends React.Component {
 
         browserHistory.push('/signin');
       }
-      this.props.listChannel(this.props.status.currentUser);
+      this.props.listChannel(this.props.status.currentUser)
+        .then(() => {
+          var publicChannel = this.props.channels.find((channel) => {return channel.id === '1';});
+          this.props.changeChannel(publicChannel);
+        })
       this.props.listMessage(this.props.activeChannel.id);
     });
   }
@@ -75,10 +77,7 @@ class Chat extends React.Component {
     let channels = [channel];
     this.props.joinChannel(this.props.status.currentUser, channels).then(()=>{
       this.props.listChannel(this.props.status.currentUser).then(()=>{
-        this.changeActiveChannel({
-          name : channel.value,
-          id : channel.id
-        });
+        this.changeActiveChannel(channel);
         this.handleSearchClose();
       });
 
@@ -100,8 +99,10 @@ class Chat extends React.Component {
     );
   }
   handleSearchClick(){
-    this.setState({
-      searchModal: true,
+    this.props.searchChannel('*').then(() => {
+      this.setState({
+        searchModal: true,
+      });
     });
   }
   handleSearchClose(){
@@ -120,7 +121,6 @@ class Chat extends React.Component {
         <SearchModal isOpen={this.state.searchModal}
                      results={this.props.search.results}
                      handleJoinChannel = {this.handleJoinChannel}
-                     searchChannel = {this.props.searchChannel}
                      changeActiveChannel={this.changeActiveChannel}
                      handleSearchClose={this.handleSearchClose}/>
         <div className={sidebarStyle}>
@@ -133,7 +133,8 @@ class Chat extends React.Component {
                    listChannel={this.props.listChannel}/>
         </div>
         <div className={styles.chatView}>
-            <ChatView activeChannel={this.props.activeChannel}
+            <ChatView isMobile={isMobile}
+                      activeChannel={this.props.activeChannel}
                       messageListStatus={this.props.messageListStatus}
                       channelListStatus={this.props.channelListStatus}
                       listMessage={this.props.listMessage}
@@ -145,6 +146,7 @@ class Chat extends React.Component {
     );
   }
 }
+
 
 const mapStateToProps = (state) => {
   return {

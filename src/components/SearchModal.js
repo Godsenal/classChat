@@ -1,5 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import {Search, Modal, Button, Label, Header, Icon, Grid} from 'semantic-ui-react';
+import _ from 'lodash';
 
 const resultRenderer = ({ name, id}) => (
   <Label content={name} />
@@ -12,7 +13,7 @@ class SearchModal extends Component{
       isLoading: false,
       results: [],
       value: '',
-      id: '',
+      channel: {},
     };
   }
   componentWillMount() {
@@ -20,23 +21,24 @@ class SearchModal extends Component{
   }
   resetComponent = () => this.setState({ isLoading: false, results: [], value: '' })
 
-  handleResultSelect = (e, result) => this.setState({ value: result.name, id: result.id, })
+  handleResultSelect = (e, result) => this.setState({ value: result.name, channel: result })
 
   handleSearchChange = (e, value) => {
     this.setState({ isLoading: true, value });
-
     setTimeout(() => {
       if (this.state.value.length < 1) return this.resetComponent();
-
-      this.props.searchChannel(this.state.value).then(()=>{
-        this.setState({isLoading: false, results: this.props.results});
+      const re = new RegExp(_.escapeRegExp(this.state.value), 'i');
+      const isMatch = (result) => re.test(result.name);
+      this.setState({
+        isLoading: false,
+        results: _.filter(this.props.results, isMatch),
       });
     }, 500);
 
   }
 
   render(){
-    const { isLoading, value, id, results } = this.state;
+    const { isLoading, value, id, results, channel } = this.state;
     return(
       <Modal open={this.props.isOpen} basic>
         <Modal.Header>
@@ -53,7 +55,7 @@ class SearchModal extends Component{
           />
         </Modal.Content>
         <Modal.Actions>
-          <Button basic color='blue' onClick={() => this.props.handleJoinChannel({value, id})} inverted> Join </Button>
+          <Button basic color='blue' onClick={() => this.props.handleJoinChannel(channel)} inverted> Join </Button>
           <Button basic color='red' onClick={this.props.handleSearchClose} inverted> No </Button>
         </Modal.Actions>
       </Modal>
