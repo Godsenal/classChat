@@ -39,7 +39,9 @@ class Chat extends React.Component {
           var publicChannel = this.props.channels.find((channel) => {return channel.id === '1';});
           this.props.changeChannel(publicChannel);
         })
-      this.props.listMessage(this.props.activeChannel.id);
+      this.props.listMessage(this.props.activeChannel.id,true,-1)
+        .then(()=>{
+        })
     });
   }
   componentDidMount() {
@@ -59,7 +61,7 @@ class Chat extends React.Component {
     socket.emit('leave channel', this.props.activeChannel);
     socket.emit('join channel', channel);
     this.props.changeChannel(channel);
-    this.props.listMessage(channel.id);
+    this.props.listMessage(channel.id, true, -1);
   }
   addMessage(message){
     var newMessage = {
@@ -70,7 +72,10 @@ class Chat extends React.Component {
     };
     this.props.addMessage(newMessage)
       .then(() => {
-        socket.emit('new message', newMessage);
+        socket.emit('new message', this.props.add.message);
+      })
+      .catch(() => {
+        console.log('failed to add Message');
       });
   }
   handleJoinChannel(channel){
@@ -127,6 +132,7 @@ class Chat extends React.Component {
           <Sidebar channels={this.props.channels}
                    changeActiveChannel={this.changeActiveChannel}
                    status={this.props.status}
+                   channelListStatus={this.props.channelListStatus}
                    handleSignout={this.handleSignout}
                    handleSearchClick={this.handleSearchClick}
                    isMobile={isMobile}
@@ -136,8 +142,8 @@ class Chat extends React.Component {
             <ChatView isMobile={isMobile}
                       activeChannel={this.props.activeChannel}
                       messageListStatus={this.props.messageListStatus}
-                      channelListStatus={this.props.channelListStatus}
                       listMessage={this.props.listMessage}
+                      activeChannel={this.props.activeChannel}
                       messages={this.props.messages}
                       addMessage={this.addMessage}
                       currentUser={this.props.status.currentUser}/>
@@ -159,6 +165,7 @@ const mapStateToProps = (state) => {
     isAdmin : state.authentication.status.isAdmin,
     search : state.channel.search,
     join : state.channel.join,
+    add : state.message.add,
     environment: state.environment,
   };
 };
@@ -177,8 +184,8 @@ const mapDispatchToProps = (dispatch) => {
     addMessage: (message) => {
       return dispatch(addMessage(message));
     },
-    listMessage: (channelID) => {
-      return dispatch(listMessage(channelID));
+    listMessage: (channelID, isInitial, topMessageId) => {
+      return dispatch(listMessage(channelID, isInitial, topMessageId));
     },
     changeChannel: (channel) => {
       return dispatch(changeChannel(channel));

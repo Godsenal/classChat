@@ -14,7 +14,6 @@ import axios from 'axios';
 
 
 export function receiveRawMessage(message) {
-  console.log(message);
   return {
     type: ROW_MESSAGE_RECEIVE,
     message
@@ -59,12 +58,16 @@ export function addMessage(message) {
 
 /* LIST MESSAGE */
 
-export function listMessage(channelID) {
+export function listMessage(channelID, isInitial, topMessageId) {
   return (dispatch) => {
     dispatch({type: MESSAGE_LIST});
-    return axios.get(`api/message/${channelID}`)
+    var messageID = -1;
+    if(!isInitial)
+      messageID = topMessageId;
+    messageID = messageID.toString();
+    return axios.get(`api/message/${channelID}/${messageID}`)
             .then((res) => {
-              dispatch({type: MESSAGE_LIST_SUCCESS, messages: res.data.messages});
+              dispatch({type: MESSAGE_LIST_SUCCESS, messages: res.data.messages, isInitial});
             }).catch((err) => {
               dispatch({type: MESSAGE_LIST_FAILURE, err: err.res.data.error});
             });

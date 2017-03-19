@@ -11,5 +11,21 @@ import Channel from './Channel';
 import ChannelList from './ChannelList';
 import SearchModal from './SearchModal';
 import ChatHeader from './ChatHeader';
+import DateMessage from './DateMessage';
 
-export {Header, ListPreview, Post, PostList, Sidebar, Comment, CommentList, Message, MessageList, Channel, ChannelList, SearchModal, ChatHeader};
+export {
+        Header,
+        ListPreview,
+        Post,
+        PostList,
+        Sidebar,
+        Comment,
+        CommentList,
+        Message,
+        MessageList,
+        Channel,
+        ChannelList,
+        SearchModal,
+        ChatHeader,
+        DateMessage,
+      };
