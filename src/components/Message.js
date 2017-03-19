@@ -9,7 +9,9 @@ class Message extends Component {
   }
   render () {
     //const myMessage = (this.props.currentUser === this.props.userName)?styles.flexMyMessage:styles.flexMessage;
+
     return(
+      <div>
         <div className={styles.flexMessage}>
           <div className={styles.messageImg}>
             <img className={styles.messageImg} src='https://semantic-ui.com/images/avatar/small/matt.jpg'/>
@@ -20,6 +22,7 @@ class Message extends Component {
             <p style={{'wordWrap':'break-word','whiteSpace':'pre-wrap'}}>{this.props.contents}</p>
           </div>
         </div>
+      </div>
     );
   }
 }

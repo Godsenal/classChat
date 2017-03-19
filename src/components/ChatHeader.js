@@ -36,7 +36,7 @@ class ChatHeader extends React.Component {
           <Dropdown pointing text={this.props.participants.length.toString()+'명'} button icon='group' labeled className='icon' >
             <Dropdown.Menu>
               {this.props.participants.map((participant) => {
-                return(<Dropdown.Item key={this.props.id} text={participant} />)
+                return(<Dropdown.Item key={participant} text={participant} />)
               })}
             </Dropdown.Menu>
           </Dropdown>

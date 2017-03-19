@@ -1,7 +1,9 @@
 import React, { PropTypes } from 'react';
 import {connect} from 'react-redux';
 import {Link, browserHistory} from 'react-router';
-import {Menu, Dropdown, Icon, Input, Loader, Dimmer} from 'semantic-ui-react';
+import {Menu, Dropdown, Icon, Segment, Loader, Dimmer} from 'semantic-ui-react';
+
+import styles from '../Style.css';
 
 
 class Sidebar extends React.Component {
@@ -25,33 +27,36 @@ class Sidebar extends React.Component {
   render () {
     const {activeItem} = this.state;
     const {activeChannelItem} = this.state;
-    const mobileView = (this.props.isMobile?
-      <Menu>
-          <Menu.Item >
-            <Dropdown item text='MENU'>
-              <Dropdown.Menu>
-                <Dropdown.Header content={this.props.status.currentUser}/>
-                <Dropdown.Divider/>
-                <Dropdown.Header content='Profile'/>
-                <Dropdown.Item>My Profile</Dropdown.Item>
-                <Dropdown.Item onClick={this.props.handleSignout}>Sign out</Dropdown.Item>
-                <Dropdown.Divider/>
-                <Dropdown.Header content='Channel'/>
-                  {this.props.channels.map((channel)=>{
-                    return(<Dropdown.Item name={channel.name} active={activeChannelItem === channel.name} key={channel.id} onClick={()=>this.handleChannelClick(channel)}>#{channel.name}</Dropdown.Item>);
-                  })}
-                <Dropdown.Header content='search'/>
-                  <Dropdown.Item name='search' onClick={this.handleSearchClick}>
-                    <Icon name='search'/>Search Channel
-                  </Dropdown.Item>
-              </Dropdown.Menu>
-            </Dropdown>
-          </Menu.Item>
-        </Menu>
+    const loaderStyle = this.props.isMobile?styles.channelLoaderMobile:styles.channelLoader;
+    const loadingView =
+            <Segment basic className={loaderStyle}>
+              <Dimmer active inverted>
+                <Loader indeterminate>Preparing Channels</Loader>
+              </Dimmer>
+            </Segment>;
+    const responsiveView = (this.props.isMobile?
+      <Menu attached >
+        <Dropdown className={styles.balooFont} item text={this.props.status.currentUser}>
+          <Dropdown.Menu>
+            <Dropdown.Item>My Profile</Dropdown.Item>
+            <Dropdown.Item onClick={this.props.handleSignout}>Sign out</Dropdown.Item>
+          </Dropdown.Menu>
+        </Dropdown>
+        <Dropdown className={styles.balooFont} item text='Channel'>
+          <Dropdown.Menu>
+            {this.props.channels.map((channel)=>{
+              return(<Dropdown.Item name={channel.name} active={activeChannelItem === channel.name} key={channel.id} onClick={()=>this.handleChannelClick(channel)}>#{channel.name}</Dropdown.Item>);
+            })}
+          </Dropdown.Menu>
+        </Dropdown>
+        <Menu.Item className={styles.balooFont} name='search' onClick={this.handleSearchClick}>
+          <Icon name='search'/>Search Channel
+        </Menu.Item>
+      </Menu>
         :
-    <Menu style = {{'height':'100vh'}} borderless vertical>
-      <Menu.Header color='red'>
-        <Dropdown item text={this.props.status.currentUser}>
+    <Menu style = {{'height':'100vh'}} vertical attached>
+      <Menu.Header >
+        <Dropdown className={styles.balooFont} item text={this.props.status.currentUser}>
           <Dropdown.Menu>
             <Dropdown.Item>My Profile</Dropdown.Item>
             <Dropdown.Item onClick={this.props.handleSignout}>Sign out</Dropdown.Item>
@@ -59,23 +64,24 @@ class Sidebar extends React.Component {
         </Dropdown>
       </Menu.Header>
       <Menu.Item>
-        <Menu.Header>CHANNELS</Menu.Header>
+        <Menu.Header className={styles.balooFont}>CHANNELS</Menu.Header>
         <Menu.Menu>
           {this.props.channels.map((channel)=>{
             return(<Menu.Item name={channel.name} active={activeChannelItem === channel.name} key={channel.id} onClick={()=>this.handleChannelClick(channel)}>#{channel.name}</Menu.Item>);
           })}
         </Menu.Menu>
       </Menu.Item>
-      <Menu.Item name='search' onClick={this.handleSearchClick}>
+      <Menu.Item className={styles.balooFont} name='search' onClick={this.handleSearchClick}>
         <Icon name='search'/>Search Channel
       </Menu.Item>
       <Menu.Item>
         <Link to ='/search' onClick={this.toggleSide}><span><Icon name='search' />Search</span></Link>
       </Menu.Item>
     </Menu>);
+    const view = (this.props.channelListStatus !== 'SUCCESS'?loadingView:responsiveView);
     return(
-      <div>
-        {mobileView}
+      <div >
+        {view}
       </div>
     );
   }

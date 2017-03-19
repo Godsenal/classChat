@@ -19,7 +19,7 @@ router.get('/', function(req, res) {
 
   // this route returns all channels including private channels for that user
 router.get('/:userName', function(req, res) {
-  channels.find({ participants: req.params.userName}, function(err, channels) {
+  channels.find({ participants: req.params.userName},null,{sort: {id : 1}}, function(err, channels) {
     if(err) {
       console.log(err);
       return res.status(400).json({error: 'internal server error', code: 1});
