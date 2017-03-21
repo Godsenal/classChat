@@ -27,14 +27,24 @@ router.get('/', function (req, res) {
 });
 
 // query DB for messages for a specific channel
-router.get('/:channelID', function (req, res) {
-  _message2.default.find({ channelID: req.params.channelID }, function (err, messages) {
-    if (err) {
-      console.log(err);
-      return res.status(500).json({ error: 'internal server error', code: 1 });
-    }
-    res.json({ messages: messages });
-  });
+router.get('/:channelID/:messageID', function (req, res) {
+  if (req.params.messageID === '-1') {
+    _message2.default.find({ $and: [{ channelID: req.params.channelID }, { id: { $gt: req.params.messageID } }] }).sort({ id: -1 }).limit(30).exec(function (err, messages) {
+      if (err) {
+        console.log(err);
+        return res.status(500).json({ error: 'internal server error', code: 1 });
+      }
+      res.json({ messages: messages });
+    });
+  } else {
+    _message2.default.find({ $and: [{ channelID: req.params.channelID }, { id: { $lt: req.params.messageID } }] }).sort({ id: -1 }).limit(30).exec(function (err, messages) {
+      if (err) {
+        console.log(err);
+        return res.status(500).json({ error: 'internal server error', code: 1 });
+      }
+      res.json({ messages: messages });
+    });
+  }
 });
 
 //post a new message to db
