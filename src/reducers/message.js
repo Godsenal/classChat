@@ -12,7 +12,7 @@ const initialState = {
   list: {
     status: 'INIT',
     messages: [],
-    lastIndex: 0,
+    isLast : false,
     err: 'ERROR',
     errCode: -1,
   },
@@ -140,9 +140,9 @@ export default function message(state, action) {
       }
     });
   case types.MESSAGE_LIST_SUCCESS:
+
     var divByDate = [];
     var divided = {};
-
     action.messages.map((message) => { // message의 date를 비교해서 date,id,messages를 가지고있는 array를 만듬.
       if(!_.isEmpty(divided) && (divided.date!==new Date(message.created).setHours(0,0,0,0))){
         divByDate.push(divided);
@@ -165,34 +165,34 @@ export default function message(state, action) {
     if(!_.isEmpty(divided))
       divByDate.push(divided);
 
-
     if(action.isInitial){ // 첫 데이터 불러오기면 그냥 set
       divByDate.reverse();
       return update(state, {
         list: {
           status: { $set: 'SUCCESS' },
-          messages: { $set: divByDate }
+          messages: { $set: divByDate },
+          isLast: { $set: action.messages.length < 30}
         }
       });
     }else{ //old메시지 인데 list에 이미 같은날짜의 데이터가 있으면 넣어주고 old메시지는 삭제.
-      if(divByDate[divByDate.length -1].date === state.list.messages[0].date){
-        divByDate[divByDate.length -1].messages.push(...state.list.messages[0].messages);
-        console.log(divByDate[divByDate.length -1]);
+      if(divByDate[0].date === state.list.messages[0].date){
+        divByDate[0].messages.push(...state.list.messages[0].messages);
         state = update(state,{
           list:{
             messages:{
               [0]:{
-                $set : divByDate[divByDate.length-1]
+                $set : divByDate[0]
               }
             }
           }
         });
-        divByDate.pop();
+        divByDate.shift();
       }
       return update(state, {
         list: {
           status: { $set: 'SUCCESS' },
-          messages: { $unshift: divByDate }
+          messages: { $unshift: divByDate },
+          isLast: { $set: action.messages.length < 30}
         }
       });
     }

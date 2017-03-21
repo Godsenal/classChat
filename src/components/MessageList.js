@@ -1,84 +1,74 @@
 import React,{Component, PropTypes} from 'react';
-import {Icon, } from 'semantic-ui-react';
-import moment from 'moment';
-import {DateMessage, Message} from './';
+import {Icon, Dimmer, Loader, Segment} from 'semantic-ui-react';
+import {DateMessage} from './';
 import styles from '../Style.css';
-import _ from 'lodash';
 
 class MessageList extends Component {
   constructor(){
     super();
-    this.state = {
-      dateMessages : [],
-    };
     this.scrollToBottom = this.scrollToBottom.bind(this);
+    this.handleScroll = this.handleScroll.bind(this);
   }
   scrollToBottom = () => {
-    const messagesContainer = this.refs.messagesContainer;
+    const messagesContainer = this.messagesContainer;
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
   };
-  setHoursZero = (date) => {
-    if(date)
-      date.setHours(0,0,0,0);
-    return date;
-  }
-  componentDidMount() {
-    this.scrollToBottom();
-  }/*
-  componentWillMount(){
-    var divByDate = [];
-    var divided = {};
-    this.props.messages.map((message) => {
-
-      if(divided.date!==new Date(message.created).setHours(0,0,0,0)){
-        divByDate.push(divided);
-        divided = {};       }
-
-      if(_.isEmpty(divided)){
-        divided = {
-          date : new Date(message.created).setHours(0,0,0,0),
-          messages : [message]
-        };
-      }
-      else{
-        divided.messages.push(message);
-      }
-    });
-    this.setState({
-      dateMessages : divByDate
-    });
-  }*/
-  componentDidUpdate(prevProps) { // scroll to bottom when new message has come.
-     //scrollTop 이 0일 때가 scroll이 맨 위로 도달했을 떄! 이거 이용해서 lazy list 하자.
-    const messagesContainer = this.refs.messagesContainer;
-    // message가 0이 아닐때.
-    if(messagesContainer.scrollTop <= 50){
-      console.log(this.props.messages[0].id);
+  handleScroll(){
+    if((!this.props.isLast)&&(this.messagesContainer.scrollTop <= 50) && (!this.isLoading)){
+      this.isLoading = true;
+      this.height = this.messagesContainer.scrollHeight;
+      this.top = this.messagesContainer.scrollTop;
+      this.props.setInitial(false);
       this.props.listMessage(this.props.activeChannel.id,false,this.props.messages[0].id)
         .then(() => {
+          this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight - (this.height - this.top);
+          this.isLoading = false;
+        })
+        .catch(()=>{
+          console.log('old Message load Failure');
         });
     }
-    if(prevProps.messages !== this.props.messages){
-      this.scrollToBottom();
-    }
+  }
+  componentDidMount() {
+    this.isLoading = false;
+    this.scrollToBottom();
+
+    //this.messagesContainer.scrollTop = this.state.prevTop + (this.messagesContainer.scrollHeight - this.state.scrollHeight);
+
   }
   render () {
     const mobileStyle = this.props.isMobile?styles.messageListContainerMobile:styles.messageListContainer;
-    const messageList = ( this.props.messages.length === 0 ?
+    const isEmpty = (this.props.messages.length === 0 ? true : false);
+    const messageList = ( isEmpty ?
       <div className={styles.emptyChat}>
         <h1>
           <Icon size='huge' name='comments outline' /><br/>아직 메시지가 없습니다.<br/>
         </h1>
         <h2>새 메시지를 남겨보세요!</h2>
       </div>
-        :this.props.messages.map((message) => {
+        :
+        this.props.messages.map((message) => {
           return (
-            <DateMessage key={message.id} ref={message.id} currentUser={this.props.currentUser} {...message} />
+            <DateMessage key={message.id} currentUser={this.props.currentUser} {...message} />
           );
         }));
+    const loadingView = ( this.isLoading === true ?
+                          <Segment>
+                            <Dimmer active>
+                              <Loader>Loading</Loader>
+                            </Dimmer>
+                          </Segment>
+                          :((isEmpty||this.props.isLast)?null
+                          :<Segment>
+                            <Dimmer active>
+                              Old Messages
+                            </Dimmer>
+                          </Segment>
+                          ));
     return(
-      <div className={mobileStyle}  ref='messagesContainer'>
+      <div className={mobileStyle} ref={(ref) => {this.messagesContainer = ref;}} onScroll={this.handleScroll}>
+        {loadingView}
         {messageList}
       </div>
     );
