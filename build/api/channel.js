@@ -31,8 +31,7 @@ router.get('/', function (req, res) {
 
 // this route returns all channels including private channels for that user
 router.get('/:userName', function (req, res) {
-
-  _channel2.default.find({ participants: req.params.userName }, function (err, channels) {
+  _channel2.default.find({ participants: req.params.userName }, null, { sort: { id: 1 } }, function (err, channels) {
     if (err) {
       console.log(err);
       return res.status(400).json({ error: 'internal server error', code: 1 });
@@ -71,12 +70,21 @@ router.put('/join/:userName', function (req, res) {
 });
 
 router.get('/search/:channelName', function (req, res) {
-  _channel2.default.find({ name: { $regex: req.params.channelName, $options: 'i' } }, null, { sort: { name: 1 } }, function (err, channels) {
-    if (err) {
-      return res.status(400).json({ error: 'internal server error', code: 1 });
-    }
-    res.json({ channels: channels });
-  });
+  if (req.params.channelName === '*') {
+    _channel2.default.find({}, function (err, channels) {
+      if (err) {
+        return res.status(400).json({ error: 'internal server error', code: 1 });
+      }
+      res.json({ channels: channels });
+    });
+  } else {
+    _channel2.default.find({ name: { $regex: req.params.channelName, $options: 'i' } }, null, { sort: { name: 1 } }, function (err, channels) {
+      if (err) {
+        return res.status(400).json({ error: 'internal server error', code: 1 });
+      }
+      res.json({ channels: channels });
+    });
+  }
 });
 
 exports.default = router;
