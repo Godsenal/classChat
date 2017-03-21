@@ -145,6 +145,7 @@ class Chat extends React.Component {
                       listMessage={this.props.listMessage}
                       activeChannel={this.props.activeChannel}
                       messages={this.props.messages}
+                      isLast={this.props.isLast}
                       addMessage={this.addMessage}
                       currentUser={this.props.status.currentUser}/>
         </div>
@@ -160,6 +161,7 @@ const mapStateToProps = (state) => {
     channels: state.channel.list.channels,
     channelListStatus: state.channel.list.status,
     messages: state.message.list.messages,
+    isLast: state.message.list.isLast,
     messageListStatus: state.message.list.status,
     status: state.authentication.status,
     isAdmin : state.authentication.status.isAdmin,

@@ -10,10 +10,16 @@ class ChatView extends Component{
     super();
     this.state = {
       message : '',
+      isInitial : true,
     };
     this.addMessage = this.addMessage.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.changeActiveChannel = this.changeActiveChannel.bind(this);
+    this.setInitial = this.setInitial.bind(this);
+  }
+  componentWillReceiveProps(nextProps){
+    if(this.props.activeChannel !== nextProps.activeChannel)
+      this.setState({isInitial : true});
   }
   changeActiveChannel(channel) {
     socket.emit('leave channel', this.props.activeChannel);
@@ -36,6 +42,11 @@ class ChatView extends Component{
       this.addMessage();
     }
   }
+  setInitial(isInitial){
+    this.setState({
+      isInitial,
+    });
+  }
   // div 바로 다음. <ChannelList channels={this.props.channels} changeActiveChannel={this.changeActiveChannel} />
   render(){
     const loadingView =
@@ -51,7 +62,9 @@ class ChatView extends Component{
                            listMessage={this.props.listMessage}
                            activeChannel={this.props.activeChannel}
                            messages={this.props.messages}
+                           isLast={this.props.isLast}
                            currentUser={this.props.currentUser}
+                           setInitial={this.setInitial}
                            messageListStatus={this.props.messageListStatus}/>
               <div className={styles.messageInputContainer}>
                 <Button className={styles.messageInputButton} icon>
@@ -60,7 +73,7 @@ class ChatView extends Component{
                 <textArea className={styles.messageInput} type ='text' value={this.state.message} onChange={this.handleChange} onKeyPress={this.handleKeyPress}/>
               </div>
             </div>;
-    const view = (this.props.messageListStatus !== 'SUCCESS'?loadingView:chatView);
+    const view = ((this.props.messageListStatus !== 'SUCCESS')&&(this.state.isInitial)?loadingView:chatView);
     return(
       <div>
         {view}
