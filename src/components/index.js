@@ -12,6 +12,7 @@ import ChannelList from './ChannelList';
 import SearchModal from './SearchModal';
 import ChatHeader from './ChatHeader';
 import DateMessage from './DateMessage';
+import InputMessage from './InputMessage';
 
 export {
         Header,
@@ -28,4 +29,5 @@ export {
         SearchModal,
         ChatHeader,
         DateMessage,
+        InputMessage,
       };

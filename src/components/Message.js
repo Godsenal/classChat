@@ -18,7 +18,7 @@ class Message extends Component {
           </div>
           <div className={styles.messageContents}>
             <span style={{'fontWeight':'bold'}}>{this.props.userName}</span>
-            <span className='grey-text' style={{'fontStyle':'italic','fontSize':10}}> ..{moment(this.props.created).format('MMMM Do YYYY, h:mm:ss a')}</span>
+            <span className='grey-text' style={{'fontStyle':'italic','fontSize':10}}> ..{moment(this.props.created).fromNow()}</span>
             <p style={{'wordWrap':'break-word','whiteSpace':'pre-wrap'}}>{this.props.contents}</p>
           </div>
         </div>

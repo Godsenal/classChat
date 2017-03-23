@@ -1,13 +1,38 @@
 import React,{Component, PropTypes} from 'react';
 import {Icon, Dimmer, Loader, Segment} from 'semantic-ui-react';
+import moment from 'moment';
+import NotificationSystem from 'react-notification-system';
 import {DateMessage} from './';
 import styles from '../Style.css';
+
 
 class MessageList extends Component {
   constructor(){
     super();
+    this.state = {
+      newMessage : false,
+    };
     this.scrollToBottom = this.scrollToBottom.bind(this);
     this.handleScroll = this.handleScroll.bind(this);
+    this.addNotification = this.addNotification.bind(this);
+  }
+  addNotification() {
+    this.notificationSystem.addNotification({
+      children:(
+        <div className={styles.flexMessage}>
+          <div className={styles.messageImg}>
+            <img className={styles.messageImg} src='https://semantic-ui.com/images/avatar/small/matt.jpg'/>
+          </div>
+          <div className={styles.messageContents}>
+            <span style={{'fontWeight':'bold'}}>{this.props.messageReceive.message.userName}</span>
+            <span className='grey-text' style={{'fontStyle':'italic','fontSize':10}}> ..{moment(this.props.messageReceive.message.created).format('MMMM Do YYYY, h:mm:ss a')}</span>
+            <p style={{'wordWrap':'break-word','whiteSpace':'pre-wrap'}}>{this.props.messageReceive.message.contents}</p>
+          </div>
+        </div>
+      ),
+      level: 'info',
+      position: 'br',
+    });
   }
   scrollToBottom = () => {
     const messagesContainer = this.messagesContainer;
@@ -34,8 +59,16 @@ class MessageList extends Component {
     this.isLoading = false;
     this.scrollToBottom();
 
-    //this.messagesContainer.scrollTop = this.state.prevTop + (this.messagesContainer.scrollHeight - this.state.scrollHeight);
 
+  }
+  componentDidUpdate(prevProps) {
+    if(prevProps.messages !== this.props.messages){
+      if((prevProps.messageReceive !== this.props.messageReceive)&&(this.messagesContainer.scrollTop < this.messagesContainer.scrollHeight - this.messagesContainer.clientHeight * 2 ) ){
+        this.addNotification();
+      }else if(!this.isLoading){
+        this.scrollToBottom();
+      }
+    }
   }
   render () {
     const mobileStyle = this.props.isMobile?styles.messageListContainerMobile:styles.messageListContainer;
@@ -70,6 +103,7 @@ class MessageList extends Component {
       <div className={mobileStyle} ref={(ref) => {this.messagesContainer = ref;}} onScroll={this.handleScroll}>
         {loadingView}
         {messageList}
+        <NotificationSystem ref={ref => this.notificationSystem = ref} />
       </div>
     );
   }
@@ -80,5 +114,11 @@ MessageList.propTypes = {
   messages : PropTypes.array.isRequired,
   currentUser : PropTypes.string.isRequired,
   messageListStatus : PropTypes.string.isRequired,
+  messageAddStatus : PropTypes.string.isRequired,
+  messageReceive : PropTypes.object.isRequired,
+  isLast : PropTypes.bool.isRequired,
+  setInitial : PropTypes.func.isRequired,
+  listMessage : PropTypes.func.isRequired,
+  activeChannel: PropTypes.object.isRequired,
 };
 export default MessageList;

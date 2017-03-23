@@ -3,6 +3,10 @@ import update from 'react-addons-update';
 import _ from 'lodash';
 
 const initialState = {
+  receive:{
+    status: 'INIT',
+    message: {},
+  },
   add:{
     status: 'INIT',
     message: {},
@@ -39,7 +43,7 @@ export default function message(state, action) {
         messages : [action.message]
       };
       return update(state, {
-        add: {
+        receive: {
           status: { $set: 'SUCCESS' },
           message: { $set: action.message}
         },
@@ -50,7 +54,7 @@ export default function message(state, action) {
     }
     else{
       return update(state, {
-        add: {
+        receive: {
           status: { $set: 'SUCCESS' },
           message: { $set: action.message}
         },

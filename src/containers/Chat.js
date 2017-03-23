@@ -29,6 +29,11 @@ class Chat extends React.Component {
   }
   //App 에서의 getStatusRequest가 ComponentDidMount에서 실행이 되어야 여기서 sign data를 사용이 가능..
   componentWillMount(){
+
+  }
+  componentDidMount() {
+    /*direct connect without signin*/
+
     this.props.getStatusRequest().then(()=>{
       if(!this.props.status.isSignedIn){
 
@@ -38,23 +43,21 @@ class Chat extends React.Component {
         .then(() => {
           var publicChannel = this.props.channels.find((channel) => {return channel.id === '1';});
           this.props.changeChannel(publicChannel);
-        })
-      this.props.listMessage(this.props.activeChannel.id,true,-1)
-        .then(()=>{
-        })
-    });
-  }
-  componentDidMount() {
-    /*direct connect without signin*/
 
-      socket.emit('chat mounted');
-      socket.emit('join channel',this.props.activeChannel);
-      socket.on('new bc message', message =>
-        this.props.receiveRawMessage(message)
-      );
-      socket.on('receive socket', socketID =>
-        this.props.receiveSocket(socketID)
-      );
+          this.props.listMessage(this.props.activeChannel.id,true,-1)
+            .then(()=>{
+            });
+          socket.emit('chat mounted');
+          socket.emit('join channel',this.props.activeChannel);
+          socket.on('new bc message', message =>
+            this.props.receiveRawMessage(message)
+          );
+          socket.on('receive socket', socketID =>
+            this.props.receiveSocket(socketID)
+          );
+        });
+
+    });
 
   }
   changeActiveChannel(channel) {
@@ -72,7 +75,7 @@ class Chat extends React.Component {
     };
     this.props.addMessage(newMessage)
       .then(() => {
-        socket.emit('new message', this.props.add.message);
+        socket.emit('new message', this.props.messageAddMessage);
       })
       .catch(() => {
         console.log('failed to add Message');
@@ -142,6 +145,8 @@ class Chat extends React.Component {
             <ChatView isMobile={isMobile}
                       activeChannel={this.props.activeChannel}
                       messageListStatus={this.props.messageListStatus}
+                      messageAddStatus={this.props.messageAddStatus}
+                      messageReceive={this.props.messageReceive}
                       listMessage={this.props.listMessage}
                       activeChannel={this.props.activeChannel}
                       messages={this.props.messages}
@@ -162,12 +167,14 @@ const mapStateToProps = (state) => {
     channelListStatus: state.channel.list.status,
     messages: state.message.list.messages,
     isLast: state.message.list.isLast,
-    messageListStatus: state.message.list.status,
     status: state.authentication.status,
     isAdmin : state.authentication.status.isAdmin,
     search : state.channel.search,
     join : state.channel.join,
-    add : state.message.add,
+    messageAddMessage : state.message.add.message,
+    messageAddStatus : state.message.add.status,
+    messageListStatus: state.message.list.status,
+    messageReceive: state.message.receive,
     environment: state.environment,
   };
 };

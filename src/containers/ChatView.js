@@ -2,20 +2,18 @@ import React, { Component, PropTypes } from 'react'
 import {Form, Button, Icon, Dimmer, Loader, Image, Segment } from 'semantic-ui-react';
 
 
-import {MessageList, ChatHeader} from '../components';
+import {MessageList, ChatHeader, InputMessage} from '../components';
 import styles from '../Style.css';
 
 class ChatView extends Component{
   constructor(){
     super();
     this.state = {
-      message : '',
       isInitial : true,
     };
-    this.addMessage = this.addMessage.bind(this);
-    this.handleChange = this.handleChange.bind(this);
     this.changeActiveChannel = this.changeActiveChannel.bind(this);
     this.setInitial = this.setInitial.bind(this);
+    this.addMessage = this.addMessage.bind(this);
   }
   componentWillReceiveProps(nextProps){
     if(this.props.activeChannel !== nextProps.activeChannel)
@@ -27,20 +25,8 @@ class ChatView extends Component{
     this.props.changeChannel(channel);
     this.props.listMessage(channel.id, true);
   }
-  addMessage(){
-    this.props.addMessage(this.state.message);
-    this.setState({message: ''});
-  }
-  handleChange(e){
-    this.setState({
-      message : e.target.value,
-    });
-  }
-  handleKeyPress = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      this.addMessage();
-    }
+  addMessage(message){
+    this.props.addMessage(message);
   }
   setInitial(isInitial){
     this.setState({
@@ -62,16 +48,13 @@ class ChatView extends Component{
                            listMessage={this.props.listMessage}
                            activeChannel={this.props.activeChannel}
                            messages={this.props.messages}
+                           messageAddStatus={this.props.messageAddStatus}
+                           messageReceive={this.props.messageReceive}
+                           messageListStatus={this.props.messageListStatus}
                            isLast={this.props.isLast}
                            currentUser={this.props.currentUser}
-                           setInitial={this.setInitial}
-                           messageListStatus={this.props.messageListStatus}/>
-              <div className={styles.messageInputContainer}>
-                <Button className={styles.messageInputButton} icon>
-                  <Icon name='plus' />
-                </Button>
-                <textArea className={styles.messageInput} type ='text' value={this.state.message} onChange={this.handleChange} onKeyPress={this.handleKeyPress}/>
-              </div>
+                           setInitial={this.setInitial}/>
+              <InputMessage addMessage={this.addMessage} />
             </div>;
     const view = ((this.props.messageListStatus !== 'SUCCESS')&&(this.state.isInitial)?loadingView:chatView);
     return(
