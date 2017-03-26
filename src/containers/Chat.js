@@ -7,7 +7,7 @@ import uuid from 'node-uuid';
 import NotificationSystem from 'react-notification-system';
 
 import {receiveRawMessage, addMessage, listMessage} from '../actions/message';
-import {addChannel, changeChannel, listChannel, searchChannel, joinChannel, receiveRawChannel} from '../actions/channel';
+import {addChannel, changeChannel, listChannel, searchChannel, joinChannel, receiveRawChannel, receiveRawParticipant} from '../actions/channel';
 import {receiveSocket, signoutRequest, getStatusRequest} from '../actions/authentication';
 import {Sidebar, SearchModal} from '../components';
 import {ChatView} from './';
@@ -51,13 +51,16 @@ class Chat extends React.Component {
           this.props.listMessage(this.props.activeChannel.id,true,-1)
             .then(()=>{
               socket.emit('chat mounted');
-              socket.emit('join channel',this.props.activeChannel);
+              socket.emit('join channel',this.props.activeChannel.id, this.props.status.currentUser);
               socket.emit('storeClientInfo',this.props.status);
+              socket.on('receive new participant', (channelID, participant) => {
+                this.props.receiveRawParticipant(channelID, participant);
+              });
               socket.on('new bc message', message =>
                 this.props.receiveRawMessage(message)
               );
               socket.on('receive private channel', (channel) =>{
-                this.props.receiveRawChannel(channel)
+                this.props.receiveRawChannel(channel);
                 this.addNotification('새로운 그룹이 생성되었습니다!', 'info', 'bl');
               });
               socket.on('receive socket', socketID =>
@@ -80,7 +83,7 @@ class Chat extends React.Component {
   }
   changeActiveChannel(channel) {
     socket.emit('leave channel', this.props.activeChannel);
-    socket.emit('join channel', channel);
+    socket.emit('join channel',channel.id, this.props.status.currentUser);
     this.props.changeChannel(channel);
     this.props.listMessage(channel.id, true, -1);
   }
@@ -197,6 +200,7 @@ class Chat extends React.Component {
                       addGroup={this.handleAddGroup}
                       currentUser={this.props.status.currentUser}/>
         </div>
+        <NotificationSystem ref={ref => this.notificationSystem = ref} />
       </div>
     );
   }
@@ -236,6 +240,9 @@ const mapDispatchToProps = (dispatch) => {
     },
     receiveRawChannel: (channel) => {
       return dispatch(receiveRawChannel(channel));
+    },
+    receiveRawParticipant: (channelID, participant) => {
+      return dispatch(receiveRawParticipant(channelID, participant));
     },
     addMessage: (message) => {
       return dispatch(addMessage(message));

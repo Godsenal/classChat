@@ -3,9 +3,10 @@ import { connect } from 'react-redux';
 import { browserHistory, Link } from 'react-router';
 import { Button, Checkbox, Icon, Message, Input, Form, Select} from 'semantic-ui-react';
 import { signupRequest } from '../actions/authentication';
+import { joinChannel } from '../actions/channel';
 import styles from '../Style.css'
 
-const channelOptions = [{key: '1', value: '1', text: '자료구조'},{key: '2', value: '2', text: '알고리즘'}];
+
 class Signup extends Component{
   constructor(){
     super();
@@ -46,15 +47,19 @@ class Signup extends Component{
   handleChange(e){
     this.setState({[`${e.target.name}`]: e.target.value});
   }
-  handleSignup(){
+  handleSignup(e){
+    e.preventDefault();
     let id = this.state.id;
     let pw = this.state.pw;
     let nickname = this.state.nickname;
     this.props.signupRequest(id, pw, nickname)
       .then(() =>{
         if(this.props.signup.status === 'SUCCESS'){
-          Materialize.toast('Welcome! Please Sign in!', 2000);
-          browserHistory.push('/signin');
+          this.props.joinChannel(id,['1'])
+            .then(() => {
+              Materialize.toast('Welcome! Please Sign in!', 2000);
+              browserHistory.push('/');
+            });
         }
         else{
           if(this.props.signup.errCode == (1 || 4)){
@@ -85,10 +90,10 @@ class Signup extends Component{
             <Form.Input name='id' label='ID' placeholder='id' type='text' onChange={this.handleChange}/>
             <Form.Input name='pw' label='Password' placeholder='password' type='password' onChange={this.handleChange}/>
           </Form.Group>
-          <Form.Input label='Username' placeholder='username' type='text' />
+          <Form.Input name='nickname' label='Username' placeholder='username' type='text' onChange={this.handleChange}/>
           <Form.Select multiple selection search label='Channel' placeholder='Select your channel' options={channelOptions} onChange={this.selectedItem}/>
           <Form.Checkbox inline label='I agree to the terms and conditions' />
-          <Button color='blue'>Submit</Button>
+          <Button color='blue' onClick={this.handleSignup}>Submit</Button>
         </Form>
         <Message attached='bottom' warning>
           <Icon name='help' />
@@ -112,7 +117,10 @@ const mapDispatchToProps = (dispatch) => {
   return {
     signupRequest: (id, pw, nickname) => {
       return dispatch(signupRequest(id, pw, nickname));
-    }
+    },
+    joinChannel: (id, channels) => {
+      return dispatch(signupRequest(id, channels));
+    },
   };
 };
 

@@ -1,9 +1,8 @@
 # StudyReact
 
 TODO:
-  NOTICE(Inside Chat Header)
   EMOJI
-  PARTICIPANTS(MAKE GROUP CHANNEL)
   CALANDER(SIDE BAR)
   CLASS ROOM
   MAP?
+  Mobile View(Header) Responsive

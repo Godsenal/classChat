@@ -13,15 +13,26 @@ import {
     CHANNEL_SEARCH_SUCCESS,
     CHANNEL_SEARCH_FAILURE,
     ROW_CHANNEL_RECEIVE,
+    ROW_PARTICIPANT_RECEIVE,
 } from './ActionTypes';
 
 import axios from 'axios';
 
 /* NOT REQUIRED FETCH ACTION */
+/* RECEIVE MESSAGE */
 export function receiveRawChannel(channel) {
   return {
     type: ROW_CHANNEL_RECEIVE,
     channel
+  };
+}
+
+/* RECEIVE PARTICIPANTS */
+export function receiveRawParticipant(channelID, participant){
+  return {
+    type : ROW_PARTICIPANT_RECEIVE,
+    channelID,
+    participant,
   };
 }
 

@@ -55,6 +55,30 @@ export default function channel(state, action) {
         channels: {$set: [...state.list.channels,action.channel]}
       }
     });
+        /* RECEIVE PARTICIPANT */
+  case types.ROW_PARTICIPANT_RECEIVE:
+    var isIn = state.activeChannel.participants.indexOf(action.participant);
+    if(isIn >= 0){
+      return state;
+    }
+    var listIndex = state.list.channels.findIndex((channel) => {
+      return channel.id === action.channelID;
+    });
+    if(listIndex <0){
+      return state;
+    }
+    return update(state, {
+      activeChannel: {
+        participants: {$push : [action.participant]}
+      },
+      list: {
+        channels:{
+          [listIndex]:{
+            participants: {$push : [action.participant]}
+          }
+        }
+      }
+    });
         /* ADD CHANNEL */
   case types.CHANNEL_ADD:
     return update(state, {

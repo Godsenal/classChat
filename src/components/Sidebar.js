@@ -46,7 +46,7 @@ class Sidebar extends React.Component {
           <Dropdown.Menu color='violet'>
             {this.props.channels.map((channel)=>{
               if(channel.type === 'CHANNEL')
-                return(<Dropdown.Item name={channel.name} active={activeChannelItem === channel.name} key={channel.id} onClick={()=>this.handleChannelClick(channel)}><Icon name='hashtag'/>{channel.name}</Dropdown.Item>);
+                return(<Dropdown.Item name={channel.name} active={this.props.activeChannel.name === channel.name} key={channel.id} onClick={()=>this.handleChannelClick(channel)}><Icon name='hashtag'/>{channel.name}</Dropdown.Item>);
             })}
           </Dropdown.Menu>
         </Dropdown>
@@ -54,7 +54,7 @@ class Sidebar extends React.Component {
           <Dropdown.Menu color='red'>
             {this.props.channels.map((channel)=>{
               if(channel.type === 'GROUP')
-                return(<Dropdown.Item color='red' name={channel.name} active={activeChannelItem === channel.name} key={channel.id} onClick={()=>this.handleChannelClick(channel)}><Icon name='group'/>{channel.name}</Dropdown.Item>);
+                return(<Dropdown.Item color='red' name={channel.name} active={this.props.activeChannel.name === channel.name} key={channel.id} onClick={()=>this.handleChannelClick(channel)}><Icon name='group'/>{channel.name}</Dropdown.Item>);
             })}
           </Dropdown.Menu>
         </Dropdown>

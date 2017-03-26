@@ -14,13 +14,13 @@ exports = module.exports = function (io) {
     });
     socket.on('storeClientInfo', function (data) {
       clients[data.currentUser] = socket.id;
-      console.log(clients);
     });
     socket.on('leave channel', function(channel) {
       socket.leave(channel);
     });
-    socket.on('join channel', function(channel) {
-      socket.join(channel.id);
+    socket.on('join channel', function(channelID, participant) {
+      socket.join(channelID);
+      socket.broadcast.to(channelID).emit('receive new participant', channelID, participant);
     });
     socket.on('new message', function(message) {
       socket.broadcast.to(message.channelID).emit('new bc message', message);
