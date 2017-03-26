@@ -24,6 +24,17 @@ class InputMessage extends React.Component {
     this.handleChange = this.handleChange.bind(this);
     this.addNotification = this.addNotification.bind(this);
   }
+  componentWillReceiveProps(nextProps){
+    if(this.state.selectOption.length !== nextProps.activeChannel.participants.length)
+      this.setState({selectOption : nextProps.activeChannel.participants.filter((participant,index) => {
+        if(participant !== this.props.currentUser){
+          return participant;
+        }
+      }).map((participant, index) => {
+        var option = {key : index, value : participant, text : participant};
+        return option;
+      }),});
+  }
   addNotification(message, level, position) {
     this.notificationSystem.addNotification({
       message,

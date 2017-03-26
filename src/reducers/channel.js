@@ -57,6 +57,7 @@ export default function channel(state, action) {
     });
         /* RECEIVE PARTICIPANT */
   case types.ROW_PARTICIPANT_RECEIVE:
+
     var isIn = state.activeChannel.participants.indexOf(action.participant);
     if(isIn >= 0){
       return state;

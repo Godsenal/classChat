@@ -53,9 +53,9 @@ class Chat extends React.Component {
               socket.emit('chat mounted');
               socket.emit('join channel',this.props.activeChannel.id, this.props.status.currentUser);
               socket.emit('storeClientInfo',this.props.status);
-              socket.on('receive new participant', (channelID, participant) => {
-                this.props.receiveRawParticipant(channelID, participant);
-              });
+              socket.on('receive new participant', (channelID, participant) =>
+                this.props.receiveRawParticipant(channelID, participant)
+              );
               socket.on('new bc message', message =>
                 this.props.receiveRawMessage(message)
               );
@@ -82,7 +82,7 @@ class Chat extends React.Component {
     });
   }
   changeActiveChannel(channel) {
-    socket.emit('leave channel', this.props.activeChannel);
+    socket.emit('leave channel', this.props.activeChannel.id);
     socket.emit('join channel',channel.id, this.props.status.currentUser);
     this.props.changeChannel(channel);
     this.props.listMessage(channel.id, true, -1);

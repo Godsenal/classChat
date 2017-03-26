@@ -14,9 +14,10 @@ exports = module.exports = function (io) {
     });
     socket.on('storeClientInfo', function (data) {
       clients[data.currentUser] = socket.id;
+      console.log(clients);
     });
-    socket.on('leave channel', function(channel) {
-      socket.leave(channel);
+    socket.on('leave channel', function(channelID) {
+      socket.leave(channelID);
     });
     socket.on('join channel', function(channelID, participant) {
       socket.join(channelID);
