@@ -1,7 +1,7 @@
 import config from './config';
 import mongoose from 'mongoose';
 import api from './api';
-import sassMiddleware from 'node-sass-middleware';
+//import sassMiddleware from 'node-sass-middleware';
 import path from 'path';
 import bodyParser from 'body-parser';
 import express from 'express';
@@ -34,11 +34,12 @@ app.use(session({
     ttl: 60*60  // 1 days (default: 14days)
   })
 }));
-
+/*
 app.use(sassMiddleware({
   src: path.join(__dirname, 'sass'),
   dest: path.join(__dirname, 'public'),
 }));
+*/
 
 
 

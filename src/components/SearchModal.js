@@ -1,6 +1,5 @@
 import React, { Component, PropTypes } from 'react';
 import {Search, Modal, Button, Label, Header, Icon, Grid} from 'semantic-ui-react';
-import _ from 'lodash';
 
 const resultRenderer = ({ name, id}) => (
   <Label content={name} />
@@ -16,6 +15,7 @@ class SearchModal extends Component{
       channel: {},
     };
   }
+  /*
   componentWillMount() {
     this.resetComponent();
   }
@@ -36,31 +36,38 @@ class SearchModal extends Component{
     }, 500);
 
   }
-
+*/
+  close = () => {
+    this.setState({
+      isOpen : false,
+    });
+  }
   render(){
     const { isLoading, value, id, results, channel } = this.state;
     return(
-      <Modal open={this.props.isOpen} basic>
-        <Modal.Header>
-        <Header icon size='huge' textAlign='center' inverted><Icon name='group'/>Search a Channel to Join</Header>
-        </Modal.Header>
-        <Modal.Content>
-          <Search aligned='center' fluid
-            loading={isLoading}
-            onResultSelect={this.handleResultSelect}
-            onSearchChange={this.handleSearchChange}
-            results={results}
-            value={value}
-            resultRenderer={resultRenderer}
-          />
-        </Modal.Content>
-        <Modal.Actions>
-          <Button basic color='blue' onClick={() => this.props.handleJoinChannel(channel)} inverted> Join </Button>
-          <Button basic color='red' onClick={this.props.handleSearchClose} inverted> No </Button>
-        </Modal.Actions>
-      </Modal>
+      <Modal open={this.props.isOpen} basic onClose={this.close}/>
     );
   }
 }
-
+/*
+<Modal open={this.props.isOpen} basic>
+  <Modal.Header>
+  <Header icon size='huge' textAlign='center' inverted><Icon name='group'/>Search a Channel to Join</Header>
+  </Modal.Header>
+  <Modal.Content>
+    <Search aligned='center' fluid
+      loading={isLoading}
+      onResultSelect={this.handleResultSelect}
+      onSearchChange={this.handleSearchChange}
+      results={results}
+      value={value}
+      resultRenderer={resultRenderer}
+    />
+  </Modal.Content>
+  <Modal.Actions>
+    <Button basic color='blue' onClick={() => this.props.handleJoinChannel(channel)} inverted> Join </Button>
+    <Button basic color='red' onClick={this.props.handleSearchClose} inverted> No </Button>
+  </Modal.Actions>
+</Modal>
+*/
 export default SearchModal;

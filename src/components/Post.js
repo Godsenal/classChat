@@ -1,5 +1,5 @@
 import React,{Component,PropTypes} from 'react';
-import {Button} from 'react-materialize';
+import {Button} from 'semantic-ui-react';
 
 class Post extends Component {
   constructor(){
