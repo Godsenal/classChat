@@ -43,9 +43,18 @@ class Sidebar extends React.Component {
           </Dropdown.Menu>
         </Dropdown>
         <Dropdown className={styles.balooFont} item text='Channel'>
-          <Dropdown.Menu>
+          <Dropdown.Menu color='violet'>
             {this.props.channels.map((channel)=>{
-              return(<Dropdown.Item name={channel.name} active={activeChannelItem === channel.name} key={channel.id} onClick={()=>this.handleChannelClick(channel)}>#{channel.name}</Dropdown.Item>);
+              if(channel.type === 'CHANNEL')
+                return(<Dropdown.Item name={channel.name} active={activeChannelItem === channel.name} key={channel.id} onClick={()=>this.handleChannelClick(channel)}><Icon name='hashtag'/>{channel.name}</Dropdown.Item>);
+            })}
+          </Dropdown.Menu>
+        </Dropdown>
+        <Dropdown className={styles.balooFont} item text='Group'>
+          <Dropdown.Menu color='red'>
+            {this.props.channels.map((channel)=>{
+              if(channel.type === 'GROUP')
+                return(<Dropdown.Item color='red' name={channel.name} active={activeChannelItem === channel.name} key={channel.id} onClick={()=>this.handleChannelClick(channel)}><Icon name='group'/>{channel.name}</Dropdown.Item>);
             })}
           </Dropdown.Menu>
         </Dropdown>
@@ -54,7 +63,7 @@ class Sidebar extends React.Component {
         </Menu.Item>
       </Menu>
         :
-    <Menu style = {{'height':'100vh'}} vertical attached>
+    <Menu style = {{'height':'100vh'}} vertical attached >
       <Menu.Header >
         <Dropdown className={styles.balooFont} item text={this.props.status.currentUser}>
           <Dropdown.Menu>
@@ -63,14 +72,16 @@ class Sidebar extends React.Component {
           </Dropdown.Menu>
         </Dropdown>
       </Menu.Header>
-      <Menu.Item>
-        <Menu.Header className={styles.balooFont}>CHANNELS</Menu.Header>
-        <Menu.Menu>
-          {this.props.channels.map((channel)=>{
-            return(<Menu.Item name={channel.name} active={activeChannelItem === channel.name} key={channel.id} onClick={()=>this.handleChannelClick(channel)}>#{channel.name}</Menu.Item>);
-          })}
-        </Menu.Menu>
-      </Menu.Item>
+      <Menu.Item header className={styles.balooFont}>CHANNELS</Menu.Item>
+        {this.props.channels.map((channel)=>{
+          if(channel.type === 'CHANNEL')
+            return(<Menu.Item color='violet' name={channel.name} active={activeChannelItem === channel.name} key={channel.id} onClick={()=>this.handleChannelClick(channel)}><Icon name='hashtag'/>{channel.name}</Menu.Item>);
+        })}
+      <Menu.Item header className={styles.balooFont}>GROUPS</Menu.Item>
+        {this.props.channels.map((channel)=>{
+          if(channel.type === 'GROUP')
+            return(<Menu.Item color='red' name={channel.name} active={activeChannelItem === channel.name} key={channel.id} onClick={()=>this.handleChannelClick(channel)}><Icon name='group'/>{channel.name}</Menu.Item>);
+        })}
       <Menu.Item className={styles.balooFont} name='search' onClick={this.handleSearchClick}>
         <Icon name='search'/>Search Channel
       </Menu.Item>

@@ -85,15 +85,14 @@ class App extends Component{
   }
   handleItemClick = (e, { name }) => this.setState({ activeItem: name })
   render(){
-    const { activeItem } = this.state;
-    const re = /(signin|signup)/;
-    const isAuth = re.test(this.props.location.pathname); // test current location is whether signin or signup
+    //const re = /(signin|signup)/;
+    //const isAuth = re.test(this.props.location.pathname); // test current location is whether signin or signup
     /* Mobile Setting */
-    const { width } = this.state;
+    //const { width } = this.state;
     //const isMobile = width <= 600;
-    const marginContent = ((!isMobile&&!isAuth)?150:0);
-    const side = ((this.state.side||!isMobile)&&!isAuth?true:false);
-    const {screenHeight, isMobile, screenWidth} = this.props.environment;
+    //const marginContent = ((!isMobile&&!isAuth)?150:0);
+    //const side = ((this.state.side||!isMobile)&&!isAuth?true:false);
+    //const {screenHeight, isMobile, screenWidth} = this.props.environment;
     //const sideAnim = (isMobile?'slide along':'overlay');
     /* Mobile Setting */
     /*const userInfo = (this.props.status.isSignedIn?
@@ -123,7 +122,7 @@ class App extends Component{
                                                     </Menu.Menu>
                                                   </Menu.Item>);*/
 
-    const header = (isAuth?null:
+    /*const header = (isAuth?null:
                             <div className='navbar-fixed'>
                               <nav>
                                 <div className="nav-wrapper black">
@@ -134,7 +133,7 @@ class App extends Component{
                                   <Link to='/' className="brand-logo center" style={{'textDecoration' : 'none'}}>TAEHEE LEE</Link>
                                 </div>
                               </nav>
-                            </div>);
+                            </div>);*/
 
 
     return(

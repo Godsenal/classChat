@@ -9,8 +9,13 @@ const initialState = {
     private: false,
     participants: [],
   },
+  receive:{
+    status: 'INIT',
+    channel: {},
+  },
   add:{
     status: 'INIT',
+    channel: {},
     err: 'ERROR',
     errCode: -1,
   },
@@ -39,6 +44,17 @@ export default function channel(state, action) {
   }
 
   switch(action.type) {
+        /*Receive CHANNEL*/
+  case types.ROW_CHANNEL_RECEIVE:
+    return update(state, {
+      receive: {
+        status : {$set: 'SUCCESS'},
+        channel : {$set: action.channel}
+      },
+      list: {
+        channels: {$set: [...state.list.channels,action.channel]}
+      }
+    });
         /* ADD CHANNEL */
   case types.CHANNEL_ADD:
     return update(state, {
@@ -50,6 +66,7 @@ export default function channel(state, action) {
     return update(state, {
       add: {
         status: { $set: 'SUCCESS' },
+        channel: { $set: action.channel},
       },
       list: {
         channels: {$set: [...state.list.channels,action.channel]}

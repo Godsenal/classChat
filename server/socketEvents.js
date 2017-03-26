@@ -1,5 +1,8 @@
+var clients = {};
 exports = module.exports = function (io) {
   // Set socket.io listeners.
+
+
   io.on('connection', (socket) => {
     socket.join('Lobby');
 
@@ -8,6 +11,10 @@ exports = module.exports = function (io) {
     socket.on('chat mounted', function() {
       // TODO: Does the server need to know the user?
       socket.emit('receive socket', socket.id);
+    });
+    socket.on('storeClientInfo', function (data) {
+      clients[data.currentUser] = socket.id;
+      console.log(clients);
     });
     socket.on('leave channel', function(channel) {
       socket.leave(channel);
@@ -27,8 +34,10 @@ exports = module.exports = function (io) {
     socket.on('stop typing', function (data) {
       socket.broadcast.to(data.channel).emit('stop typing bc', data.user);
     });
-    socket.on('new private channel', function(socketID, channel) {
-      socket.broadcast.to(socketID).emit('receive private channel', channel);
+    socket.on('new private channel', function(participants,channel) {
+      participants.forEach(function(element){
+        socket.broadcast.to(clients[element]).emit('receive private channel', channel);
+      });
     });
   });
 };

@@ -40,7 +40,7 @@ class MessageList extends Component {
 
   };
   handleScroll(){
-    if((!this.props.isLast)&&(this.messagesContainer.scrollTop <= 50) && (!this.isLoading)){
+    if((!this.props.isLast)&&(this.messagesContainer.scrollTop == 0) && (!this.isLoading)){
       this.isLoading = true;
       this.height = this.messagesContainer.scrollHeight;
       this.top = this.messagesContainer.scrollTop;
@@ -87,17 +87,15 @@ class MessageList extends Component {
           );
         }));
     const loadingView = ( this.isLoading === true ?
-                          <Segment>
-                            <Dimmer active>
+                          <Segment className={styles.receiveOld} basic>
+                            <Dimmer active inverted>
                               <Loader>Loading</Loader>
                             </Dimmer>
                           </Segment>
                           :((isEmpty||this.props.isLast)?null
-                          :<Segment>
-                            <Dimmer active>
-                              Old Messages
-                            </Dimmer>
-                          </Segment>
+                          :<div className={styles.receiveOld}>
+                            <span className={styles.receiveOldText}>Get Old Messages</span>
+                          </div>
                           ));
     return(
       <div className={mobileStyle} ref={(ref) => {this.messagesContainer = ref;}} onScroll={this.handleScroll}>

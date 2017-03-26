@@ -1,12 +1,13 @@
 import React, { PropTypes } from 'react'
 import {connect} from 'react-redux';
 import {browserHistory} from 'react-router';
-import {Grid, Modal, Button, Input} from 'semantic-ui-react';
+import {} from 'semantic-ui-react';
 import io from 'socket.io-client';
 import uuid from 'node-uuid';
+import NotificationSystem from 'react-notification-system';
 
 import {receiveRawMessage, addMessage, listMessage} from '../actions/message';
-import {changeChannel, listChannel, searchChannel, joinChannel} from '../actions/channel';
+import {addChannel, changeChannel, listChannel, searchChannel, joinChannel, receiveRawChannel} from '../actions/channel';
 import {receiveSocket, signoutRequest, getStatusRequest} from '../actions/authentication';
 import {Sidebar, SearchModal} from '../components';
 import {ChatView} from './';
@@ -26,6 +27,9 @@ class Chat extends React.Component {
     this.handleSearchClick = this.handleSearchClick.bind(this);
     this.handleSearchClose = this.handleSearchClose.bind(this);
     this.handleJoinChannel = this.handleJoinChannel.bind(this);
+    this.handleAddChannel = this.handleAddChannel.bind(this);
+    this.handleAddGroup = this.handleAddGroup.bind(this);
+    this.addNotification = this.addNotification.bind(this);
   }
   //App 에서의 getStatusRequest가 ComponentDidMount에서 실행이 되어야 여기서 sign data를 사용이 가능..
   componentWillMount(){
@@ -33,7 +37,7 @@ class Chat extends React.Component {
   }
   componentDidMount() {
     /*direct connect without signin*/
-
+    /* Get Singin Status First */
     this.props.getStatusRequest().then(()=>{
       if(!this.props.status.isSignedIn){
 
@@ -46,19 +50,33 @@ class Chat extends React.Component {
 
           this.props.listMessage(this.props.activeChannel.id,true,-1)
             .then(()=>{
+              socket.emit('chat mounted');
+              socket.emit('join channel',this.props.activeChannel);
+              socket.emit('storeClientInfo',this.props.status);
+              socket.on('new bc message', message =>
+                this.props.receiveRawMessage(message)
+              );
+              socket.on('receive private channel', (channel) =>{
+                this.props.receiveRawChannel(channel)
+                this.addNotification('새로운 그룹이 생성되었습니다!', 'info', 'bl');
+              });
+              socket.on('receive socket', socketID =>
+                this.props.receiveSocket(socketID)
+              );
             });
-          socket.emit('chat mounted');
-          socket.emit('join channel',this.props.activeChannel);
-          socket.on('new bc message', message =>
-            this.props.receiveRawMessage(message)
-          );
-          socket.on('receive socket', socketID =>
-            this.props.receiveSocket(socketID)
-          );
+
         });
 
     });
 
+  }
+  addNotification(message, level, position) {
+    this.notificationSystem.addNotification({
+      message,
+      level,
+      position,
+      autoDismiss: 2,
+    });
   }
   changeActiveChannel(channel) {
     socket.emit('leave channel', this.props.activeChannel);
@@ -79,6 +97,30 @@ class Chat extends React.Component {
       })
       .catch(() => {
         console.log('failed to add Message');
+      });
+  }
+  handleAddChannel(channel){
+    channel.channelID = this.props.activeChannel.id;
+    this.props.addChannel(channel).then(()=>{
+      this.changeActiveChannel(channel);
+    });
+  }
+  handleAddGroup(group){
+    var newChannel = {
+      name : group.name,
+      id: `${Date.now()}${uuid.v4()}`,
+      private: true,
+      participants : group.participants,
+      type : 'GROUP',
+      channelID : group.channelID
+    };
+    this.props.addChannel(newChannel)
+      .then(()=> {
+        socket.emit('new private channel', this.props.channelAdd.channel.participants, this.props.channelAdd.channel);
+        this.changeActiveChannel(this.props.channelAdd.channel);
+      })
+      .catch(()=>{
+        this.addNotification(this.props.channelAdd.err,'error','bc');
       });
   }
   handleJoinChannel(channel){
@@ -152,6 +194,7 @@ class Chat extends React.Component {
                       messages={this.props.messages}
                       isLast={this.props.isLast}
                       addMessage={this.addMessage}
+                      addGroup={this.handleAddGroup}
                       currentUser={this.props.status.currentUser}/>
         </div>
       </div>
@@ -163,6 +206,7 @@ class Chat extends React.Component {
 const mapStateToProps = (state) => {
   return {
     activeChannel: state.channel.activeChannel,
+    channelAdd : state.channel.add,
     channels: state.channel.list.channels,
     channelListStatus: state.channel.list.status,
     messages: state.message.list.messages,
@@ -190,6 +234,9 @@ const mapDispatchToProps = (dispatch) => {
     receiveRawMessage: (message) => {
       return dispatch(receiveRawMessage(message));
     },
+    receiveRawChannel: (channel) => {
+      return dispatch(receiveRawChannel(channel));
+    },
     addMessage: (message) => {
       return dispatch(addMessage(message));
     },
@@ -198,6 +245,9 @@ const mapDispatchToProps = (dispatch) => {
     },
     changeChannel: (channel) => {
       return dispatch(changeChannel(channel));
+    },
+    addChannel: (channel) => {
+      return dispatch(addChannel(channel));
     },
     listChannel: (userName) => {
       return dispatch(listChannel(userName));

@@ -84,6 +84,7 @@
 .messageInputContainer{
   position: relative;
   margin: 0 1.25rem;
+  vertical-align: top;
 }
 .messageInputButton{
   position: absolute;
@@ -152,4 +153,20 @@
 }
 .balooFont{
   font-family: 'Baloo Bhaina', 'Nanum Gothic', sans-serif;
+}
+
+.signinModal{
+  width: 30%;
+}
+.receiveOld{
+  height: 10rem;
+  text-align: center;
+
+}
+.receiveOldText{
+  vertical-align: bottom;
+  font-size: 20px;
+}
+.messageInputHeight{
+  height: 40px;
 }
