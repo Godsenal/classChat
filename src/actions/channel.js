@@ -8,6 +8,9 @@ import {
     CHANNEL_JOIN,
     CHANNEL_JOIN_SUCCESS,
     CHANNEL_JOIN_FAILURE,
+    CHANNEL_LEAVE,
+    CHANNEL_LEAVE_SUCCESS,
+    CHANNEL_LEAVE_FAILURE,
     CHANNEL_CHANGE,
     CHANNEL_SEARCH,
     CHANNEL_SEARCH_SUCCESS,
@@ -28,11 +31,12 @@ export function receiveRawChannel(channel) {
 }
 
 /* RECEIVE PARTICIPANTS */
-export function receiveRawParticipant(channelID, participant){
+export function receiveRawParticipant(channelID, participant ,isLeave = false){
   return {
     type : ROW_PARTICIPANT_RECEIVE,
     channelID,
     participant,
+    isLeave
   };
 }
 
@@ -50,7 +54,7 @@ export function addChannel(channel) {
 }
 
 /* JOIN CHANNEL */
-export  function joinChannel(userName, channels){
+export  function joinChannel(channels, userName){ // channel ID의 Array
   return (dispatch) => {
     dispatch({type: CHANNEL_JOIN});
     return axios.put(`api/channel/join/${userName}`,channels)
@@ -58,6 +62,19 @@ export  function joinChannel(userName, channels){
               dispatch({type: CHANNEL_JOIN_SUCCESS});
             }).catch((err)=> {
               dispatch({type: CHANNEL_JOIN_FAILURE, err: err.response.data.error});
+            });
+  };
+}
+
+/* LEAVE CHANNEL */
+export  function leaveChannel(channelID, userName){
+  return (dispatch) => {
+    dispatch({type: CHANNEL_LEAVE});
+    return axios.put(`api/channel/leave/${userName}`,{channelID})
+            .then((res)=>{
+              dispatch({type: CHANNEL_LEAVE_SUCCESS, channel : res.data.channel, isRemoved: res.data.isRemoved});
+            }).catch((err)=> {
+              dispatch({type: CHANNEL_LEAVE_FAILURE, err: err.data.error, code: err.data.code});
             });
   };
 }

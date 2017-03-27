@@ -82,6 +82,11 @@ class Sidebar extends React.Component {
           if(channel.type === 'GROUP')
             return(<Menu.Item color='red' name={channel.name} active={activeChannelItem === channel.name} key={channel.id} onClick={()=>this.handleChannelClick(channel)}><Icon name='group'/>{channel.name}</Menu.Item>);
         })}
+      <Menu.Item header className={styles.balooFont}>DIRECT</Menu.Item>
+        {this.props.channels.map((channel)=>{
+          if(channel.type === 'DIRECT')
+            return(<Menu.Item color='red' name={channel.name} active={activeChannelItem === channel.name} key={channel.id} onClick={()=>this.handleChannelClick(channel)}><Icon name='group'/>{channel.name}</Menu.Item>);
+        })}
       <Menu.Item className={styles.balooFont} name='search' onClick={this.handleSearchClick}>
         <Icon name='search'/>Search Channel
       </Menu.Item>

@@ -7,7 +7,7 @@ import uuid from 'node-uuid';
 import NotificationSystem from 'react-notification-system';
 
 import {receiveRawMessage, addMessage, listMessage} from '../actions/message';
-import {addChannel, changeChannel, listChannel, searchChannel, joinChannel, receiveRawChannel, receiveRawParticipant} from '../actions/channel';
+import {addChannel, changeChannel, listChannel, searchChannel, joinChannel, leaveChannel, receiveRawChannel, receiveRawParticipant} from '../actions/channel';
 import {receiveSocket, signoutRequest, getStatusRequest} from '../actions/authentication';
 import {Sidebar, SearchModal} from '../components';
 import {ChatView} from './';
@@ -21,12 +21,14 @@ class Chat extends React.Component {
     this.state={
       searchModal: false,
     };
+
     this.handleSignout = this.handleSignout.bind(this);
     this.addMessage = this.addMessage.bind(this);
     this.changeActiveChannel = this.changeActiveChannel.bind(this);
     this.handleSearchClick = this.handleSearchClick.bind(this);
     this.handleSearchClose = this.handleSearchClose.bind(this);
     this.handleJoinChannel = this.handleJoinChannel.bind(this);
+    this.handleLeaveChannel = this.handleLeaveChannel.bind(this);
     this.handleAddChannel = this.handleAddChannel.bind(this);
     this.handleAddGroup = this.handleAddGroup.bind(this);
     this.addNotification = this.addNotification.bind(this);
@@ -35,6 +37,16 @@ class Chat extends React.Component {
   componentWillMount(){
 
   }
+
+  addNotification(message, level, position) {
+    this.notificationSystem.addNotification({
+      message,
+      level,
+      position,
+      autoDismiss: 2,
+    });
+  }
+
   componentDidMount() {
     /*direct connect without signin*/
     /* Get Singin Status First */
@@ -53,15 +65,20 @@ class Chat extends React.Component {
               socket.emit('chat mounted');
               socket.emit('join channel',this.props.activeChannel.id, this.props.status.currentUser);
               socket.emit('storeClientInfo',this.props.status);
-              socket.on('receive new participant', (channelID, participant) =>
-                this.props.receiveRawParticipant(channelID, participant)
+              socket.on('receive new participant', (channelID, participant, isLeave) =>{
+                this.props.receiveRawParticipant(channelID, participant, isLeave)
+              }
               );
               socket.on('new bc message', message =>
                 this.props.receiveRawMessage(message)
               );
               socket.on('receive private channel', (channel) =>{
                 this.props.receiveRawChannel(channel);
-                this.addNotification('새로운 그룹이 생성되었습니다!', 'info', 'bl');
+                if(channel.type === 'GROUP'){
+                  this.addNotification('새로운 그룹이 생성되었습니다!', 'info', 'bl');
+                }else if(channel.type ==='DIRECT'){
+                  this.addNotification('1:1 채팅이 추가되었습니다!', 'info', 'bl');
+                }
               });
               socket.on('receive socket', socketID =>
                 this.props.receiveSocket(socketID)
@@ -73,16 +90,8 @@ class Chat extends React.Component {
     });
 
   }
-  addNotification(message, level, position) {
-    this.notificationSystem.addNotification({
-      message,
-      level,
-      position,
-      autoDismiss: 2,
-    });
-  }
-  changeActiveChannel(channel) {
-    socket.emit('leave channel', this.props.activeChannel.id);
+  changeActiveChannel(channel, isLeave = false) {
+    socket.emit('leave channel', this.props.activeChannel.id, this.props.status.currentUser, isLeave);
     socket.emit('join channel',channel.id, this.props.status.currentUser);
     this.props.changeChannel(channel);
     this.props.listMessage(channel.id, true, -1);
@@ -114,21 +123,29 @@ class Chat extends React.Component {
       id: `${Date.now()}${uuid.v4()}`,
       private: true,
       participants : group.participants,
-      type : 'GROUP',
-      channelID : group.channelID
+      type : group.type,
+      channelID : this.props.activeChannel.id,
     };
     this.props.addChannel(newChannel)
       .then(()=> {
-        socket.emit('new private channel', this.props.channelAdd.channel.participants, this.props.channelAdd.channel);
-        this.changeActiveChannel(this.props.channelAdd.channel);
-      })
-      .catch(()=>{
-        this.addNotification(this.props.channelAdd.err,'error','bc');
+        if(this.props.channelAdd.status === 'SUCCESS'){
+          socket.emit('new private channel', this.props.channelAdd.channel.participants, this.props.channelAdd.channel);
+          this.changeActiveChannel(this.props.channelAdd.channel);
+        }
+        else if(this.props.channelAdd.status === 'FAILURE'){
+          if(this.props.channelAdd.errCode === 2){
+            var existChannel = this.props.channels.find((channel) => {
+              return channel.name === group.name;
+            });
+            this.changeActiveChannel(existChannel);
+          }
+          this.addNotification(this.props.channelAdd.errCode,'error','bc');
+        }
       });
   }
   handleJoinChannel(channel){
     let channels = [channel];
-    this.props.joinChannel(this.props.status.currentUser, channels).then(()=>{
+    this.props.joinChannel(channels, this.props.status.currentUser).then(()=>{
       this.props.listChannel(this.props.status.currentUser).then(()=>{
         this.changeActiveChannel(channel);
         this.handleSearchClose();
@@ -136,10 +153,18 @@ class Chat extends React.Component {
 
     });
   }
+  handleLeaveChannel(){
+    this.props.leaveChannel(this.props.activeChannel.id, this.props.status.currentUser)
+      .then(()=>{
+        if(this.props.channelLeave.status === 'SUCCESS'){
+          this.changeActiveChannel(this.props.channels[0], true); //hard coding- need to fix!
+        }
+      })
+  }
   handleSignout(){
     this.props.signoutRequest().then(
       () => {
-        socket.emit('leave channel', this.props.activeChannel);
+        socket.emit('leave channel', this.props.activeChannel.id);
         Materialize.toast('Good Bye!', 2000);
         let signinData = {
           isSignedIn: false,
@@ -193,11 +218,11 @@ class Chat extends React.Component {
                       messageAddStatus={this.props.messageAddStatus}
                       messageReceive={this.props.messageReceive}
                       listMessage={this.props.listMessage}
-                      activeChannel={this.props.activeChannel}
                       messages={this.props.messages}
                       isLast={this.props.isLast}
                       addMessage={this.addMessage}
                       addGroup={this.handleAddGroup}
+                      leaveChannel={this.handleLeaveChannel}
                       currentUser={this.props.status.currentUser}/>
         </div>
         <NotificationSystem ref={ref => this.notificationSystem = ref} />
@@ -213,6 +238,7 @@ const mapStateToProps = (state) => {
     channelAdd : state.channel.add,
     channels: state.channel.list.channels,
     channelListStatus: state.channel.list.status,
+    channelLeave : state.channel.leave,
     messages: state.message.list.messages,
     isLast: state.message.list.isLast,
     status: state.authentication.status,
@@ -241,8 +267,8 @@ const mapDispatchToProps = (dispatch) => {
     receiveRawChannel: (channel) => {
       return dispatch(receiveRawChannel(channel));
     },
-    receiveRawParticipant: (channelID, participant) => {
-      return dispatch(receiveRawParticipant(channelID, participant));
+    receiveRawParticipant: (channelID, participant, isLeave) => {
+      return dispatch(receiveRawParticipant(channelID, participant, isLeave));
     },
     addMessage: (message) => {
       return dispatch(addMessage(message));
@@ -259,8 +285,11 @@ const mapDispatchToProps = (dispatch) => {
     listChannel: (userName) => {
       return dispatch(listChannel(userName));
     },
-    joinChannel: (userName, channelName) => {
-      return dispatch(joinChannel(userName, channelName));
+    joinChannel: (channelName, userName) => {
+      return dispatch(joinChannel(channelName, userName));
+    },
+    leaveChannel: (channelID, userName) => {
+      return dispatch(leaveChannel(channelID, userName));
     },
     searchChannel: (channelName) => {
       return dispatch(searchChannel(channelName));

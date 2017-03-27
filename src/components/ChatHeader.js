@@ -36,12 +36,15 @@ class ChatHeader extends React.Component {
           <Dropdown pointing text={this.props.participants.length.toString()+'명'} button icon='group' labeled className='icon' >
             <Dropdown.Menu>
               {this.props.participants.map((participant) => {
-                return(<Dropdown.Item key={participant} text={participant} />)
+                return(<Dropdown.Item key={participant} text={participant} />);
               })}
             </Dropdown.Menu>
           </Dropdown>
           <Button icon color='black' onClick={this.showModal}>
             <Icon name='search' />
+          </Button>
+          <Button icon primary onClick={this.props.leaveChannel}>
+            <Icon name='sign out' />
           </Button>
         </div>
         <Divider/>
@@ -53,10 +56,12 @@ ChatHeader.propTypes = {
   name : PropTypes.string.isRequired,
   participants: PropTypes.array.isRequired,
   id : PropTypes.string.isRequired,
+  leaveChannel : PropTypes.func.isRequired,
 };
 ChatHeader.defaultProps = {
   name : '',
   participants : [],
   id : '',
+  leaveChannel : () => console.log('props error(leaveChannel)'),
 };
 export default ChatHeader;

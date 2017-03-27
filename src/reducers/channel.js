@@ -30,6 +30,11 @@ const initialState = {
     err: 'ERROR',
     errCode: -1,
   },
+  leave: {
+    status: 'INIT',
+    err: 'ERROR',
+    errCode: -1,
+  },
   search: {
     status: 'INIT',
     results: [],
@@ -46,6 +51,10 @@ export default function channel(state, action) {
   switch(action.type) {
         /*Receive CHANNEL*/
   case types.ROW_CHANNEL_RECEIVE:
+    var channelIndex = state.list.channels.findIndex((channel)=> channel.id === action.channel.id);
+    if(channelIndex >=0){ //이미 존재할 경우
+      return state;
+    }
     return update(state, {
       receive: {
         status : {$set: 'SUCCESS'},
@@ -58,28 +67,47 @@ export default function channel(state, action) {
         /* RECEIVE PARTICIPANT */
   case types.ROW_PARTICIPANT_RECEIVE:
 
-    var isIn = state.activeChannel.participants.indexOf(action.participant);
-    if(isIn >= 0){
-      return state;
-    }
+    var participantIndex = state.activeChannel.participants.indexOf(action.participant);
     var listIndex = state.list.channels.findIndex((channel) => {
       return channel.id === action.channelID;
     });
     if(listIndex <0){
       return state;
     }
-    return update(state, {
-      activeChannel: {
-        participants: {$push : [action.participant]}
-      },
-      list: {
-        channels:{
-          [listIndex]:{
-            participants: {$push : [action.participant]}
+    if(!action.isLeave){ //들어올 때 추가하기위해 이미 있는지 파악(있으면 그냥 return)
+      if(participantIndex >= 0){
+        return state;
+      }
+      return update(state, {
+        activeChannel: {
+          participants: {$push : [action.participant]}
+        },
+        list: {
+          channels:{
+            [listIndex]:{
+              participants: {$push : [action.participant]}
+            }
           }
         }
+      });
+    }
+    else{ //나갈때 제거하기 위해 이미 있는지 파악(없으면 그냥 return)
+      if(participantIndex < 0){
+        return state;
       }
-    });
+      return update(state, {
+        activeChannel: {
+          participants: {$splice : [[participantIndex,1]]}
+        },
+        list: {
+          channels:{
+            [listIndex]:{
+              participants: {$splice : [[participantIndex,1]]}
+            }
+          }
+        }
+      });
+    }
         /* ADD CHANNEL */
   case types.CHANNEL_ADD:
     return update(state, {
@@ -144,6 +172,37 @@ export default function channel(state, action) {
   case types.CHANNEL_JOIN_FAILURE:
     return update(state, {
       join: {
+        status: { $set: 'FAILURE' },
+        err: { $set: action.err },
+        errCode: { $set: action.code}
+      }
+    });
+
+      /* CHANNEL LEAVE */
+  case types.CHANNEL_LEAVE:
+    return update(state, {
+      leave: {
+        status: { $set: 'WAITING' },
+      }
+    });
+  case types.CHANNEL_LEAVE_SUCCESS:
+    var removeIndex = state.list.channels.findIndex((channel)=>{
+      return channel.id === action.channel.id;
+    });
+    if(removeIndex < 0){
+      return state;
+    }
+    return update(state, {
+      leave: {
+        status: { $set: 'SUCCESS' }
+      },
+      list: {
+        channels: { $splice: [[removeIndex, 1]]}
+      },
+    });
+  case types.CHANNEL_LEAVE_FAILURE:
+    return update(state, {
+      leave: {
         status: { $set: 'FAILURE' },
         err: { $set: action.err },
         errCode: { $set: action.code}

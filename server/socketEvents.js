@@ -14,14 +14,16 @@ exports = module.exports = function (io) {
     });
     socket.on('storeClientInfo', function (data) {
       clients[data.currentUser] = socket.id;
-      console.log(clients);
     });
-    socket.on('leave channel', function(channelID) {
+    socket.on('leave channel', function(channelID, participant, isLeave = false) { // 소켓만 나갈 때
+      if(isLeave){
+        socket.broadcast.to(channelID).emit('receive new participant', channelID, participant, isLeave);
+      }
       socket.leave(channelID);
     });
     socket.on('join channel', function(channelID, participant) {
       socket.join(channelID);
-      socket.broadcast.to(channelID).emit('receive new participant', channelID, participant);
+      socket.broadcast.to(channelID).emit('receive new participant', channelID, participant, false);
     });
     socket.on('new message', function(message) {
       socket.broadcast.to(message.channelID).emit('new bc message', message);

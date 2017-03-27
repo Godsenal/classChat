@@ -12,7 +12,7 @@ class DateMessage extends React.Component {
       <div>
         <Divider horizontal>{moment(this.props.date).format('LL')}</Divider>
         {this.props.messages.map((message, i) => {
-          return <Message key={i} currentUser={this.props.currentUser} {...message} />;
+          return <Message key={i} currentUser={this.props.currentUser} addGroup={this.props.addGroup} {...message} />;
         })}
       </div>
     );
@@ -23,12 +23,14 @@ DateMessage.propTypes = {
   date : PropTypes.number.isRequired,
   messages : PropTypes.array.isRequired,
   currentUser : PropTypes.string.isRequired,
+  addGroup : PropTypes.func.isRequired,
 };
 
 DateMessage.defaultProps = {
   date : 0,
   messages : [],
   currentUser : '',
+  addGroup : () => {console.log('props Error');},
 };
 
 

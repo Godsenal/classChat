@@ -24,7 +24,7 @@ class InputMessage extends React.Component {
     this.handleChange = this.handleChange.bind(this);
     this.addNotification = this.addNotification.bind(this);
   }
-  componentWillReceiveProps(nextProps){
+  componentWillReceiveProps(nextProps){ // participant 가 새로 추가되었을 때 바로 변경.
     if(this.state.selectOption.length !== nextProps.activeChannel.participants.length)
       this.setState({selectOption : nextProps.activeChannel.participants.filter((participant,index) => {
         if(participant !== this.props.currentUser){
@@ -84,8 +84,8 @@ class InputMessage extends React.Component {
     }else{
       var group ={
         name: this.state.groupName,
-        participants : this.state.selected,
-        channelID : this.props.activeChannel.id,
+        participants : [this.props.currentUser,...this.state.selected],
+        type : 'GROUP',
       };
       this.props.addGroup(group);
       this.setState({

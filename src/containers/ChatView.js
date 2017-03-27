@@ -43,7 +43,7 @@ class ChatView extends Component{
             </Segment>;
     const chatView =
             <div>
-              <ChatHeader {...this.props.activeChannel} />
+              <ChatHeader {...this.props.activeChannel} leaveChannel={this.props.leaveChannel}/>
               <MessageList isMobile={this.props.isMobile}
                            listMessage={this.props.listMessage}
                            activeChannel={this.props.activeChannel}
@@ -53,7 +53,8 @@ class ChatView extends Component{
                            messageListStatus={this.props.messageListStatus}
                            isLast={this.props.isLast}
                            currentUser={this.props.currentUser}
-                           setInitial={this.setInitial}/>
+                           setInitial={this.setInitial}
+                           addGroup={this.props.addGroup}/>
               <InputMessage addMessage={this.addMessage} addGroup={this.props.addGroup} activeChannel={this.props.activeChannel} currentUser={this.props.currentUser}/>
             </div>;
     const view = ((this.props.messageListStatus !== 'SUCCESS')&&(this.state.isInitial))?loadingView:chatView;

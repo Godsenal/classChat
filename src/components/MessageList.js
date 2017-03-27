@@ -32,6 +32,7 @@ class MessageList extends Component {
       ),
       level: 'info',
       position: 'br',
+      onClick: this.scrollToBottom,
     });
   }
   scrollToBottom = () => {
@@ -83,7 +84,7 @@ class MessageList extends Component {
         :
         this.props.messages.map((message) => {
           return (
-            <DateMessage key={message.id} currentUser={this.props.currentUser} {...message} />
+            <DateMessage key={message.id} currentUser={this.props.currentUser} addGroup={this.props.addGroup} {...message} />
           );
         }));
     const loadingView = ( this.isLoading === true ?
@@ -118,5 +119,6 @@ MessageList.propTypes = {
   setInitial : PropTypes.func.isRequired,
   listMessage : PropTypes.func.isRequired,
   activeChannel: PropTypes.object.isRequired,
+  addGroup : PropTypes.func.isRequired,
 };
 export default MessageList;
