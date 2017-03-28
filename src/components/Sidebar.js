@@ -11,7 +11,7 @@ class Sidebar extends React.Component {
     super();
     this.state = {
       activeItem :'',
-      activeChannelItem :'public',
+      activeChannelItem :'1', // need to fix
     };
   }
   handleChannelClick = (channel) => {
@@ -25,8 +25,8 @@ class Sidebar extends React.Component {
     this.props.handleSearchClick();
   }
   render () {
-    const {activeItem} = this.state;
     const {activeChannelItem} = this.state;
+    const {activeChannel} = this.props;
     const loaderStyle = this.props.isMobile?styles.channelLoaderMobile:styles.channelLoader;
     const loadingView =
             <Segment basic className={loaderStyle}>
@@ -46,7 +46,7 @@ class Sidebar extends React.Component {
           <Dropdown.Menu color='violet'>
             {this.props.channels.map((channel)=>{
               if(channel.type === 'CHANNEL')
-                return(<Dropdown.Item name={channel.name} active={this.props.activeChannel.name === channel.name} key={channel.id} onClick={()=>this.handleChannelClick(channel)}><Icon name='hashtag'/>{channel.name}</Dropdown.Item>);
+                return(<Dropdown.Item name={channel.name} active={activeChannel.id === channel.id} key={channel.id} onClick={()=>this.handleChannelClick(channel)}><Icon name='hashtag'/>{channel.name}</Dropdown.Item>);
             })}
           </Dropdown.Menu>
         </Dropdown>
@@ -54,7 +54,7 @@ class Sidebar extends React.Component {
           <Dropdown.Menu color='red'>
             {this.props.channels.map((channel)=>{
               if(channel.type === 'GROUP')
-                return(<Dropdown.Item color='red' name={channel.name} active={this.props.activeChannel.name === channel.name} key={channel.id} onClick={()=>this.handleChannelClick(channel)}><Icon name='group'/>{channel.name}</Dropdown.Item>);
+                return(<Dropdown.Item color='red' name={channel.name} active={activeChannel.id === channel.id} key={channel.id} onClick={()=>this.handleChannelClick(channel)}><Icon name='group'/>{channel.name}</Dropdown.Item>);
             })}
           </Dropdown.Menu>
         </Dropdown>
@@ -63,7 +63,7 @@ class Sidebar extends React.Component {
         </Menu.Item>
       </Menu>
         :
-    <Menu style = {{'height':'100vh'}} vertical attached >
+    <Menu style = {{'height':'100vh', 'overflowY':'scroll'}} vertical attached >
       <Menu.Header >
         <Dropdown className={styles.balooFont} item text={this.props.status.currentUser}>
           <Dropdown.Menu>
@@ -75,17 +75,17 @@ class Sidebar extends React.Component {
       <Menu.Item header className={styles.balooFont}>CHANNELS</Menu.Item>
         {this.props.channels.map((channel)=>{
           if(channel.type === 'CHANNEL')
-            return(<Menu.Item color='violet' name={channel.name} active={activeChannelItem === channel.name} key={channel.id} onClick={()=>this.handleChannelClick(channel)}><Icon name='hashtag'/>{channel.name}</Menu.Item>);
+            return(<Menu.Item color='violet' name={channel.name} active={activeChannel.id === channel.id} key={channel.id} onClick={()=>this.handleChannelClick(channel)}><Icon name='hashtag'/>{channel.name}</Menu.Item>);
         })}
       <Menu.Item header className={styles.balooFont}>GROUPS</Menu.Item>
         {this.props.channels.map((channel)=>{
           if(channel.type === 'GROUP')
-            return(<Menu.Item color='red' name={channel.name} active={activeChannelItem === channel.name} key={channel.id} onClick={()=>this.handleChannelClick(channel)}><Icon name='group'/>{channel.name}</Menu.Item>);
+            return(<Menu.Item color='red' name={channel.name} active={activeChannel.id === channel.id} key={channel.id} onClick={()=>this.handleChannelClick(channel)}><Icon name='group'/>{channel.name}</Menu.Item>);
         })}
       <Menu.Item header className={styles.balooFont}>DIRECT</Menu.Item>
         {this.props.channels.map((channel)=>{
           if(channel.type === 'DIRECT')
-            return(<Menu.Item color='red' name={channel.name} active={activeChannelItem === channel.name} key={channel.id} onClick={()=>this.handleChannelClick(channel)}><Icon name='group'/>{channel.name}</Menu.Item>);
+            return(<Menu.Item color='red' name={channel.name} active={activeChannel.id === channel.id} key={channel.id} onClick={()=>this.handleChannelClick(channel)}><Icon name='group'/>{channel.name}</Menu.Item>);
         })}
       <Menu.Item className={styles.balooFont} name='search' onClick={this.handleSearchClick}>
         <Icon name='search'/>Search Channel

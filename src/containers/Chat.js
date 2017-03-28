@@ -32,21 +32,12 @@ class Chat extends React.Component {
     this.handleLeaveChannel = this.handleLeaveChannel.bind(this);
     this.handleAddChannel = this.handleAddChannel.bind(this);
     this.handleAddGroup = this.handleAddGroup.bind(this);
-    this.addNotification = this.addNotification.bind(this);
   }
   //App 에서의 getStatusRequest가 ComponentDidMount에서 실행이 되어야 여기서 sign data를 사용이 가능..
   componentWillMount(){
 
   }
 
-  addNotification(message, level, position) {
-    this.notificationSystem.addNotification({
-      message,
-      level,
-      position,
-      autoDismiss: 2,
-    });
-  }
 
   componentDidMount() {
     /*direct connect without signin*/
@@ -75,9 +66,9 @@ class Chat extends React.Component {
               socket.on('receive private channel', (channel) =>{
                 this.props.receiveRawChannel(channel);
                 if(channel.type === 'GROUP'){
-                  this.props.addPropsNotification({message:'새로운 그룹이 생성되었습니다!', level:'info', position:'bl',uuid: `${Date.now()}${uuid.v4()}`});
+                  this.props.addNotification({message:'새로운 그룹이 생성되었습니다!', level:'info', position:'bl',uuid: `${Date.now()}${uuid.v4()}`});
                 }else if(channel.type ==='DIRECT'){
-                  this.addNotification('1:1 채팅이 추가되었습니다!', 'info', 'bl');
+                  this.props.addNotification({message:'1:1 채널이 추가되었습니다!', level:'info', position:'bl',uuid: `${Date.now()}${uuid.v4()}`});
                 }
               });
               socket.on('receive socket', socketID =>
@@ -133,13 +124,15 @@ class Chat extends React.Component {
           this.changeActiveChannel(this.props.channelAdd.channel);
         }
         else if(this.props.channelAdd.status === 'FAILURE'){
-          if(this.props.channelAdd.errCode === 2){
+          if(this.props.channelAdd.errCode === 2){ // 이미 있는 다이렉트메시지 채널을 만들때.
             var existChannel = this.props.channels.find((channel) => {
               return channel.name === group.name;
             });
+            socket.emit('new private channel', existChannel.participants, existChannel);
             this.changeActiveChannel(existChannel);
+          }else{
+            this.props.addNotification({message:`에러가 발생했습니다. code=${this.props.channelAdd.errCode}`, level:'error', position:'bc',uuid: `${Date.now()}${uuid.v4()}`});
           }
-          this.addNotification(this.props.channelAdd.errCode,'error','bc');
         }
       });
   }
@@ -207,6 +200,7 @@ class Chat extends React.Component {
         <div className={sidebarStyle}>
           <Sidebar channels={this.props.channels}
                    changeActiveChannel={this.changeActiveChannel}
+                   activeChannel={this.props.activeChannel}
                    status={this.props.status}
                    channelListStatus={this.props.channelListStatus}
                    handleSignout={this.handleSignout}
@@ -228,7 +222,6 @@ class Chat extends React.Component {
                       leaveChannel={this.handleLeaveChannel}
                       currentUser={this.props.status.currentUser}/>
         </div>
-        <NotificationSystem ref={ref => this.notificationSystem = ref} />
       </div>
     );
   }
@@ -300,7 +293,7 @@ const mapDispatchToProps = (dispatch) => {
     signoutRequest: () => {
       return dispatch(signoutRequest());
     },
-    addPropsNotification: (notification) => {
+    addNotification: (notification) => {
       return dispatch(addNotification(notification));
     },
   };

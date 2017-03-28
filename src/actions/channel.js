@@ -48,7 +48,7 @@ export function addChannel(channel) {
             .then((res) => {
               dispatch({type: CHANNEL_ADD_SUCCESS, channel: res.data.channel});
             }).catch((err) => {
-              dispatch({type: CHANNEL_ADD_FAILURE, err: err.response.data.error, code: err.response.data.code});
+              dispatch({type: CHANNEL_ADD_FAILURE, err: err.response.data.error, code: err.response.data.code, channel: err.response.data.channel, });
             });
   };
 }

@@ -126,6 +126,35 @@ export default function channel(state, action) {
       }
     });
   case types.CHANNEL_ADD_FAILURE:
+    if(action.code === 2){
+      var errIndex = state.list.channels.findIndex((channel) => {return channel.id === action.channel.id;});
+      if(errIndex >= 0){
+        return update(state, {
+          add: {
+            status: { $set: 'FAILURE' },
+            err: { $set: action.err},
+            errCode: { $set: action.code}
+          },
+          list: {
+            channels: {
+              [errIndex]: {$set : action.channel}
+            }
+          }
+        });
+      }
+      else{ //상대방은 채널이 있는데 내가 없을때
+        return update(state, {
+          add: {
+            status: { $set: 'FAILURE' },
+            err: { $set: action.err},
+            errCode: { $set: action.code}
+          },
+          list: {
+            channels: {$push: [action.channel]}
+          }
+        });
+      }
+    }
     return update(state, {
       add: {
         status: { $set: 'FAILURE' },

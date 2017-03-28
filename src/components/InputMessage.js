@@ -110,7 +110,7 @@ class InputMessage extends React.Component {
     <Modal open={type === 'group'} size='small' onClose={this.handleInit}>
       <Modal.Header>그룹 추가</Modal.Header>
       <Modal.Content>
-        <Input label='그룹명' fluid name='grouName' value={groupName} onChange={this.handleChange}/>
+        <Input label='그룹명' fluid name='groupName' value={groupName} onChange={this.handleChange}/>
         <Modal.Description>
           <Select multiple selection fluid search placeholder='그룹에 초대할 사람' options={selectOption} onChange={this.selectedItem}/>
         </Modal.Description>

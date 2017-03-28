@@ -46,6 +46,9 @@ class ChatHeader extends React.Component {
           <Button icon primary onClick={this.props.leaveChannel}>
             <Icon name='sign out' />
           </Button>
+          <Button icon onClick={this.showSetting}>
+            <Icon name='setting' />
+          </Button>
         </div>
         <Divider/>
       </div>
