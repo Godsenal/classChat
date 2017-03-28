@@ -13,7 +13,6 @@ exports = module.exports = function (io) {
     });
     socket.on('storeClientInfo', function (data) {
       clients[data.currentUser] = socket.id;
-      console.log(socket.id);
     });
     socket.on('disconnected', function(data){
       clients[data.current] = null;
