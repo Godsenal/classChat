@@ -4,16 +4,21 @@ exports = module.exports = function (io) {
 
 
   io.on('connection', (socket) => {
-    socket.join('Lobby');
 
     console.log('a user connected');
 
     socket.on('chat mounted', function() {
       // TODO: Does the server need to know the user?
-      socket.emit('receive socket', socket.id);
+      socket.emit('receive socket', socket.userId);
     });
     socket.on('storeClientInfo', function (data) {
       clients[data.currentUser] = socket.id;
+      console.log(socket.id);
+    });
+    socket.on('disconnected', function(data){
+      clients[data.current] = null;
+      delete clients[data.currentUser];
+      console.log('user disconnected');
     });
     socket.on('leave channel', function(channelID, participant, isLeave = false) { // 소켓만 나갈 때
       if(isLeave){
@@ -29,7 +34,7 @@ exports = module.exports = function (io) {
       socket.broadcast.to(message.channelID).emit('new bc message', message);
     });
     socket.on('new channel', function(channel) {
-      socket.broadcast.emit('new channel', channel);
+      socket.broadcast.emit('receive channel', channel);
     });
     socket.on('typing', function (data) {
       socket.broadcast.to(data.channel).emit('typing bc', data.user);

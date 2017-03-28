@@ -1,4 +1,4 @@
-import React, { PropTypes } from 'react'
+import React, { PropTypes } from 'react';
 import {connect} from 'react-redux';
 import {browserHistory} from 'react-router';
 import {} from 'semantic-ui-react';
@@ -9,6 +9,7 @@ import NotificationSystem from 'react-notification-system';
 import {receiveRawMessage, addMessage, listMessage} from '../actions/message';
 import {addChannel, changeChannel, listChannel, searchChannel, joinChannel, leaveChannel, receiveRawChannel, receiveRawParticipant} from '../actions/channel';
 import {receiveSocket, signoutRequest, getStatusRequest} from '../actions/authentication';
+import {addNotification} from '../actions/environment';
 import {Sidebar, SearchModal} from '../components';
 import {ChatView} from './';
 import styles from '../Style.css';
@@ -53,7 +54,7 @@ class Chat extends React.Component {
     this.props.getStatusRequest().then(()=>{
       if(!this.props.status.isSignedIn){
 
-        browserHistory.push('/signin');
+        browserHistory.push('/');
       }
       this.props.listChannel(this.props.status.currentUser)
         .then(() => {
@@ -65,17 +66,16 @@ class Chat extends React.Component {
               socket.emit('chat mounted');
               socket.emit('join channel',this.props.activeChannel.id, this.props.status.currentUser);
               socket.emit('storeClientInfo',this.props.status);
-              socket.on('receive new participant', (channelID, participant, isLeave) =>{
+              socket.on('receive new participant', (channelID, participant, isLeave) =>
                 this.props.receiveRawParticipant(channelID, participant, isLeave)
-              }
               );
-              socket.on('new bc message', message =>
-                this.props.receiveRawMessage(message)
-              );
+              socket.on('new bc message', (message) =>{
+                this.props.receiveRawMessage(message);
+              });
               socket.on('receive private channel', (channel) =>{
                 this.props.receiveRawChannel(channel);
                 if(channel.type === 'GROUP'){
-                  this.addNotification('새로운 그룹이 생성되었습니다!', 'info', 'bl');
+                  this.props.addPropsNotification({message:'새로운 그룹이 생성되었습니다!', level:'info', position:'bl',uuid: `${Date.now()}${uuid.v4()}`});
                 }else if(channel.type ==='DIRECT'){
                   this.addNotification('1:1 채팅이 추가되었습니다!', 'info', 'bl');
                 }
@@ -159,12 +159,15 @@ class Chat extends React.Component {
         if(this.props.channelLeave.status === 'SUCCESS'){
           this.changeActiveChannel(this.props.channels[0], true); //hard coding- need to fix!
         }
-      })
+      });
   }
   handleSignout(){
+    var status = this.props.status;
+
     this.props.signoutRequest().then(
       () => {
-        socket.emit('leave channel', this.props.activeChannel.id);
+        socket.emit('leave channel', this.props.activeChannel.id, status.currentUser);
+        socket.emit('disconnected',this.props.status);
         Materialize.toast('Good Bye!', 2000);
         let signinData = {
           isSignedIn: false,
@@ -296,7 +299,10 @@ const mapDispatchToProps = (dispatch) => {
     },
     signoutRequest: () => {
       return dispatch(signoutRequest());
-    }
+    },
+    addPropsNotification: (notification) => {
+      return dispatch(addNotification(notification));
+    },
   };
 };
 

@@ -36,6 +36,11 @@ export default function message(state, action) {
       if(message.date === new Date(action.message.created).setHours(0,0,0,0))
         matchIndex = i;
     });
+    /* //이미 있는지 확인(socket 해결되면 뺄것)
+    var alreadyMatchIndex = state.list.messages[matchIndex].messages.findIndex((message)=>{return message.id===action.message.id;});
+    if(alreadyMatchIndex >= 0){
+      return state;
+    }*/
     if(matchIndex < 0){
       let newData = {
         id : action.message.id,

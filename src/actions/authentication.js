@@ -65,7 +65,9 @@ export function signoutRequest() {
     return axios.post('/api/account/signout')
             .then((res) => {
               if(res.data.success){
+                //var url = window.location.origin;
                 browserHistory.push('/');
+                console.log(url);
               }
               dispatch({type: AUTH_SIGNOUT});
             });

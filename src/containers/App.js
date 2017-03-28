@@ -2,8 +2,10 @@ import React,{Component, PropTypes} from 'react';
 import { Menu, Icon, Grid} from 'semantic-ui-react';
 import {connect} from 'react-redux';
 import {Link} from 'react-router';
+import NotificationSystem from 'react-notification-system';
+
 import { getStatusRequest, signoutRequest} from '../actions/authentication';
-import { initEnvironment } from '../actions/environment';
+import { initEnvironment} from '../actions/environment';
 import {Sidebar} from '../components';
 
 
@@ -17,6 +19,14 @@ class App extends Component{
       getChannel: false,
     };
     this.handleSignout = this.handleSignout.bind(this);
+    this.addNotification = this.addNotification.bind(this);
+  }
+  addNotification(notification) {
+    this.notificationSystem.addNotification(notification);
+  }
+  componentWillReceiveProps(nextProps){
+    if(this.props.notification !== nextProps.notification)
+      this.addNotification(nextProps.notification);
   }
   componentWillMount() {
     this.props.initEnvironment();
@@ -139,6 +149,7 @@ class App extends Component{
     return(
       <div>
         {this.props.children}
+        <NotificationSystem ref={ref => this.notificationSystem = ref} />
       </div>
     );
   }
@@ -155,7 +166,8 @@ App.propTypes = {
 const mapStateToProps = (state) => {
   return {
     status: state.authentication.status,
-    environment: state.environment
+    environment: state.environment,
+    notification: state.environment.notification,
   };
 };
 const mapDispatchToProps = (dispatch) => {

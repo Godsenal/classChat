@@ -1,6 +1,7 @@
 import{
   CHANGE_IS_MOBILE,
   CHANGE_WIDTH_AND_HEIGHT,
+  NOTIFICATION_ADD,
 } from './ActionTypes';
 
 function changeIsMobile(isMobile) {
@@ -31,5 +32,12 @@ export function initEnvironment() {
     window.onresize = () => {
       dispatch(changeWidthAndHeight(window.innerHeight, window.innerWidth));
     };
+  };
+}
+
+export function addNotification(notification){
+  return {
+    type: NOTIFICATION_ADD,
+    notification,
   };
 }

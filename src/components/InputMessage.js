@@ -18,6 +18,7 @@ class InputMessage extends React.Component {
         return option;
       }),
       selected:[],
+      input:'',
       groupName: '',
     };
     this.handleKeyPress= this.handleKeyPress.bind(this);
@@ -44,15 +45,13 @@ class InputMessage extends React.Component {
     });
   }
   handleChange(e){
-    this.setState({
-      groupName : e.target.value
-    });
+    this.setState({[`${e.target.name}`]: e.target.value});
   }
   handleKeyPress = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      this.props.addMessage(this.messageInput.value);
-      this.messageInput.value = '';
+      this.props.addMessage(this.state.input);
+      this.setState({input : ''});
     }
   }
   handleGroupClick = () => {
@@ -97,7 +96,7 @@ class InputMessage extends React.Component {
   }
   //<Select multiple selection search placeholder='그룹에 초대할 사람' options={participantsOptions} onChange={this.selectedItem}/>
   render () {
-    const {type, selectOption, groupName} = this.state;
+    const {type, selectOption, groupName, input} = this.state;
     const inputView =
       <div>
         <Button.Group floated='left'>
@@ -105,13 +104,13 @@ class InputMessage extends React.Component {
           <Button icon='image' onClick={this.handleImageClick}/>
           <Button icon='file text outline' onClick={this.handleFileClick}/>
         </Button.Group>
-        <textArea className={styles.messageInput} ref={ref => this.messageInput = ref} type ='text' onChange={this.handleChange} onKeyPress={this.handleKeyPress}/>
+        <textArea className={styles.messageInput} name='input' value={input} type ='text' onChange={this.handleChange} onKeyPress={this.handleKeyPress}/>
       </div>;
     const groupModal =
     <Modal open={type === 'group'} size='small' onClose={this.handleInit}>
       <Modal.Header>그룹 추가</Modal.Header>
       <Modal.Content>
-        <Input label='그룹명' fluid ref={ref => this.groupName = ref} value={groupName} onChange={this.handleChange}/>
+        <Input label='그룹명' fluid name='grouName' value={groupName} onChange={this.handleChange}/>
         <Modal.Description>
           <Select multiple selection fluid search placeholder='그룹에 초대할 사람' options={selectOption} onChange={this.selectedItem}/>
         </Modal.Description>

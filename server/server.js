@@ -22,13 +22,12 @@ mongoose.connect(config.dbUrl);
 const app = express();
 
 
-
 app.use(bodyParser.json());
 
 app.use(session({
   secret: 'Godsenal!3737',
-  saveUninitialized: true,
-  resave: true,
+  saveUninitialized: false,
+  resave: false,
   store: new MongoStore({
     url: config.dbUrl,
     ttl: 60*60  // 1 days (default: 14days)
@@ -58,9 +57,12 @@ app.get('*', (req,res)=>{
 
 
 
-let server = app.listen(config.port, () => {
+var server = app.listen(config.port, () => {
   console.info('Express listening on port', config.port);
 });
 
-const io = require('socket.io').listen(server);
+var io = require('socket.io').listen(server);
 socketEvents(io);
+
+
+//const io = require('socket.io')(server) ?
