@@ -1,5 +1,4 @@
 import React, { PropTypes } from 'react';
-import {connect} from 'react-redux';
 import {Link, browserHistory} from 'react-router';
 import {Menu, Dropdown, Icon, Segment, Loader, Dimmer} from 'semantic-ui-react';
 

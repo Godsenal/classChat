@@ -57,7 +57,7 @@ export function addChannel(channel) {
 export  function joinChannel(channels, userName){ // channel ID의 Array
   return (dispatch) => {
     dispatch({type: CHANNEL_JOIN});
-    return axios.put(`api/channel/join/${userName}`,channels)
+    return axios.put(`api/channel/join/${userName}`,{channels})
             .then((res)=>{
               dispatch({type: CHANNEL_JOIN_SUCCESS});
             }).catch((err)=> {
@@ -81,10 +81,15 @@ export  function leaveChannel(channelID, userName){
 
 /* LIST CHANNEL */
 
-export function listChannel(userName) {
+export function listChannel(userName,type = null) {
   return (dispatch) => {
     dispatch({type: CHANNEL_LIST});
-    return axios.get(`api/channel/${userName}`)
+    var url = `api/channel/${userName}`;
+    if(type !== null){
+      var listType = type.toUpperCase();
+      url = url + `/${listType}`;
+    }
+    return axios.get(url)
             .then((res) => {
               dispatch({type: CHANNEL_LIST_SUCCESS, channels: res.data.channels});
             }).catch((err) => {

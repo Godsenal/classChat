@@ -66,22 +66,26 @@ export default function channel(state, action) {
     });
         /* RECEIVE PARTICIPANT */
   case types.ROW_PARTICIPANT_RECEIVE:
-
-    var participantIndex = state.activeChannel.participants.indexOf(action.participant);
     var listIndex = state.list.channels.findIndex((channel) => {
       return channel.id === action.channelID;
     });
     if(listIndex <0){
       return state;
     }
+    var participantIndex = state.list.channels[listIndex].participants.indexOf(action.participant);
+
     if(!action.isLeave){ //들어올 때 추가하기위해 이미 있는지 파악(있으면 그냥 return)
       if(participantIndex >= 0){
         return state;
+      }//상대가 들어온 채널이 현재 채널인지 확인
+      if(action.channelID === state.activeChannel.id){
+        state = update(state, {
+          activeChannel: {
+            participants: {$push : [action.participant]}
+          }
+        });
       }
       return update(state, {
-        activeChannel: {
-          participants: {$push : [action.participant]}
-        },
         list: {
           channels:{
             [listIndex]:{
@@ -95,10 +99,14 @@ export default function channel(state, action) {
       if(participantIndex < 0){
         return state;
       }
+      if(action.channelID === state.activeChannel.id){
+        state = update(state, {
+          activeChannel: {
+            participants: {$splice : [[participantIndex,1]]}
+          }
+        });
+      }
       return update(state, {
-        activeChannel: {
-          participants: {$splice : [[participantIndex,1]]}
-        },
         list: {
           channels:{
             [listIndex]:{

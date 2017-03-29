@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { browserHistory, Link } from 'react-router';
 import { Button, Checkbox, Icon, Message, Input, Form, Select} from 'semantic-ui-react';
 import { signupRequest } from '../actions/authentication';
-import { joinChannel } from '../actions/channel';
+import { joinChannel, listChannel } from '../actions/channel';
 import styles from '../Style.css'
 
 
@@ -14,12 +14,22 @@ class Signup extends Component{
       id: '',
       pw: '',
       nickname: '',
-      idValid: false,
-      pwValid: false,
-      nicknameValid: false,
+      channelOptions: [],
+      selected:[],
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleSignup = this.handleSignup.bind(this);
+  }
+  componentDidMount() {
+    this.props.listChannel('*','CHANNEL')
+      .then(()=>{
+        this.setState({
+          channelOptions: this.props.channelList.channels.map((channel, index) => {
+            var option = {key : index, value : channel.id, text : channel.name};
+            return option;
+          })
+        });
+      });
   }
   //[`${e.target.name}`]: e.target.value
   handleValid = () =>{
@@ -52,10 +62,11 @@ class Signup extends Component{
     let id = this.state.id;
     let pw = this.state.pw;
     let nickname = this.state.nickname;
+    var selected = this.state.selected;
     this.props.signupRequest(id, pw, nickname)
       .then(() =>{
         if(this.props.signup.status === 'SUCCESS'){
-          this.props.joinChannel(id,['1'])
+          this.props.joinChannel(selected, id)
             .then(() => {
               Materialize.toast('Welcome! Please Sign in!', 2000);
               browserHistory.push('/');
@@ -74,10 +85,13 @@ class Signup extends Component{
       } );
   }
   selectedItem = (e, data) => {
-    console.log(data.value);
+    this.setState({
+      selected: data.value
+    });
   }
   render(){
-    const {idValid, pwValid, nicknameValid} = this.state;
+    const {channelOptions} = this.state;
+    const {channelList} = this.props;
     return(
       <div style = {{'height':'100vh', 'alignItems' : 'center'}}>
         <Message
@@ -106,10 +120,13 @@ class Signup extends Component{
 Signup.propTypes = {
   signupRequest : PropTypes.func.isRequired,
   signup : PropTypes.object.isRequired,
+  channelList : PropTypes.object.isRequired,
+  listChannel : PropTypes.func.isRequired,
 };
 const mapStateToProps = (state) => {
   return {
     signup: state.authentication.signup,
+    channelList: state.channel.list,
   };
 };
 
@@ -118,8 +135,11 @@ const mapDispatchToProps = (dispatch) => {
     signupRequest: (id, pw, nickname) => {
       return dispatch(signupRequest(id, pw, nickname));
     },
-    joinChannel: (id, channels) => {
-      return dispatch(signupRequest(id, channels));
+    joinChannel: (channels, userName) => {
+      return dispatch(joinChannel(channels, userName));
+    },
+    listChannel: (userName, listType) => {
+      return dispatch(listChannel(userName, listType));
     },
   };
 };

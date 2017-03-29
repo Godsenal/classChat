@@ -28,6 +28,15 @@ router.get('/:userName', function(req, res) {
     res.json({channels});
   });
 });
+router.get('/:userName/:listType', function(req, res) {
+  channels.find({ type: req.params.listType},null,{sort: {id : 1}}, function(err, channels) {
+    if(err) {
+      console.log(err);
+      return res.status(400).json({error: 'internal server error', code: 1});
+    }
+    res.json({channels});
+  });
+});
 
   // post a new user to channel list db
 router.post('/new_channel', function(req, res) {
@@ -106,20 +115,17 @@ router.put('/leave/:userName', function(req,res){ // 총 한명일때 나가면 
   //post a user to channel TODO: find whether user is already exist or not.
 router.put('/join/:userName', function(req,res){
   //multi Id to array
-  var ids = [];
-  for (var i=0; i<req.body.length; ++i) {
-    ids.push(req.body[i].id);
-  }
-  channels.update({id:{$in : ids}},{$addToSet:{participants:req.params.userName}},{ multi: true }, function(err, updated){
+  channels.update({id:{$in : req.body.channels}},{$addToSet:{participants:req.params.userName}},{ multi: true }, function(err, channels){
     if(err){
       console.log(err);
       return res.status(500).json({error: 'internal server error', code: 1});
     }
-    res.json({updated});
+    return res.json({channels});
   });
 });
 
 router.get('/search/:channelName', function(req, res){
+  //Do i need this?
   if(req.params.channelName === '*'){
     channels.find({},function(err,channels){
       if(err){

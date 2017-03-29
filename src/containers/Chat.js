@@ -4,7 +4,6 @@ import {browserHistory} from 'react-router';
 import {} from 'semantic-ui-react';
 import io from 'socket.io-client';
 import uuid from 'node-uuid';
-import NotificationSystem from 'react-notification-system';
 
 import {receiveRawMessage, addMessage, listMessage} from '../actions/message';
 import {addChannel, changeChannel, listChannel, searchChannel, joinChannel, leaveChannel, receiveRawChannel, receiveRawParticipant} from '../actions/channel';
@@ -55,7 +54,7 @@ class Chat extends React.Component {
           this.props.listMessage(this.props.activeChannel.id,true,-1)
             .then(()=>{
               socket.emit('chat mounted');
-              socket.emit('join channel',this.props.activeChannel.id, this.props.status.currentUser);
+              socket.emit('join channel',this.props.activeChannel.id, this.props.status.currentUser, this.props.activeChannel.participants);
               socket.emit('storeClientInfo',this.props.status);
               socket.on('receive new participant', (channelID, participant, isLeave) =>
                 this.props.receiveRawParticipant(channelID, participant, isLeave)
@@ -81,9 +80,9 @@ class Chat extends React.Component {
     });
 
   }
-  changeActiveChannel(channel, isLeave = false) {
-    socket.emit('leave channel', this.props.activeChannel.id, this.props.status.currentUser, isLeave);
-    socket.emit('join channel',channel.id, this.props.status.currentUser);
+  changeActiveChannel(channel, isLeave = false) { // leave가 true라면 socket전송할 participants를 보내줌.
+    socket.emit('leave channel', this.props.activeChannel.id, this.props.status.currentUser, isLeave, this.props.activeChannel.participants);
+    socket.emit('join channel',channel.id, this.props.status.currentUser, channel.participants);
     this.props.changeChannel(channel);
     this.props.listMessage(channel.id, true, -1);
   }
@@ -147,10 +146,12 @@ class Chat extends React.Component {
     });
   }
   handleLeaveChannel(){
-    this.props.leaveChannel(this.props.activeChannel.id, this.props.status.currentUser)
+    var activeChannel = this.props.activeChannel; // ui를 위해 먼저 채널을 이동.
+    this.changeActiveChannel(this.props.channels[0], true);
+    this.props.leaveChannel(activeChannel.id, this.props.status.currentUser)
       .then(()=>{
         if(this.props.channelLeave.status === 'SUCCESS'){
-          this.changeActiveChannel(this.props.channels[0], true); //hard coding- need to fix!
+           //hard coding- need to fix!
         }
       });
   }

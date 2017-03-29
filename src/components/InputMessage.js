@@ -9,7 +9,7 @@ class InputMessage extends React.Component {
     super(props);
     this.state= {
       type : 'input', // filter로 자신을 걸러주고 object로 mapping
-      selectOption : this.props.activeChannel.participants.filter((participant,index) => {
+      selectOption : this.props.activeChannel.participants.filter((participant) => {
         if(participant !== this.props.currentUser){
           return participant;
         }
@@ -25,9 +25,9 @@ class InputMessage extends React.Component {
     this.handleChange = this.handleChange.bind(this);
     this.addNotification = this.addNotification.bind(this);
   }
-  componentWillReceiveProps(nextProps){ // participant 가 새로 추가되었을 때 바로 변경.
-    if(this.state.selectOption.length !== nextProps.activeChannel.participants.length)
-      this.setState({selectOption : nextProps.activeChannel.participants.filter((participant,index) => {
+  componentWillReceiveProps(nextProps){ // participant 가 새로 추가되었을 때 바로 변경. +1은 자기자신 제외한거 다시 더한거.
+    if(this.state.selectOption.length+1 !== nextProps.activeChannel.participants.length){
+      this.setState({selectOption : nextProps.activeChannel.participants.filter((participant) => {
         if(participant !== this.props.currentUser){
           return participant;
         }
@@ -35,6 +35,7 @@ class InputMessage extends React.Component {
         var option = {key : index, value : participant, text : participant};
         return option;
       }),});
+    }
   }
   addNotification(message, level, position) {
     this.notificationSystem.addNotification({

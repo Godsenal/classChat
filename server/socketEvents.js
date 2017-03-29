@@ -19,15 +19,23 @@ exports = module.exports = function (io) {
       delete clients[data.currentUser];
       console.log('user disconnected');
     });
-    socket.on('leave channel', function(channelID, participant, isLeave = false) { // 소켓만 나갈 때
+    socket.on('leave channel', function(channelID, participant, isLeave = false, participants = []) { // 소켓만 나갈 때
       if(isLeave){
-        socket.broadcast.to(channelID).emit('receive new participant', channelID, participant, isLeave);
+        participants.map(function(element){
+          if(participant !== element){
+            socket.broadcast.to(clients[element]).emit('receive new participant', channelID, participant, isLeave);
+          }
+        });
       }
       socket.leave(channelID);
     });
-    socket.on('join channel', function(channelID, participant) {
+    socket.on('join channel', function(channelID, participant, participants) {
       socket.join(channelID);
-      socket.broadcast.to(channelID).emit('receive new participant', channelID, participant, false);
+      participants.map(function(element){
+        if(participant !== element){
+          socket.broadcast.to(clients[element]).emit('receive new participant', channelID, participant, false);
+        }
+      });
     });
     socket.on('new message', function(message) {
       socket.broadcast.to(message.channelID).emit('new bc message', message);

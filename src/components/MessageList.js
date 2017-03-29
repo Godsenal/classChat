@@ -107,7 +107,6 @@ class MessageList extends Component {
     );
   }
 }
-
 MessageList.propTypes = {
   isMobile : PropTypes.bool.isRequired,
   messages : PropTypes.array.isRequired,
