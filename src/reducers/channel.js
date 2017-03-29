@@ -79,11 +79,13 @@ export default function channel(state, action) {
         return state;
       }//상대가 들어온 채널이 현재 채널인지 확인
       if(action.channelID === state.activeChannel.id){
-        state = update(state, {
-          activeChannel: {
-            participants: {$push : [action.participant]}
-          }
-        });
+        if(!state.activeChannel.participants.includes(action.participant)){
+          state = update(state, {
+            activeChannel: {
+              participants: {$push : [action.participant]}
+            }
+          });
+        }
       }
       return update(state, {
         list: {
@@ -116,6 +118,32 @@ export default function channel(state, action) {
         }
       });
     }
+
+  case types.ROW_SIGNUP_PARTICIPANT_RECEIVE:
+
+    if(action.channels.includes(state.activeChannel.id)){
+      state = update(state, {
+        activeChannel: {
+          participants: {$push: [action.participant]}
+        }
+      });
+    }
+    state.list.channels.map((channel, index) => {
+      if(action.channels.includes(channel.id)){
+        //if(!channel.participants.includes(action.participant)) 이미 있는지 확인(굳이 할 필요 있을까? id 는 독립인데)
+        state = update(state, {
+          list: {
+            channels: {
+              [index] :{
+                participants: {$push: [action.participant]}
+              }
+            }
+          }
+        });
+      }
+    });
+    return state;
+
         /* ADD CHANNEL */
   case types.CHANNEL_ADD:
     return update(state, {

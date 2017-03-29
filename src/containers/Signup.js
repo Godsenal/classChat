@@ -2,6 +2,8 @@ import React, {Component, PropTypes} from 'react';
 import { connect } from 'react-redux';
 import { browserHistory, Link } from 'react-router';
 import { Button, Checkbox, Icon, Message, Input, Form, Select} from 'semantic-ui-react';
+
+
 import { signupRequest } from '../actions/authentication';
 import { joinChannel, listChannel } from '../actions/channel';
 import styles from '../Style.css'
@@ -68,6 +70,7 @@ class Signup extends Component{
         if(this.props.signup.status === 'SUCCESS'){
           this.props.joinChannel(selected, id)
             .then(() => {
+              this.props.socket.emit('signup participant', selected, id);
               Materialize.toast('Welcome! Please Sign in!', 2000);
               browserHistory.push('/');
             });

@@ -17,6 +17,7 @@ import {
     CHANNEL_SEARCH_FAILURE,
     ROW_CHANNEL_RECEIVE,
     ROW_PARTICIPANT_RECEIVE,
+    ROW_SIGNUP_PARTICIPANT_RECEIVE,
 } from './ActionTypes';
 
 import axios from 'axios';
@@ -37,6 +38,14 @@ export function receiveRawParticipant(channelID, participant ,isLeave = false){
     channelID,
     participant,
     isLeave
+  };
+}
+/* RECEIVE PARTICIPANT SIGN UP */
+export function receiveRawSignupParticipant(channels, participant){
+  return {
+    type : ROW_SIGNUP_PARTICIPANT_RECEIVE,
+    channels,
+    participant,
   };
 }
 

@@ -2,6 +2,7 @@ import{
   CHANGE_IS_MOBILE,
   CHANGE_WIDTH_AND_HEIGHT,
   NOTIFICATION_ADD,
+  SOCKET_CONNECT,
 } from './ActionTypes';
 
 function changeIsMobile(isMobile) {

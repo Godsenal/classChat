@@ -3,15 +3,15 @@ import { Menu, Icon, Grid} from 'semantic-ui-react';
 import {connect} from 'react-redux';
 import {Link} from 'react-router';
 import NotificationSystem from 'react-notification-system';
-
+import io from 'socket.io-client';
 import { getStatusRequest, signoutRequest} from '../actions/authentication';
-import { initEnvironment} from '../actions/environment';
+import { initEnvironment, connectSocket} from '../actions/environment';
 import {Sidebar} from '../components';
 
-
+const socket = io.connect();
 class App extends Component{
-  constructor(){
-    super();
+  constructor(props){
+    super(props);
     this.state={
       side : false,
       width: window.innerWidth,
@@ -29,6 +29,8 @@ class App extends Component{
       this.addNotification(nextProps.notification);
   }
   componentWillMount() {
+
+
     this.props.initEnvironment();
     //window.addEventListener('resize', this.handleWindowSizeChange);
   }
@@ -148,7 +150,9 @@ class App extends Component{
 
     return(
       <div>
-        {this.props.children}
+        {this.props.children && React.cloneElement(this.props.children, {
+          socket
+        })}
         <NotificationSystem ref={ref => this.notificationSystem = ref} />
       </div>
     );
@@ -180,6 +184,9 @@ const mapDispatchToProps = (dispatch) => {
     },
     initEnvironment: () => {
       return dispatch(initEnvironment());
+    },
+    connectSocket: (socket) => {
+      return dispatch(connectSocket(socket));
     }
   };
 };
