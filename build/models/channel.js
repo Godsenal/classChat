@@ -16,7 +16,9 @@ var channelSchema = new Schema({
   name: String,
   id: String,
   private: Boolean,
-  participants: Array
+  participants: Array,
+  type: { type: String, default: 'CHANNEL' },
+  channelID: String
 });
 
 exports.default = _mongoose2.default.model('channel', channelSchema);

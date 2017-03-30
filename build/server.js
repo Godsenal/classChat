@@ -12,10 +12,6 @@ var _api = require('./api');
 
 var _api2 = _interopRequireDefault(_api);
 
-var _nodeSassMiddleware = require('node-sass-middleware');
-
-var _nodeSassMiddleware2 = _interopRequireDefault(_nodeSassMiddleware);
-
 var _path = require('path');
 
 var _path2 = _interopRequireDefault(_path);
@@ -39,6 +35,8 @@ var _socketEvents2 = _interopRequireDefault(_socketEvents);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var MongoStore = require('connect-mongo')(_expressSession2.default);
+//import sassMiddleware from 'node-sass-middleware';
+
 
 var db = _mongoose2.default.connection;
 db.on('error', console.error);
@@ -55,18 +53,19 @@ app.use(_bodyParser2.default.json());
 
 app.use((0, _expressSession2.default)({
   secret: 'Godsenal!3737',
-  saveUninitialized: true,
-  resave: true,
+  saveUninitialized: false,
+  resave: false,
   store: new MongoStore({
     url: _config2.default.dbUrl,
     ttl: 60 * 60 // 1 days (default: 14days)
   })
 }));
-
-app.use((0, _nodeSassMiddleware2.default)({
-  src: _path2.default.join(__dirname, 'sass'),
-  dest: _path2.default.join(__dirname, 'public')
+/*
+app.use(sassMiddleware({
+  src: path.join(__dirname, 'sass'),
+  dest: path.join(__dirname, 'public'),
 }));
+*/
 
 app.use('/', _express2.default.static(_path2.default.join(__dirname, './../public'))); // 정적인 페이지 로드
 
@@ -83,3 +82,5 @@ var server = app.listen(_config2.default.port, function () {
 
 var io = require('socket.io').listen(server);
 (0, _socketEvents2.default)(io);
+
+//const io = require('socket.io')(server) ?
