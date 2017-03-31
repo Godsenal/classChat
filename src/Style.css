@@ -35,6 +35,13 @@
   margin : 2rem;
   vertical-align: top;
 }
+.flexMessageWaiting{
+  display: -webkit-flex;
+  display:flex;
+  margin : 2rem;
+  vertical-align: top;
+  opacity: 0.3;
+}
 .flexMyMessage{
   display: -webkit-flex;
   display:flex;

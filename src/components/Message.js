@@ -20,10 +20,10 @@ class Message extends Component {
     const myMessage = (this.props.currentUser === this.props.userName)?
       <div>HI {this.props.currentUser}</div>
       :<Button onClick={ () => this.handleAddGroup(this.props.userName)}>1:1 채팅하기</Button>;
-
+    const waitingStyle = (this.props.isWaiting?styles.flexMessageWaiting:styles.flexMessage);
     return(
       <div>
-        <div className={styles.flexMessage}>
+        <div className={waitingStyle}>
           <div className={styles.messageImg}>
             <img className={styles.messageImg} src='https://semantic-ui.com/images/avatar/small/matt.jpg'/>
           </div>
@@ -43,11 +43,20 @@ class Message extends Component {
     );
   }
 }
+Message.defaultProps = {
+  userName : '',
+  created : moment().format(),
+  contents : '',
+  addGroup : () => {console.log('Add Group Error')},
+  currentUser : '',
+  isWaiting : false,
+};
 Message.propTypes = {
   userName : PropTypes.string.isRequired,
   created : PropTypes.string.isRequired,
   contents : PropTypes.string.isRequired,
   addGroup : PropTypes.func.isRequired,
   currentUser : PropTypes.string.isRequired,
+  isWaiting : PropTypes.bool.isRequired,
 };
 export default Message;

@@ -46,7 +46,7 @@ export function changeChannel(channel) {
 /* ADD MESSAGE */
 export function addMessage(message) {
   return (dispatch) => {
-    dispatch({type: MESSAGE_ADD});
+    dispatch({type: MESSAGE_ADD, message});
     return axios.post('/api/message/new_message', message)
             .then((res) => {
               dispatch({type: MESSAGE_ADD_SUCCESS, message: res.data.message});

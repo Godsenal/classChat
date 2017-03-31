@@ -3,6 +3,7 @@ import {connect} from 'react-redux';
 import {browserHistory} from 'react-router';
 import {} from 'semantic-ui-react';
 import uuid from 'node-uuid';
+import moment from 'moment';
 
 import {receiveRawMessage, addMessage, listMessage} from '../actions/message';
 import {addChannel, changeChannel, listChannel, searchChannel, joinChannel, leaveChannel, receiveRawChannel, receiveRawParticipant, receiveRawSignupParticipant} from '../actions/channel';
@@ -92,6 +93,7 @@ class Chat extends React.Component {
       channelID: this.props.activeChannel.id,
       contents: message,
       userName: this.props.status.currentUser,
+      created: moment().format(),
     };
     this.props.addMessage(newMessage)
       .then(() => {
@@ -100,6 +102,7 @@ class Chat extends React.Component {
       .catch(() => {
         console.log('failed to add Message');
       });
+
   }
   handleAddChannel(channel){
     channel.channelID = this.props.activeChannel.id;
@@ -190,7 +193,6 @@ class Chat extends React.Component {
     const isMobile = (screenWidth<600 && screenWidth>1)?true:false;
     const layoutStyle = isMobile?styles.flexLayoutMobile:styles.flexLayout;
     const sidebarStyle = isMobile?styles.chatSidebarMobile:styles.chatSidebar;
-
     return(
       <div className={layoutStyle} style={{'height':{screenHeight}}}>
         <SearchModal isOpen={this.state.searchModal}

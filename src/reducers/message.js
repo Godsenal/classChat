@@ -10,6 +10,7 @@ const initialState = {
   add:{
     status: 'INIT',
     message: {},
+    waitingMessages: [],
     err: 'ERROR',
     errCode: -1,
   },
@@ -80,20 +81,15 @@ export default function message(state, action) {
         }
       });
     }
-  case types.MESSAGE_ADD:
-    return update(state, {
-      add: {
-        status: { $set: 'WAITING'}
-      }
-    });
-  case types.MESSAGE_ADD_SUCCESS:
+  case types.MESSAGE_ADD: // 보내는 사람은 데이터에 등록되기전에 먼저 보기 위해서.
     var matchAddIndex = -1;
-    state.list.messages.map((message,i)=>{
+    state.list.messages.map((message,i)=>{ // 현재 메시지랑 날짜가 같은 Date Object를 찾음.
       if(message.date === new Date(action.message.created).setHours(0,0,0,0))
         matchAddIndex = i;
     });
+    action.message.isWaiting = true; //서버에 저장된게 아직 아니므로 waiting.
+    if(matchAddIndex < 0){ // Match되는게 없을 경우 push함.
 
-    if(matchAddIndex < 0){
       let newData = {
         id : action.message.id,
         date : new Date(action.message.created).setHours(0,0,0,0),
@@ -101,9 +97,10 @@ export default function message(state, action) {
       };
       return update(state, {
         add: {
-          status: { $set: 'SUCCESS' },
-          message: { $set: action.message}
-        },
+          status: { $set: 'WAITING' },
+          message: { $set: action.message},
+          waitingMessages: { $push: [{dateIndex: state.list.messages.length, messageIndex: 0}]}
+        }, // 새로 push들어가는 메시지이기 때문에 date group에서의 위치는 제일 마지막. messageIndex는 처음 들어가는 것이기 때문에 0
         list: {
           messages: { $push: [newData]}
         }
@@ -112,8 +109,9 @@ export default function message(state, action) {
     else{
       return update(state, {
         add: {
-          status: { $set: 'SUCCESS' },
-          message: { $set: action.message}
+          status: { $set: 'WAITING' },
+          message: { $set: action.message},
+          waitingMessages: { $push: [{dateIndex: matchAddIndex, messageIndex: state.list.messages[matchAddIndex].messages.length}]}
         },
         list: {
           messages: {
@@ -132,12 +130,43 @@ export default function message(state, action) {
         }
       });
     }
-  case types.MESSAGE_ADD_FAILURE:
+  case types.MESSAGE_ADD_SUCCESS:
+    var waitingMessage = state.add.waitingMessages.shift();
+    var dateIndex = waitingMessage.dateIndex;
+    var messageIndex = waitingMessage.messageIndex;
     return update(state, {
       add: {
-        status: { $set: 'FAILURE' },
-        err: { $set: action.err},
-        errCode: { $set: action.code}
+        status: { $set: 'SUCCESS'},
+        message: { $set: action.message},
+      },
+      list: {
+        messages: {
+          [dateIndex]:{
+            messages:{
+              [messageIndex]:{
+                $set: action.message
+              }
+            }
+          }
+        }
+      }
+    });
+  case types.MESSAGE_ADD_FAILURE:
+    var waitingMessageFailure = state.add.waitingMessages.shift();
+    var dateIndexFailure = waitingMessageFailure.dateIndex;
+    var messageIndexFailure = waitingMessageFailure.messageIndex;
+    return update(state, {
+      add: {
+        status: { $set: 'SUCCESS'}
+      },
+      list: {
+        messages: {
+          [dateIndexFailure]:{
+            messages:{
+              $splice: [[messageIndexFailure,1]]
+            }
+          }
+        }
       }
     });
 
