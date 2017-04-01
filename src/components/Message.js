@@ -21,6 +21,11 @@ class Message extends Component {
       <div>HI {this.props.currentUser}</div>
       :<Button onClick={ () => this.handleAddGroup(this.props.userName)}>1:1 채팅하기</Button>;
     const waitingStyle = (this.props.isWaiting?styles.flexMessageWaiting:styles.flexMessage);
+    const contents = this.props.types === 'message'?
+                    <p style={{'wordWrap':'break-word','whiteSpace':'pre-wrap'}}>{this.props.contents}</p>
+                    :<a href={`/api/download/${this.props.types}/${this.props.url}/${this.props.contents}`} download>
+                      <p style={{'wordWrap':'break-word','whiteSpace':'pre-wrap'}}>{this.props.contents}</p>
+                     </a>;
     return(
       <div>
         <div className={waitingStyle}>
@@ -36,7 +41,7 @@ class Message extends Component {
               {myMessage}
             </Popup>
             <span className='grey-text' style={{'fontStyle':'italic','fontSize':10}}> ..{moment(this.props.created).fromNow()}</span>
-            <p style={{'wordWrap':'break-word','whiteSpace':'pre-wrap'}}>{this.props.contents}</p>
+            {contents}
           </div>
         </div>
       </div>
@@ -47,9 +52,11 @@ Message.defaultProps = {
   userName : '',
   created : moment().format(),
   contents : '',
-  addGroup : () => {console.log('Add Group Error')},
+  addGroup : () => {console.log('Add Group Error');},
   currentUser : '',
   isWaiting : false,
+  types : 'message',
+  url : '',
 };
 Message.propTypes = {
   userName : PropTypes.string.isRequired,
@@ -58,5 +65,7 @@ Message.propTypes = {
   addGroup : PropTypes.func.isRequired,
   currentUser : PropTypes.string.isRequired,
   isWaiting : PropTypes.bool.isRequired,
+  types : PropTypes.string.isRequired,
+  url : PropTypes.string.isRequired,
 };
 export default Message;

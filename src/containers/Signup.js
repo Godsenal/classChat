@@ -4,7 +4,7 @@ import { browserHistory, Link } from 'react-router';
 import { Button, Checkbox, Icon, Message, Input, Form, Select} from 'semantic-ui-react';
 
 
-import { signupRequest } from '../actions/authentication';
+import { signupRequest, getStatusRequest} from '../actions/authentication';
 import { joinChannel, listChannel } from '../actions/channel';
 import styles from '../Style.css'
 
@@ -23,15 +23,24 @@ class Signup extends Component{
     this.handleSignup = this.handleSignup.bind(this);
   }
   componentDidMount() {
-    this.props.listChannel('*','CHANNEL')
+    this.props.getStatusRequest()
       .then(()=>{
-        this.setState({
-          channelOptions: this.props.channelList.channels.map((channel, index) => {
-            var option = {key : index, value : channel.id, text : channel.name};
-            return option;
-          })
-        });
+        if(this.props.status.valid){
+          browserHistory.push('/channel');
+        }
+        else{
+          this.props.listChannel('*','CHANNEL')
+            .then(()=>{
+              this.setState({
+                channelOptions: this.props.channelList.channels.map((channel, index) => {
+                  var option = {key : index, value : channel.id, text : channel.name};
+                  return option;
+                })
+              });
+            });
+        }
       });
+
   }
   //[`${e.target.name}`]: e.target.value
   handleValid = () =>{
@@ -125,10 +134,12 @@ Signup.propTypes = {
   signup : PropTypes.object.isRequired,
   channelList : PropTypes.object.isRequired,
   listChannel : PropTypes.func.isRequired,
+  status: PropTypes.object.isRequired,
 };
 const mapStateToProps = (state) => {
   return {
     signup: state.authentication.signup,
+    status: state.authentication.status,
     channelList: state.channel.list,
   };
 };
@@ -143,6 +154,9 @@ const mapDispatchToProps = (dispatch) => {
     },
     listChannel: (userName, listType) => {
       return dispatch(listChannel(userName, listType));
+    },
+    getStatusRequest: () => {
+      return dispatch(getStatusRequest());
     },
   };
 };

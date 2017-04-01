@@ -46,8 +46,26 @@ export function changeChannel(channel) {
 /* ADD MESSAGE */
 export function addMessage(message) {
   return (dispatch) => {
-    dispatch({type: MESSAGE_ADD, message});
-    return axios.post('/api/message/new_message', message)
+    var messageCopy = message;
+    var data = message;
+    let url = '/api/message/new_message';
+    if(typeof message.contents !== 'string'){
+      let type = 'file';
+      data = new FormData();
+      data.append('files', message.contents);
+      data.append('contents',message.contents.name);
+      data.append('id',message.id);
+      data.append('channelID',message.channelID);
+      data.append('userName',message.userName);
+      data.append('created',message.created);
+      data.append('types',message.types);
+      url = `/api/message/new_message/${type}`;
+
+      messageCopy.contents = message.contents.name;
+      messageCopy.types = type;
+    }
+    dispatch({type: MESSAGE_ADD, message: messageCopy});
+    return axios.post(url, data)
             .then((res) => {
               dispatch({type: MESSAGE_ADD_SUCCESS, message: res.data.message});
             }).catch((err) => {
@@ -56,14 +74,15 @@ export function addMessage(message) {
   };
 }
 
+
 /* LIST MESSAGE */
 
-export function listMessage(channelID, isInitial, topMessageId) {
+export function listMessage(channelID, isInitial, topMessageID) {
   return (dispatch) => {
     dispatch({type: MESSAGE_LIST});
     var messageID = -1;
     if(!isInitial)
-      messageID = topMessageId;
+      messageID = topMessageID;
     messageID = messageID.toString();
     return axios.get(`api/message/${channelID}/${messageID}`)
             .then((res) => {

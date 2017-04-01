@@ -123,19 +123,16 @@ router.post('/signin', (req, res) => {
 */
 router.get('/getinfo', (req, res) => {
   if(typeof req.session.loginInfo === 'undefined') {
-    return res.status(401).json({
-      error: 'NOT SIGNED IN',
-      code : 1,
-    });
+    return next({error: 'Not login'});
   }
-  res.json({ info: req.session.loginInfo });
+  return res.json({ info: req.session.loginInfo });
 });
 
 /*
     LOGOUT: POST /api/account/logout
 */
 router.post('/signout', (req, res) => {
-  req.session.destroy(err => { if(err) throw err; });
+  req.session.destroy();
   return res.json({ success: true });
 });
 

@@ -13,6 +13,7 @@ class ChatHeader extends React.Component {
   closeModal = () => this.setState({ open: false });
   render () {
     const {open} = this.state;
+    const {name, participants, id, type, leaveChannel, currentUser} = this.props;
     const searchModal = <Modal open={open} basic size ='small' onClose={this.closeModal}>
                           <Modal.Header>
                             Search Message
@@ -28,12 +29,23 @@ class ChatHeader extends React.Component {
                             <Button positive icon='checkmark' labelPosition='right' content='Yes' />
                           </Modal.Actions>
                         </Modal>;
+    const outBtn = type !== 'CHANNEL' ?<Button icon primary onClick={leaveChannel}>
+                                        <Icon name='sign out' />
+                                      </Button>:null;
+    var directName = name;
+    if(type === 'DIRECT'){
+      var splitName = name.split('+');
+      var filterName = splitName.filter((name) => {
+        return name !== currentUser;
+      });
+      directName = filterName[0] + '님과의 채팅';
+    }
     return(
       <div>
         {searchModal}
         <div className={styles.chatHeader}>
-          <span className={styles.chatHeaderName} size='massive'><Icon name='comments outline'/>#{this.props.name}</span>
-          <Dropdown pointing text={this.props.participants.length.toString()+'명'} button icon='group' labeled className='icon' >
+          <span className={styles.chatHeaderName} size='massive'><Icon name='comments outline'/>#{directName}</span>
+          <Dropdown pointing text={participants.length.toString()+'명'} button icon='group' labeled className='icon' >
             <Dropdown.Menu>
               {this.props.participants.map((participant) => {
                 return(<Dropdown.Item key={participant} text={participant} />);
@@ -43,12 +55,7 @@ class ChatHeader extends React.Component {
           <Button icon color='black' onClick={this.showModal}>
             <Icon name='search' />
           </Button>
-          <Button icon primary onClick={this.props.leaveChannel}>
-            <Icon name='sign out' />
-          </Button>
-          <Button icon onClick={this.showSetting}>
-            <Icon name='setting' />
-          </Button>
+          {outBtn}
         </div>
         <Divider/>
       </div>
@@ -60,11 +67,15 @@ ChatHeader.propTypes = {
   participants: PropTypes.array.isRequired,
   id : PropTypes.string.isRequired,
   leaveChannel : PropTypes.func.isRequired,
+  type : PropTypes.string.isRequired,
+  currentUser : PropTypes.string.isRequired,
 };
 ChatHeader.defaultProps = {
   name : '',
   participants : [],
   id : '',
   leaveChannel : () => console.log('props error(leaveChannel)'),
+  type : 'CHANNEL',
+  currentUser : '',
 };
 export default ChatHeader;

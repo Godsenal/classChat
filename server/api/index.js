@@ -5,6 +5,7 @@ import post from './post';
 import comment from './comment';
 import channel from './channel';
 import message from './message';
+import download from './download';
 
 
 const router = express.Router();
@@ -25,5 +26,6 @@ router.use('/post', post);
 router.use('/comment', comment);
 router.use('/channel', channel);
 router.use('/message', message);
+router.use('/download',download);
 
 export default router;

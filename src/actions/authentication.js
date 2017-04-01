@@ -12,7 +12,6 @@ import {
     AUTH_SOCKET_RECEIVE,
 } from './ActionTypes';
 
-import { browserHistory } from 'react-router';
 import axios from 'axios';
 
 /* dispatch안에는 action 객체가 들어가고 state 는 redux에서 알아서 관리
@@ -64,11 +63,11 @@ export function signoutRequest() {
   return (dispatch) => {
     return axios.post('/api/account/signout')
             .then((res) => {
+              dispatch({type: AUTH_SIGNOUT});
               if(res.data.success){
                 var url = window.location.origin;
                 window.location.replace(url);
               }
-              dispatch({type: AUTH_SIGNOUT});
             });
   };
 }

@@ -1,5 +1,5 @@
-import React, { Component, PropTypes } from 'react'
-import {Form, Button, Icon, Dimmer, Loader, Image, Segment } from 'semantic-ui-react';
+import React, { Component, PropTypes } from 'react';
+import {Dimmer, Loader,  Segment } from 'semantic-ui-react';
 
 
 import {MessageList, ChatHeader, InputMessage} from '../components';
@@ -11,19 +11,12 @@ class ChatView extends Component{
     this.state = {
       isInitial : true,
     };
-    this.changeActiveChannel = this.changeActiveChannel.bind(this);
     this.setInitial = this.setInitial.bind(this);
     this.addMessage = this.addMessage.bind(this);
   }
   componentWillReceiveProps(nextProps){
     if(this.props.activeChannel !== nextProps.activeChannel)
       this.setState({isInitial : true});
-  }
-  changeActiveChannel(channel) {
-    socket.emit('leave channel', this.props.activeChannel);
-    socket.emit('join channel', channel);
-    this.props.changeChannel(channel);
-    this.props.listMessage(channel.id, true);
   }
   addMessage(message){
     this.props.addMessage(message);
@@ -43,7 +36,7 @@ class ChatView extends Component{
             </Segment>;
     const chatView =
             <div>
-              <ChatHeader {...this.props.activeChannel} leaveChannel={this.props.leaveChannel}/>
+              <ChatHeader {...this.props.activeChannel} leaveChannel={this.props.leaveChannel} currentUser={this.props.currentUser}/>
               <MessageList isMobile={this.props.isMobile}
                            listMessage={this.props.listMessage}
                            activeChannel={this.props.activeChannel}
@@ -65,6 +58,34 @@ class ChatView extends Component{
     );
   }
 }
-
-
+ChatView.defaultProps = {
+  isMobile : false,
+  currentUser : '',
+  activeChannel : {},
+  changeChannel : () => {console.log('ChatView props Error');},
+  leaveChannel : () => {console.log('ChatView props Error');},
+  addGroupp : () => {console.log('ChatView props Error');},
+  messages : [],
+  messageReceive : {},
+  messageAddStatus : 'INIT',
+  messageListStatus : 'INIT',
+  isLast : false,
+  listMessage : () => {console.log('ChatView props Error');},
+  addMessage : () => {console.log('ChatView props Error');},
+};
+ChatView.propTypes = {
+  isMobile : PropTypes.bool.isRequired,
+  currentUser : PropTypes.string.isRequired,
+  activeChannel : PropTypes.object.isRequired,
+  changeChannel : PropTypes.func.isRequired,
+  leaveChannel : PropTypes.func.isRequired,
+  addGroup : PropTypes.func.isRequired,
+  messages : PropTypes.array.isRequired,
+  messageReceive : PropTypes.object.isRequired,
+  messageAddStatus : PropTypes.string.isRequired,
+  messageListStatus : PropTypes.string.isRequired,
+  isLast : PropTypes.bool.isRequired,
+  listMessage : PropTypes.func.isRequired,
+  addMessage : PropTypes.func.isRequired,
+};
 export default ChatView;

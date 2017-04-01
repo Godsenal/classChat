@@ -7,6 +7,7 @@ import bodyParser from 'body-parser';
 import express from 'express';
 import session from 'express-session';
 import socketEvents from './socketEvents';
+
 const MongoStore = require('connect-mongo')(session);
 
 
@@ -18,6 +19,7 @@ db.once('open', function(){
 
 mongoose.Promise = require('bluebird');
 mongoose.connect(config.dbUrl);
+
 
 const app = express();
 
@@ -52,7 +54,6 @@ app.get('*', (req,res)=>{
   res.sendFile(path.resolve(__dirname, './../public/index.html'));
 
 });
-
 
 
 

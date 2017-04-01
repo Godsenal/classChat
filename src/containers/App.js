@@ -1,12 +1,10 @@
 import React,{Component, PropTypes} from 'react';
-import { Menu, Icon, Grid} from 'semantic-ui-react';
 import {connect} from 'react-redux';
-import {Link} from 'react-router';
 import NotificationSystem from 'react-notification-system';
 import io from 'socket.io-client';
+import {browserHistory} from 'react-router';
 import { getStatusRequest, signoutRequest} from '../actions/authentication';
 import { initEnvironment, connectSocket} from '../actions/environment';
-import {Sidebar} from '../components';
 
 const socket = io.connect();
 class App extends Component{
@@ -41,45 +39,6 @@ class App extends Component{
     this.setState({
       side : !this.state.side,
     });
-  }
-  componentDidMount() {
-        // get login data from cookie
-    function getCookie(name){
-      var value = '; '+ document.cookie;
-      var parts = value.split('; ' + name + '=');
-      if (parts.length == 2) return parts.pop().split(';').shift();
-    }
-    let signinData = getCookie('key');
-
-        // if loginData is undefined, do nothing
-    if(typeof signinData === 'undefined') return;
-
-        // decode base64 & parse json
-    signinData = JSON.parse(atob(signinData));
-        // if not logged in, do nothing
-    if(!signinData.isSignedIn) return;
-
-        // page refreshed & has a session in cookie,
-        // check whether this cookie is valid or not
-    this.props.getStatusRequest().then(
-      () => {
-        if(!this.props.status.valid) {
-                    // if session is not valid
-                    // logout the session
-          signinData = {
-            isSignedIn: false,
-            id: '',
-            nickname: '',
-            isAdmin: false,
-          };
-
-          document.cookie = 'key=' + btoa(JSON.stringify(signinData));
-
-          Materialize.toast('Your session is expired, please sign in again', 4000);
-        }
-      }
-    );
-
   }
   handleSignout(){
     this.props.signoutRequest().then(
@@ -160,12 +119,21 @@ class App extends Component{
 
 }
 
+App.defaultProps ={
+  getStatusRequest: ()=> {console.log('App props Error');},
+  signoutRequest: ()=> {console.log('App props Error');},
+  initEnvironment : () => {console.log('App props Error');},
+  status : {},
+  environment : {},
+  notification : {},
+};
 App.propTypes = {
   getStatusRequest : PropTypes.func.isRequired,
   signoutRequest : PropTypes.func.isRequired,
   status : PropTypes.object.isRequired,
   environment : PropTypes.object.isRequired,
   initEnvironment : PropTypes.func.isRequired,
+  notification : PropTypes.object.isRequired,
 };
 const mapStateToProps = (state) => {
   return {

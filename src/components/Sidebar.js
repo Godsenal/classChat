@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react';
-import {Link, browserHistory} from 'react-router';
+import {Link} from 'react-router';
 import {Menu, Dropdown, Icon, Segment, Loader, Dimmer} from 'semantic-ui-react';
 
 import styles from '../Style.css';
@@ -20,11 +20,10 @@ class Sidebar extends React.Component {
     });
     this.props.changeActiveChannel(channel);
   }
-  handleSearchClick = (e) => {
+  handleSearchClick = () => {
     this.props.handleSearchClick();
   }
   render () {
-    const {activeChannelItem} = this.state;
     const {activeChannel} = this.props;
     const loaderStyle = this.props.isMobile?styles.channelLoaderMobile:styles.channelLoader;
     const loadingView =
@@ -45,7 +44,11 @@ class Sidebar extends React.Component {
           <Dropdown.Menu color='violet'>
             {this.props.channels.map((channel)=>{
               if(channel.type === 'CHANNEL')
-                return(<Dropdown.Item name={channel.name} active={activeChannel.id === channel.id} key={channel.id} onClick={()=>this.handleChannelClick(channel)}><Icon name='hashtag'/>{channel.name}</Dropdown.Item>);
+                return(<Dropdown.Item name={channel.name}
+                                      active={activeChannel.id === channel.id}
+                                      key={channel.id}
+                                      onClick={()=>this.handleChannelClick(channel)}>
+                                      <Icon name='hashtag'/>{channel.name}</Dropdown.Item>);
             })}
           </Dropdown.Menu>
         </Dropdown>
@@ -53,7 +56,12 @@ class Sidebar extends React.Component {
           <Dropdown.Menu color='red'>
             {this.props.channels.map((channel)=>{
               if(channel.type === 'GROUP')
-                return(<Dropdown.Item color='red' name={channel.name} active={activeChannel.id === channel.id} key={channel.id} onClick={()=>this.handleChannelClick(channel)}><Icon name='group'/>{channel.name}</Dropdown.Item>);
+                return(<Dropdown.Item color='red'
+                                      name={channel.name}
+                                      active={activeChannel.id === channel.id}
+                                      key={channel.id}
+                                      onClick={()=>this.handleChannelClick(channel)}>
+                                      <Icon name='group'/>{channel.name}</Dropdown.Item>);
             })}
           </Dropdown.Menu>
         </Dropdown>
@@ -62,7 +70,7 @@ class Sidebar extends React.Component {
         </Menu.Item>
       </Menu>
         :
-    <Menu style = {{'height':'100vh', 'overflowY':'scroll'}} vertical attached >
+    <Menu style = {{'height':'100vh'}} vertical attached >
       <Menu.Header >
         <Dropdown className={styles.balooFont} item text={this.props.status.currentUser}>
           <Dropdown.Menu>
@@ -73,18 +81,38 @@ class Sidebar extends React.Component {
       </Menu.Header>
       <Menu.Item header className={styles.balooFont}>CHANNELS</Menu.Item>
         {this.props.channels.map((channel)=>{
-          if(channel.type === 'CHANNEL')
-            return(<Menu.Item color='violet' name={channel.name} active={activeChannel.id === channel.id} key={channel.id} onClick={()=>this.handleChannelClick(channel)}><Icon name='hashtag'/>{channel.name}</Menu.Item>);
+          if(channel.type === 'CHANNEL'){
+            return(<Menu.Item color='violet'
+                              name={channel.name}
+                              active={activeChannel.id === channel.id}
+                              key={channel.id}
+                              onClick={()=>this.handleChannelClick(channel)}>
+                              <Icon name='hashtag'/>{channel.name}</Menu.Item>);}
         })}
       <Menu.Item header className={styles.balooFont}>GROUPS</Menu.Item>
         {this.props.channels.map((channel)=>{
-          if(channel.type === 'GROUP')
-            return(<Menu.Item color='red' name={channel.name} active={activeChannel.id === channel.id} key={channel.id} onClick={()=>this.handleChannelClick(channel)}><Icon name='group'/>{channel.name}</Menu.Item>);
+          if(channel.type === 'GROUP'){
+            return(<Menu.Item color='red'
+                              name={channel.name}
+                              active={activeChannel.id === channel.id}
+                              key={channel.id}
+                              onClick={()=>this.handleChannelClick(channel)}>
+                              <Icon name='group'/>{channel.name}</Menu.Item>);}
         })}
       <Menu.Item header className={styles.balooFont}>DIRECT</Menu.Item>
         {this.props.channels.map((channel)=>{
-          if(channel.type === 'DIRECT')
-            return(<Menu.Item color='red' name={channel.name} active={activeChannel.id === channel.id} key={channel.id} onClick={()=>this.handleChannelClick(channel)}><Icon name='group'/>{channel.name}</Menu.Item>);
+          var splitName = channel.name.split('+');
+          var filterName = splitName.filter((name) => {
+            return name !== this.props.status.currentUser;
+          });
+          var directName = filterName[0] + '님과의 채팅';
+          if(channel.type === 'DIRECT'){
+            return(<Menu.Item color='red'
+                              name={channel.name}
+                              active={activeChannel.id === channel.id}
+                              key={channel.id}
+                              onClick={()=>this.handleChannelClick(channel)}>
+                              <Icon name='user'/>{directName}</Menu.Item>);}
         })}
       <Menu.Item className={styles.balooFont} name='search' onClick={this.handleSearchClick}>
         <Icon name='search'/>Search Channel
@@ -102,9 +130,25 @@ class Sidebar extends React.Component {
   }
 }
 
+Sidebar.defaultProps = {
+  status : {},
+  activeChannel : {},
+  isMobile : false,
+  channels : [],
+  channelListStatus : 'INIT',
+  handleSignout : () => {console.log('sidebar props Error');},
+  handleSearchClick : () => {console.log('sidebar props Error');},
+  changeActiveChannel : () => {console.log('sidebar props Error');},
+};
 Sidebar.propTypes = {
   status : PropTypes.object.isRequired,
-
+  activeChannel: PropTypes.object.isRequired,
+  isMobile : PropTypes.bool.isRequired,
+  channels : PropTypes.array.isRequired,
+  channelListStatus : PropTypes.string.isRequired,
+  handleSignout : PropTypes.func.isRequired,
+  handleSearchClick : PropTypes.func.isRequired,
+  changeActiveChannel : PropTypes.func.isRequired,
 };
 
 

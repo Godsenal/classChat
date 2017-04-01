@@ -1,7 +1,6 @@
 import React, { PropTypes } from 'react';
-import {Button, Icon, Select, Input, Modal} from 'semantic-ui-react';
+import {Button, Select, Input, Modal} from 'semantic-ui-react';
 import NotificationSystem from 'react-notification-system';
-
 import styles from '../Style.css';
 
 class InputMessage extends React.Component {
@@ -25,7 +24,7 @@ class InputMessage extends React.Component {
     this.handleChange = this.handleChange.bind(this);
     this.addNotification = this.addNotification.bind(this);
   }
-  componentWillReceiveProps(nextProps){ // participant 가 새로 추가되었을 때 바로 변경. +1은 자기자신 제외한거 다시 더한거.
+  componentWillReceiveProps(nextProps){ // participant가 새로 추가되었을 때 바로 변경. +1은 자기자신 제외한거 다시 더한거.
     if(this.state.selectOption.length+1 !== nextProps.activeChannel.participants.length){
       this.setState({selectOption : nextProps.activeChannel.participants.filter((participant) => {
         if(participant !== this.props.currentUser){
@@ -67,9 +66,30 @@ class InputMessage extends React.Component {
   handleInit = () => {
     this.setState({type : 'input'});
   }
+  handleDirectClick = () => {
+    this.setState({type : 'direct'});
+  }
+  handleFile = (e) => {
+    e.preventDefault();
+    this.props.addMessage(e.target.files[0]);
+    this.setState({file : e.target.files[0]});
+  }
   selectedItem = (e, data) =>{
     this.setState({
       selected : data.value,
+    });
+  }
+  handleAddDirect = () => {
+    var sortParticipants = [this.props.currentUser, this.state.selected].sort();
+    var group ={
+      name: (sortParticipants[0] + '+' + sortParticipants[1]),
+      participants : sortParticipants,
+      type : 'DIRECT',
+    };
+    this.props.addGroup(group);
+    this.setState({
+      selected : [],
+      type : 'input',
     });
   }
   handleAddGroup = () => {
@@ -101,11 +121,14 @@ class InputMessage extends React.Component {
     const inputView =
       <div>
         <Button.Group floated='left'>
+          <Button icon='user' onClick={this.handleDirectClick}/>
           <Button icon='group' onClick={this.handleGroupClick}/>
           <Button icon='image' onClick={this.handleImageClick}/>
-          <Button icon='file text outline' onClick={this.handleFileClick}/>
+          <label htmlFor="file" className="ui icon button">
+            <i className="file icon"></i></label>
+          <input type="file" id="file" style={{'display':'none'}} onChange={this.handleFile}/>
         </Button.Group>
-        <textArea className={styles.messageInput} name='input' value={input} type ='text' onChange={this.handleChange} onKeyPress={this.handleKeyPress}/>
+        <textArea className={styles.messageInput} name='input' value={input} type ='file' onChange={this.handleChange} onKeyPress={this.handleKeyPress}/>
       </div>;
     const groupModal =
     <Modal open={type === 'group'} size='small' onClose={this.handleInit}>
@@ -121,16 +144,55 @@ class InputMessage extends React.Component {
       </Modal.Actions>
       <NotificationSystem ref={ref => this.notificationSystem = ref} />
     </Modal>;
+    const directModal =
+    <Modal open={type === 'direct'} size='small' onClose={this.handleInit}>
+      <Modal.Header>1:1채팅 추가</Modal.Header>
+      <Modal.Content>
+        <Modal.Description>
+          <Select selection fluid search placeholder='1:1채팅 상대' options={selectOption} onChange={this.selectedItem}/>
+        </Modal.Description>
+      </Modal.Content>
+      <Modal.Actions>
+        <Button primary onClick={this.handleAddDirect}>1:1채팅 만들기</Button>
+      </Modal.Actions>
+      <NotificationSystem ref={ref => this.notificationSystem = ref} />
+    </Modal>;
+    const fileModal =
+    <Modal open={type === 'file'} size='small' onClose={this.handleInit}>
+      <Modal.Header>1:1채팅 추가</Modal.Header>
+      <Modal.Content>
+        <Modal.Description>
+          <form ref="uploadForm" className="uploader" encType="multipart/form-data" >
+            <input ref="file" type="file" name="file" className={styles.messageInput}/>
+          </form>
+        </Modal.Description>
+      </Modal.Content>
+      <Modal.Actions>
+        <Button primary onClick={this.handleAddDirect}>1:1채팅 만들기</Button>
+      </Modal.Actions>
+      <NotificationSystem ref={ref => this.notificationSystem = ref} />
+    </Modal>;
     return(
       <div className={styles.messageInputContainer}>
         {inputView}
         {groupModal}
+        {directModal}
+        {fileModal}
       </div>
     );
   }
 }
+InputMessage.defaultProps = {
+  activeChannel : {participant : []},
+  addMessage : '',
+  addGroup : ()=> {console.log('prop Error');},
+  currentUser : '',
+};
 InputMessage.propTypes ={
+  activeChannel : PropTypes.object.isRequired,
   addMessage : PropTypes.func.isRequired,
+  addGroup : PropTypes.func.isRequired,
+  currentUser : PropTypes.string.isRequired,
 };
 
 export default InputMessage;

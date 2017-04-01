@@ -4,7 +4,7 @@ import {Header, Icon, Menu, Modal, Form, Button} from 'semantic-ui-react';
 import {Link, browserHistory} from 'react-router';
 import NotificationSystem from 'react-notification-system';
 
-import {signinRequest} from '../actions/authentication';
+import {signinRequest, getStatusRequest} from '../actions/authentication';
 import styles from '../Style.css';
 class Home extends Component{
   constructor(){
@@ -15,6 +15,14 @@ class Home extends Component{
       modalOpen : false,
     };
     this.addNotification = this.addNotification.bind(this);
+  }
+  componentDidMount() {
+    this.props.getStatusRequest()
+      .then(()=>{
+        if(this.props.status.valid){
+          browserHistory.push('/channel');
+        }
+      });
   }
   addNotification(message, level, position) {
     this.notificationSystem.addNotification({
@@ -44,7 +52,7 @@ class Home extends Component{
     e.preventDefault();
     this.props.signinRequest(this.state.id,this.state.pw)
       .then(() => {
-        if(this.props.status === 'SUCCESS') {
+        if(this.props.signin.status === 'SUCCESS') {
           let signinData = {
             isSignedIn: true,
             id: this.state.id,
@@ -105,12 +113,15 @@ Home.defaultProps = {
 };
 Home.propTypes = {
   signinRequest: PropTypes.func.isRequired,
-  status: PropTypes.string.isRequired,
+  getStatusRequest : PropTypes.func.isRequired,
+  signin : PropTypes.object.isRequired,
+  status: PropTypes.object.isRequired,
   nickname: PropTypes.string.isRequired,
 };
 const mapStateToProps = (state) => {
   return {
-    status: state.authentication.signin.status,
+    signin: state.authentication.signin,
+    status: state.authentication.status,
   };
 };
 
@@ -119,6 +130,9 @@ const mapDispatchToProps = (dispatch) => {
     signinRequest: (id, pw) => {
       return dispatch(signinRequest(id,pw));
     },
+    getStatusRequest: () => {
+      return dispatch(getStatusRequest());
+    }
   };
 };
 

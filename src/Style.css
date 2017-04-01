@@ -11,6 +11,13 @@
   display: flex;
   flex-direction: column;
 }
+.loadingView{
+  font-family: 'Baloo Bhaina', cursive;
+  height: 100vh;
+  display: -webkit-flex;
+  display: flex;
+  flex-direction: column;
+}
 .chatSidebar{
   font-family: 'Baloo Bhaina', cursive;
   flex-basis: 100px;

@@ -1,7 +1,7 @@
 import React, { PropTypes } from 'react';
 import {connect} from 'react-redux';
 import {browserHistory} from 'react-router';
-import {} from 'semantic-ui-react';
+import {Segment, Dimmer, Loader} from 'semantic-ui-react';
 import uuid from 'node-uuid';
 import moment from 'moment';
 
@@ -39,44 +39,62 @@ class Chat extends React.Component {
   componentDidMount() {
     /*direct connect without signin*/
     /* Get Singin Status First */
+    function getCookie(name){
+      var value = '; '+ document.cookie;
+      var parts = value.split('; ' + name + '=');
+      if (parts.length == 2) return parts.pop().split(';').shift();
+    }
+    let signinData = getCookie('key');
+
+        // if loginData is undefined, do nothing
+    if(typeof signinData === 'undefined'){
+      browserHistory.push('/');
+    }
+
+        // decode base64 & parse json
+    signinData = JSON.parse(atob(signinData));
+        // if not logged in, do nothing
+    if(!signinData.isSignedIn){
+      browserHistory.push('/');
+    }
+
     this.props.getStatusRequest().then(()=>{
-      if(!this.props.status.isSignedIn){
+      if(!this.props.status.valid){
 
         browserHistory.push('/');
       }
-      this.props.listChannel(this.props.status.currentUser)
-        .then(() => {
-          var publicChannel = this.props.channels.find((channel) => {return channel.id === '1';});
-          this.props.changeChannel(publicChannel);
-
-          this.props.listMessage(this.props.activeChannel.id,true,-1)
-            .then(()=>{
-              this.props.socket.emit('chat mounted');
-              this.props.socket.emit('join channel',this.props.activeChannel.id, this.props.status.currentUser, this.props.activeChannel.participants);
-              this.props.socket.emit('storeClientInfo',this.props.status);
-              this.props.socket.on('receive signup participant', (channels, userName) => {
-                this.props.receiveRawSignupParticipant(channels, userName);
-              });
-              this.props.socket.on('receive new participant', (channelID, participant, isLeave) =>
-                this.props.receiveRawParticipant(channelID, participant, isLeave)
-              );
-              this.props.socket.on('new bc message', (message) =>{
-                this.props.receiveRawMessage(message);
-              });
-              this.props.socket.on('receive private channel', (channel) =>{
-                this.props.receiveRawChannel(channel);
-                if(channel.type === 'GROUP'){
-                  this.props.addNotification({message:'새로운 그룹이 생성되었습니다!', level:'info', position:'bl',uuid: `${Date.now()}${uuid.v4()}`});
-                }else if(channel.type ==='DIRECT'){
-                  this.props.addNotification({message:'1:1 채널이 추가되었습니다!', level:'info', position:'bl',uuid: `${Date.now()}${uuid.v4()}`});
-                }
-              });
-              this.props.socket.on('receive socket', socketID =>
-                this.props.receiveSocket(socketID)
-              );
+      else{
+        this.props.listChannel(this.props.status.currentUser)
+          .then(()=>{
+            var publicChannel = this.props.channels.find((channel) => {return channel.id === '1';});
+            this.props.changeChannel(publicChannel);
+            this.props.listMessage(this.props.activeChannel.id,true,-1).then(()=>{
+            this.props.socket.emit('chat mounted');
+            this.props.socket.emit('join channel',this.props.activeChannel.id, this.props.status.currentUser, this.props.activeChannel.participants);
+            this.props.socket.emit('storeClientInfo',this.props.status);
+            this.props.socket.on('receive signup participant', (channels, userName) => {
+              this.props.receiveRawSignupParticipant(channels, userName);
             });
-
+            this.props.socket.on('receive new participant', (channelID, participant, isLeave) =>
+              this.props.receiveRawParticipant(channelID, participant, isLeave)
+            );
+            this.props.socket.on('new bc message', (message) =>{
+              this.props.receiveRawMessage(message);
+            });
+            this.props.socket.on('receive private channel', (channel) =>{
+              this.props.receiveRawChannel(channel);
+              if(channel.type === 'GROUP'){
+                this.props.addNotification({message:'새로운 그룹이 생성되었습니다!', level:'info', position:'bl',uuid: `${Date.now()}${uuid.v4()}`});
+              }else if(channel.type ==='DIRECT'){
+                this.props.addNotification({message:'1:1 채널이 추가되었습니다!', level:'info', position:'bl',uuid: `${Date.now()}${uuid.v4()}`});
+              }
+            });
+            this.props.socket.on('receive socket', socketID =>
+              this.props.receiveSocket(socketID)
+            );
+          });
         });
+      }
 
     });
 
@@ -174,6 +192,7 @@ class Chat extends React.Component {
         };
         document.cookie = 'key=' + btoa(JSON.stringify(signinData));
       }
+
     );
   }
   handleSearchClick(){
@@ -189,12 +208,19 @@ class Chat extends React.Component {
     });
   }
   render () {
+    const {status} = this.props;
     const {screenHeight, screenWidth} = this.props.environment;
     const isMobile = (screenWidth<600 && screenWidth>1)?true:false;
+    const isLoading = <Segment basic className={styles.loadingView}>
+                        <Dimmer active inverted>
+                          <Loader indeterminate inline='centered' size='massive'>Authenticating User</Loader>
+                        </Dimmer>
+                      </Segment>;
     const layoutStyle = isMobile?styles.flexLayoutMobile:styles.flexLayout;
     const sidebarStyle = isMobile?styles.chatSidebarMobile:styles.chatSidebar;
     return(
-      <div className={layoutStyle} style={{'height':{screenHeight}}}>
+      <div>
+      {status.valid?<div className={layoutStyle} style={{'height':{screenHeight}}}>
         <SearchModal isOpen={this.state.searchModal}
                      results={this.props.search.results}
                      handleJoinChannel = {this.handleJoinChannel}
@@ -225,7 +251,8 @@ class Chat extends React.Component {
                       leaveChannel={this.handleLeaveChannel}
                       currentUser={this.props.status.currentUser}/>
         </div>
-      </div>
+      </div>:isLoading}
+    </div>
     );
   }
 }
