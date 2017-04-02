@@ -56,7 +56,7 @@ class Message extends Component {
                       </Segment>;
     return(
       <div>
-        <div ref={ref => this.image = ref} className={waitingStyle}>
+        <div className={waitingStyle}>
           <div className={styles.messageImg}>
             <img className={styles.messageImg} src='https://semantic-ui.com/images/avatar/small/matt.jpg'/>
           </div>
