@@ -7,8 +7,7 @@ import { createStore, applyMiddleware } from 'redux';
 
 import thunk from 'redux-thunk';
 
-import {App, Home, ListView, PostView, Signin, Signup, SearchView, Chat} from './containers';
-import axios from 'axios';
+import {App, Home, ListView, PostView, Signin, Signup, SearchView, Chat, ImageView} from './containers';
 import reducers from './reducers';
 
 const store = createStore(reducers, applyMiddleware(thunk)); // thunk가 mapDispatchToProps 할 때, 인자를 전달 할 수 있게 도와줌.
@@ -60,6 +59,7 @@ ReactDOM.render(
           <Route path="channel" component={Chat}>
             <Route path=":channelName" component={Chat} />
           </Route>
+          <Route path="image/:url/:name" component={ImageView} />
           <Route path=":postId" component={PostView} />
         </Route>
       </Router>

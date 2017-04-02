@@ -27,13 +27,13 @@ class Sidebar extends React.Component {
     const {activeChannel} = this.props;
     const loaderStyle = this.props.isMobile?styles.channelLoaderMobile:styles.channelLoader;
     const loadingView =
-            <Segment basic className={loaderStyle}>
+            <Segment basic inverted className={loaderStyle}>
               <Dimmer active inverted>
                 <Loader indeterminate>Preparing Channels</Loader>
               </Dimmer>
             </Segment>;
     const responsiveView = (this.props.isMobile?
-      <Menu attached >
+      <Menu attached inverted>
         <Dropdown className={styles.balooFont} item text={this.props.status.currentUser}>
           <Dropdown.Menu>
             <Dropdown.Item>My Profile</Dropdown.Item>
@@ -70,7 +70,7 @@ class Sidebar extends React.Component {
         </Menu.Item>
       </Menu>
         :
-    <Menu style = {{'height':'100vh'}} vertical attached >
+    <Menu style = {{'height':'100vh'}} vertical attached inverted>
       <Menu.Header >
         <Dropdown className={styles.balooFont} item text={this.props.status.currentUser}>
           <Dropdown.Menu>

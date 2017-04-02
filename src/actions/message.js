@@ -50,7 +50,7 @@ export function addMessage(message) {
     var data = message;
     let url = '/api/message/new_message';
     if(typeof message.contents !== 'string'){
-      let type = 'file';
+      let type = message.types.split('/')[0];
       data = new FormData();
       data.append('files', message.contents);
       data.append('contents',message.contents.name);

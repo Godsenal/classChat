@@ -2,61 +2,100 @@
 @import url(http://fonts.googleapis.com/earlyaccess/nanumgothic.css);
 
 .flexLayout{
-  display: -webkit-flex;
-  display:flex;
+  display: -webkit-box;      /* OLD - iOS 6-, Safari 3.1-6 */
+  display: -moz-box;         /* OLD - Firefox 19- (buggy but mostly works) */
+  display: -ms-flexbox;      /* TWEENER - IE 10 */
+  display: -webkit-flex;     /* NEW - Chrome */
+  display: flex;
 }
 .flexLayoutMobile{
   height: 100vh;
-  display: -webkit-flex;
+  display: -webkit-box;      /* OLD - iOS 6-, Safari 3.1-6 */
+  display: -moz-box;         /* OLD - Firefox 19- (buggy but mostly works) */
+  display: -ms-flexbox;      /* TWEENER - IE 10 */
+  display: -webkit-flex;     /* NEW - Chrome */
   display: flex;
+  -webkit-box-flex-direction: column;      /* OLD - iOS 6-, Safari 3.1-6 */
+  -moz-box-flex-direction: column;
+  -webkit-flex-direction: column;     /* Chrome */
+  -ms-flex-direction: column;
   flex-direction: column;
 }
 .loadingView{
   font-family: 'Baloo Bhaina', cursive;
   height: 100vh;
-  display: -webkit-flex;
+  display: -webkit-box;      /* OLD - iOS 6-, Safari 3.1-6 */
+  display: -moz-box;         /* OLD - Firefox 19- (buggy but mostly works) */
+  display: -ms-flexbox;      /* TWEENER - IE 10 */
+  display: -webkit-flex;     /* NEW - Chrome */
   display: flex;
   flex-direction: column;
 }
 .chatSidebar{
   font-family: 'Baloo Bhaina', cursive;
-  flex-basis: 100px;
-  -webkit-filter: invert(100%); /* Safari 6.0 - 9.0 */
-  filter: invert(100%);
+  -webkit-box-flex: 0 1 auto;      /* OLD - iOS 6-, Safari 3.1-6 */
+  -moz-box-flex: 0 1 auto;         /* OLD - Firefox 19- */             /* For old syntax, otherwise collapses. */
+  -webkit-flex: 0 1 auto;          /* Chrome */
+  -ms-flex: 0 1 auto;              /* IE 10 */
+  flex: 0 1 auto;
+  min-width: 100px;
 }
 .chatSidebarMobile{
   font-family: 'Roboto Slab', sans-serif;
-  flex-basis: 2rem;
+  -webkit-box-flex: 0 1 auto;      /* OLD - iOS 6-, Safari 3.1-6 */
+  -moz-box-flex: 0 1 auto;         /* OLD - Firefox 19- */             /* For old syntax, otherwise collapses. */
+  -webkit-flex: 0 1 auto;          /* Chrome */
+  -ms-flex: 0 1 auto;              /* IE 10 */
+  flex: 0 1 auto;
+  min-height: 2rem;
   width: 100%;
-  -webkit-filter: invert(100%); /* Safari 6.0 - 9.0 */
-  filter: invert(100%);
 }
 .chatView{
   font-family: 'Baloo Bhaina', cursive;
-  -webkit-flex: 1;
-  flex:1;
+  -webkit-box-flex: 1;      /* OLD - iOS 6-, Safari 3.1-6 */
+  -moz-box-flex: 1;         /* OLD - Firefox 19- */             /* For old syntax, otherwise collapses. */
+  -webkit-flex: 1;          /* Chrome */
+  -ms-flex: 1;              /* IE 10 */
+  flex: 1;
 }
 .flexMessage{
-  display: -webkit-flex;
-  display:flex;
+  display: -webkit-box;      /* OLD - iOS 6-, Safari 3.1-6 */
+  display: -moz-box;         /* OLD - Firefox 19- (buggy but mostly works) */
+  display: -ms-flexbox;      /* TWEENER - IE 10 */
+  display: -webkit-flex;     /* NEW - Chrome */
+  display: flex;
   margin : 2rem;
   vertical-align: top;
 }
 .flexMessageWaiting{
-  display: -webkit-flex;
-  display:flex;
+  display: -webkit-box;      /* OLD - iOS 6-, Safari 3.1-6 */
+  display: -moz-box;         /* OLD - Firefox 19- (buggy but mostly works) */
+  display: -ms-flexbox;      /* TWEENER - IE 10 */
+  display: -webkit-flex;     /* NEW - Chrome */
+  display: flex;
   margin : 2rem;
   vertical-align: top;
   opacity: 0.3;
 }
 .flexMyMessage{
-  display: -webkit-flex;
-  display:flex;
+  display: -webkit-box;      /* OLD - iOS 6-, Safari 3.1-6 */
+  display: -moz-box;         /* OLD - Firefox 19- (buggy but mostly works) */
+  display: -ms-flexbox;      /* TWEENER - IE 10 */
+  display: -webkit-flex;     /* NEW - Chrome */
+  display: flex;
+  -webkit-box-flex-direction: row-reverse;      /* OLD - iOS 6-, Safari 3.1-6 */
+  -moz-box-flex-direction: row-reverse;
+  -webkit-flex-direction: row-reverse;     /* Chrome */
+  -ms-flex-direction: row-reverse;
   flex-direction: row-reverse;
   margin-top: 20px;
   margin-left: 30px;
 }
 .messageImg{
+  -webkit-box-flex-basis: 2.25rem;      /* OLD - iOS 6-, Safari 3.1-6 */
+  -moz-box-flex-basis: 2.25rem;
+  -webkit-flex-basis: 2.25rem;         /* Chrome */
+  -ms-flex-basis: 2.25rem;
   flex-basis: 2.25rem;
   width: 2.25rem;
   height: 2.25rem;
@@ -64,10 +103,17 @@
 .messageContents{
   font-family: 'Nanum Gothic', sans-serif;
   margin-left: 1rem;
+  -webkit-box-flex: 1;      /* OLD - iOS 6-, Safari 3.1-6 */
+  -moz-box-flex: 1;         /* OLD - Firefox 19- */             /* For old syntax, otherwise collapses. */
+  -webkit-flex: 1;          /* Chrome */
+  -ms-flex: 1;              /* IE 10 */
   flex: 1;
 }
 .chatHeader{
-  display: -webkit-flex;
+  display: -webkit-box;      /* OLD - iOS 6-, Safari 3.1-6 */
+  display: -moz-box;         /* OLD - Firefox 19- (buggy but mostly works) */
+  display: -ms-flexbox;      /* TWEENER - IE 10 */
+  display: -webkit-flex;     /* NEW - Chrome */
   display: flex;
   align-items: center;
   margin-top: 10px;
@@ -151,12 +197,16 @@
 .messageLoader{
   height: 100vh;
 }
+.messageLoaderMobile{
+  height: 90vh;
+}
 .channelLoader{
   height: 100vh;
   width: 15rem;
 }
 .channelLoaderMobile{
-  height: 5rem;
+  font-family: 'Baloo Bhaina', cursive;
+  height: 10vh;
 }
 .loadingImage{
   max-width:100%;
@@ -183,4 +233,8 @@
 }
 .messageInputHeight{
   height: 40px;
+}
+.imageMessage{
+  width:200px;
+  height:200px;
 }

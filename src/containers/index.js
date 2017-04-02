@@ -10,4 +10,5 @@ import ChannelView from './ChannelView';
 import ChatView from './ChatView';
 import Chat from './Chat';
 
-export {App, Home, ListView, PostView, SearchView, Signin, Signup, ChannelView, ChatView, Chat};
+import ImageView from './ImageView';
+export {App, Home, ListView, PostView, SearchView, Signin, Signup, ChannelView, ChatView, Chat, ImageView};

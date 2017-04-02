@@ -28,8 +28,9 @@ class ChatView extends Component{
   }
   // div 바로 다음. <ChannelList channels={this.props.channels} changeActiveChannel={this.changeActiveChannel} />
   render(){
+    const loaderStyle = this.props.isMobile?styles.messageLoaderMobile:styles.messageLoader;
     const loadingView =
-            <Segment basic className={styles.messageLoader}>
+            <Segment basic className={loaderStyle}>
               <Dimmer active inverted>
                 <Loader indeterminate >Preparing Messages</Loader>
               </Dimmer>

@@ -123,7 +123,10 @@ router.post('/signin', (req, res) => {
 */
 router.get('/getinfo', (req, res) => {
   if(typeof req.session.loginInfo === 'undefined') {
-    return next({error: 'Not login'});
+    return res.status(401).json({
+      error: 'INVALID STATUS',
+      code: 1
+    });
   }
   return res.json({ info: req.session.loginInfo });
 });

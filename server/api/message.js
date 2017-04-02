@@ -4,7 +4,7 @@ import multer from 'multer';
 const router = express.Router();
 
 const storage = multer.diskStorage({
-  destination: './files',
+  destination: './public/files',
   filename(req, file, cb) {
     cb(null, `${new Date()}-${file.originalname}`);
   },
@@ -52,7 +52,6 @@ router.get('/:channelID/:messageID', function(req, res) {
 
   //post a new message to db
 router.post('/new_message', function(req, res) {
-  console.log(req.body.contents);
   var newMessage = new messages(req.body);
   newMessage.save(function (err, message) {
     if(err) {
@@ -66,7 +65,7 @@ router.post('/new_message', function(req, res) {
 router.post('/new_message/:types', upload.single('files') , function(req, res) {
   let message = {
     ...req.body,
-    url: `./${new Date()}-${req.file.originalname}`,
+    url: `${new Date()}-${req.file.originalname}`,
     types: req.params.types,
   };
   var newMessage = new messages(message);

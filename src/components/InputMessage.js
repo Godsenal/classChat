@@ -121,9 +121,13 @@ class InputMessage extends React.Component {
     const inputView =
       <div>
         <Button.Group floated='left'>
-          <Button icon='user' onClick={this.handleDirectClick}/>
-          <Button icon='group' onClick={this.handleGroupClick}/>
-          <Button icon='image' onClick={this.handleImageClick}/>
+          <label htmlFor="user" className="ui icon button" onClick={this.handleDirectClick}>
+            <i className="user icon"></i></label>
+          <label htmlFor="group" className="ui icon button" onClick={this.handleGroupClick}>
+            <i className="group icon"></i></label>
+          <label htmlFor="image" className="ui icon button">
+            <i className="image icon"></i></label>
+          <input type="file" id="image" style={{'display':'none'}} onChange={this.handleFile}/>
           <label htmlFor="file" className="ui icon button">
             <i className="file icon"></i></label>
           <input type="file" id="file" style={{'display':'none'}} onChange={this.handleFile}/>

@@ -66,7 +66,8 @@ class Chat extends React.Component {
       else{
         this.props.listChannel(this.props.status.currentUser)
           .then(()=>{
-            var publicChannel = this.props.channels.find((channel) => {return channel.id === '1';});
+            var findChannel = this.props.channels.filter((channel) => {return channel.id === '1';});
+            var publicChannel = findChannel[0];
             this.props.changeChannel(publicChannel);
             this.props.listMessage(this.props.activeChannel.id,true,-1).then(()=>{
             this.props.socket.emit('chat mounted');
@@ -106,12 +107,17 @@ class Chat extends React.Component {
     this.props.listMessage(channel.id, true, -1);
   }
   addMessage(message){
+    let types = 'message';
+    if(typeof message !== 'string'){
+      types = message.type;
+    }
     var newMessage = {
       id: `${Date.now()}${uuid.v4()}`,
       channelID: this.props.activeChannel.id,
       contents: message,
       userName: this.props.status.currentUser,
       created: moment().format(),
+      types: types,
     };
     this.props.addMessage(newMessage)
       .then(() => {

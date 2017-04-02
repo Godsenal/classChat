@@ -6,6 +6,12 @@ import {browserHistory} from 'react-router';
 import { getStatusRequest, signoutRequest} from '../actions/authentication';
 import { initEnvironment, connectSocket} from '../actions/environment';
 
+import Bluebird from 'bluebird';
+// Node
+global.Promise = Bluebird;
+// Browser
+window.Promise = Bluebird;
+
 const socket = io.connect();
 class App extends Component{
   constructor(props){
@@ -155,7 +161,7 @@ const mapDispatchToProps = (dispatch) => {
     },
     connectSocket: (socket) => {
       return dispatch(connectSocket(socket));
-    }
+    },
   };
 };
 
