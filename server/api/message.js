@@ -23,7 +23,7 @@ router.get('/', function(req, res) {
 });
 
 // query DB for messages for a specific channel
-router.get('/:channelID/:messageID', function(req, res) {
+router.get('/list/:channelID/:messageID', function(req, res) {
   if(req.params.messageID === '-1'){
     messages.find({$and: [{channelID: req.params.channelID},{id : {$gt: req.params.messageID}}]})
             .sort({id : -1})
@@ -49,7 +49,33 @@ router.get('/:channelID/:messageID', function(req, res) {
             });
   }
 });
-
+  //get filtered message
+router.get('/filter/:channelID/:messageID/:types', function(req, res){
+  if(req.params.messageID === '-1'){
+    messages.find({$and: [{channelID: req.params.channelID},{types: req.params.types},{id : {$gt: req.params.messageID}}]})
+      .sort({id: -1})
+      .limit(15)
+      .exec((err, messages)=>{
+        if(err) {
+          console.log(err);
+          return res.status(500).json({error: 'internal server error', code: 1});
+        }
+        return res.json({messages});
+      });
+  }
+  else{
+    messages.find({$and: [{channelID: req.params.channelID},{types: req.params.types},{id : {$lt: req.params.messageID}}]})
+      .sort({id: -1})
+      .limit(15)
+      .exec((err, messages)=>{
+        if(err) {
+          console.log(err);
+          return res.status(500).json({error: 'internal server error', code: 1});
+        }
+        return res.json({messages});
+      });
+  }
+});
   //post a new message to db
 router.post('/new_message', function(req, res) {
   var newMessage = new messages(req.body);

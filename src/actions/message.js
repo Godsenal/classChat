@@ -5,6 +5,9 @@ import {
     MESSAGE_LIST,
     MESSAGE_LIST_SUCCESS,
     MESSAGE_LIST_FAILURE,
+    MESSAGE_FILTER,
+    MESSAGE_FILTER_SUCCESS,
+    MESSAGE_FILTER_FAILURE,
     ROW_MESSAGE_RECEIVE,
 } from './ActionTypes';
 
@@ -77,18 +80,33 @@ export function addMessage(message) {
 
 /* LIST MESSAGE */
 
-export function listMessage(channelID, isInitial, topMessageID) {
+export function listMessage(channelID, isInitial, topMessageID = '-1') {
   return (dispatch) => {
     dispatch({type: MESSAGE_LIST});
     var messageID = -1;
     if(!isInitial)
       messageID = topMessageID;
     messageID = messageID.toString();
-    return axios.get(`api/message/${channelID}/${messageID}`)
+    return axios.get(`api/message/list/${channelID}/${messageID}`)
             .then((res) => {
               dispatch({type: MESSAGE_LIST_SUCCESS, messages: res.data.messages, isInitial});
             }).catch((err) => {
               dispatch({type: MESSAGE_LIST_FAILURE, err: err.res.data.error});
+            });
+  };
+}//밑에처럼 바꾸기
+
+/* FILTER MESSAGE */
+
+export function filterMessage(channelID, types, topMessageID = '-1') {
+  return (dispatch) => {
+    dispatch({type: MESSAGE_FILTER});
+    var messageID = topMessageID;
+    return axios.get(`api/message/filter/${channelID}/${messageID}/${types}`)
+            .then((res) => {
+              dispatch({type: MESSAGE_FILTER_SUCCESS, messages: res.data.messages, topMessageID: topMessageID});
+            }).catch((err) => {
+              dispatch({type: MESSAGE_FILTER_FAILURE, err: err.res.data.error});
             });
   };
 }

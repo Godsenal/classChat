@@ -1,8 +1,8 @@
 import React, { Component, PropTypes } from 'react';
-import {Dimmer, Loader,  Segment } from 'semantic-ui-react';
+import {Dimmer, Loader,  Segment, Sidebar, Button, Dropdown, Menu, Icon, Input } from 'semantic-ui-react';
 
 
-import {MessageList, ChatHeader, InputMessage} from '../components';
+import {MessageList, ChatHeader, InputMessage, FilterDateMessage} from '../components';
 import styles from '../Style.css';
 
 class ChatView extends Component{
@@ -10,6 +10,8 @@ class ChatView extends Component{
     super();
     this.state = {
       isInitial : true,
+      menu : false,
+      filter : '',
     };
     this.setInitial = this.setInitial.bind(this);
     this.addMessage = this.addMessage.bind(this);
@@ -26,6 +28,15 @@ class ChatView extends Component{
       isInitial,
     });
   }
+  toggleMenu = () => {
+    this.setState({
+      menu: !this.state.menu,
+    });
+  }
+  handleFilter = (e) => {
+    this.props.filterMessage(this.props.activeChannel.id, e.target.id);
+    this.setState({filter: e.target.id});
+  }
   // div 바로 다음. <ChannelList channels={this.props.channels} changeActiveChannel={this.changeActiveChannel} />
   render(){
     const loaderStyle = this.props.isMobile?styles.messageLoaderMobile:styles.messageLoader;
@@ -37,7 +48,7 @@ class ChatView extends Component{
             </Segment>;
     const chatView =
             <div>
-              <ChatHeader {...this.props.activeChannel} leaveChannel={this.props.leaveChannel} currentUser={this.props.currentUser}/>
+              <ChatHeader {...this.props.activeChannel} toggleMenu={this.toggleMenu} leaveChannel={this.props.leaveChannel} currentUser={this.props.currentUser}/>
               <MessageList isMobile={this.props.isMobile}
                            listMessage={this.props.listMessage}
                            activeChannel={this.props.activeChannel}
@@ -53,9 +64,28 @@ class ChatView extends Component{
             </div>;
     const view = ((this.props.messageListStatus !== 'SUCCESS')&&(this.state.isInitial))?loadingView:chatView;
     return(
-      <div>
-        {view}
-      </div>
+      <Sidebar.Pushable as='div'>
+        <Sidebar as={Segment} animation='overlay' direction='right' width='wide' visible={this.state.menu} style={{'background':'#B3B2AD'}} icon='labeled' vertical inverted>
+          <Menu fixed='top'>
+            <Menu.Item name='닫기' onClick={this.toggleMenu}/>
+            <Dropdown item icon='filter' simple>
+              <Dropdown.Menu>
+                <Dropdown.Item icon='file' text='File' id='application' onClick={this.handleFilter}/>
+                <Dropdown.Item icon='image' text='Image' id='image' onClick={this.handleFilter}/>
+              </Dropdown.Menu>
+            </Dropdown>
+            <Menu.Item>
+              <Input className='icon' icon='search' placeholder='Search...' />
+            </Menu.Item>
+          </Menu>
+          {this.props.messageFilter.status === 'SUCCESS'&&this.props.messageFilter.messages.map((message) => {
+            return <FilterDateMessage key={message.id} {...message} currentUser={this.props.currentUser} />;
+          })}
+        </Sidebar>
+        <Sidebar.Pusher>
+          {view}
+        </Sidebar.Pusher>
+      </Sidebar.Pushable>
     );
   }
 }

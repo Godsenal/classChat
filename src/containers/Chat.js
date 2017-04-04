@@ -5,8 +5,16 @@ import {Segment, Dimmer, Loader} from 'semantic-ui-react';
 import uuid from 'node-uuid';
 import moment from 'moment';
 
-import {receiveRawMessage, addMessage, listMessage} from '../actions/message';
-import {addChannel, changeChannel, listChannel, searchChannel, joinChannel, leaveChannel, receiveRawChannel, receiveRawParticipant, receiveRawSignupParticipant} from '../actions/channel';
+import {receiveRawMessage, addMessage, listMessage, filterMessage} from '../actions/message';
+import {addChannel,
+        changeChannel,
+        listChannel,
+        searchChannel,
+        joinChannel,
+        leaveChannel,
+        receiveRawChannel,
+        receiveRawParticipant,
+        receiveRawSignupParticipant} from '../actions/channel';
 import {receiveSocket, signoutRequest, getStatusRequest} from '../actions/authentication';
 import {addNotification} from '../actions/environment';
 import {Sidebar, SearchModal} from '../components';
@@ -22,6 +30,7 @@ class Chat extends React.Component {
 
     this.handleSignout = this.handleSignout.bind(this);
     this.addMessage = this.addMessage.bind(this);
+    this.handleFilterMessage = this.handleFilterMessage.bind(this);
     this.changeActiveChannel = this.changeActiveChannel.bind(this);
     this.handleSearchClick = this.handleSearchClick.bind(this);
     this.handleSearchClose = this.handleSearchClose.bind(this);
@@ -127,6 +136,9 @@ class Chat extends React.Component {
         console.log('failed to add Message');
       });
 
+  }
+  handleFilterMessage(channelID, types){
+    this.props.filterMessage(channelID, types);
   }
   handleAddChannel(channel){
     channel.channelID = this.props.activeChannel.id;
@@ -250,7 +262,9 @@ class Chat extends React.Component {
                       messageAddStatus={this.props.messageAddStatus}
                       messageReceive={this.props.messageReceive}
                       listMessage={this.props.listMessage}
+                      filterMessage={this.handleFilterMessage}
                       messages={this.props.messages}
+                      messageFilter={this.props.messageFilter}
                       isLast={this.props.isLast}
                       addMessage={this.addMessage}
                       addGroup={this.handleAddGroup}
@@ -281,6 +295,7 @@ const mapStateToProps = (state) => {
     messageAddStatus : state.message.add.status,
     messageListStatus: state.message.list.status,
     messageReceive: state.message.receive,
+    messageFilter : state.message.filter,
     environment: state.environment,
   };
 };
@@ -307,6 +322,9 @@ const mapDispatchToProps = (dispatch) => {
     },
     listMessage: (channelID, isInitial, topMessageId) => {
       return dispatch(listMessage(channelID, isInitial, topMessageId));
+    },
+    filterMessage: (channelID, types, topMessageId) => {
+      return dispatch(filterMessage(channelID, types, topMessageId));
     },
     changeChannel: (channel) => {
       return dispatch(changeChannel(channel));

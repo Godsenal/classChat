@@ -13,7 +13,7 @@ class Message extends Component {
     };
   }
   handleImageLoad = () => {
-    this.setState({ imageStatus: 'loaded' });
+    this.setState({ imageStatus: 'loaded' }); // onload
 
   }
   handleToggleImage = () => {
@@ -47,7 +47,6 @@ class Message extends Component {
                         {this.state.hiddenImage&&<Button onClick={this.handleToggleImage}>이미지 보기</Button>}
                         <Image size ='medium'
                                hidden={this.state.hiddenImage}
-                               onLoad={this.handleImageLoad}
                                bordered
                                as='a'
                                href={`/image/${this.props.url}/${this.props.contents}`}

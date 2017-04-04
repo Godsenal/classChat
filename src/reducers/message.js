@@ -21,6 +21,13 @@ const initialState = {
     err: 'ERROR',
     errCode: -1,
   },
+  filter: {
+    status: 'INIT',
+    messages: [],
+    isLast : false,
+    err: 'ERROR',
+    errCode: -1,
+  }
 };
 
 export default function message(state, action) {
@@ -181,6 +188,8 @@ export default function message(state, action) {
 
     var divByDate = [];
     var divided = {};
+
+
     action.messages.map((message) => { // message의 date를 비교해서 date,id,messages를 가지고있는 array를 만듬.
       if(!_.isEmpty(divided) && (divided.date!==new Date(message.created).setHours(0,0,0,0))){
         divByDate.push(divided);
@@ -237,6 +246,77 @@ export default function message(state, action) {
   case types.MESSAGE_LIST_FAILURE:
     return update(state, {
       list: {
+        status: { $set: 'FAILURE' },
+        err: { $set: action.err },
+        errCode: { $set: action.code}
+      }
+    });
+  /* FILTER MESSAGE */
+  case types.MESSAGE_FILTER:
+    return update(state, {
+      filter: {
+        status: { $set: 'WAITING'}
+      },
+    });
+  case types.MESSAGE_FILTER_SUCCESS:
+    var divByDateFilter = [];
+    var dividedFilter = {};
+    action.messages.map((message) => { // message의 date를 비교해서 date,id,messages를 가지고있는 array를 만듬.
+      if(!_.isEmpty(dividedFilter) && (dividedFilter.date!==new Date(message.created).setHours(0,0,0,0))){
+        divByDateFilter.push(dividedFilter);
+        dividedFilter = {};
+      }
+
+      if(_.isEmpty(dividedFilter)){
+        dividedFilter = {
+          id: message.id,
+          date : new Date(message.created).setHours(0,0,0,0),
+          messages : [message]
+        };
+      }
+      else{
+        dividedFilter.id = message.id;
+        dividedFilter.messages.unshift(message);
+      }
+    });
+    //마지막 메시지들은 날짜가 다른지 비교를 못하므로 따로 처리
+    if(!_.isEmpty(dividedFilter))
+      divByDateFilter.push(dividedFilter);
+
+    if(action.topMessageID === '-1'){ // 첫 데이터 불러오기면 그냥 set
+      divByDateFilter.reverse();
+      return update(state, {
+        filter: {
+          status: { $set: 'SUCCESS' },
+          messages: { $set: divByDateFilter },
+          isLast: { $set: action.messages.length < 15}
+        }
+      });
+    }else{ //old메시지 인데 list에 이미 같은날짜의 데이터가 있으면 넣어주고 old메시지는 삭제.
+      if(divByDateFilter[0].date === state.filter.messages[0].date){
+        divByDateFilter[0].messages.push(...state.filter.messages[0].messages);
+        state = update(state,{
+          filter:{
+            messages:{
+              [0]:{
+                $set : divByDateFilter[0]
+              }
+            }
+          }
+        });
+        divByDateFilter.shift();
+      }
+      return update(state, {
+        filter: {
+          status: { $set: 'SUCCESS' },
+          messages: { $unshift: divByDateFilter },
+          isLast: { $set: action.messages.length < 15}
+        }
+      });
+    }
+  case types.MESSAGE_FILTER_FAILURE:
+    return update(state, {
+      filter: {
         status: { $set: 'FAILURE' },
         err: { $set: action.err },
         errCode: { $set: action.code}

@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react';
-import {Icon, Divider, Dropdown, Modal, Button} from 'semantic-ui-react';
+import {Icon, Divider, Dropdown, Modal, Button, Input} from 'semantic-ui-react';
 import styles from '../Style.css';
 
 class ChatHeader extends React.Component {
@@ -56,6 +56,9 @@ class ChatHeader extends React.Component {
             <Icon name='search' />
           </Button>
           {outBtn}
+          <Button icon onClick={this.props.toggleMenu}>
+            <Icon name='list layout' />
+          </Button>
         </div>
         <Divider/>
       </div>
