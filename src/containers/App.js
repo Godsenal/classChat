@@ -33,12 +33,37 @@ class App extends Component{
       this.addNotification(nextProps.notification);
   }
   componentDidMount() {
-    this.props.getStatusRequest()
-      .then(()=>{
-        if(this.props.status.valid){
+    /*
+    function getCookie(name){
+      var value = '; '+ document.cookie;
+      var parts = value.split('; ' + name + '=');
+      if (parts.length == 2) return parts.pop().split(';').shift();
+    }
+    let signinData = getCookie('key');
+
+
+        // if loginData is undefined, do nothing
+    if(typeof signinData === 'undefined'){
+      return ;
+    }
+
+        // decode base64 & parse json
+    signinData = JSON.parse(atob(signinData));
+        // if not logged in, do nothing
+    if(signinData.isSignedIn){
+      browserHistory.push('/channel');
+    }else{
+      return ;
+    }
+    */
+    let token = localStorage.getItem('token') || null;
+    if(token !== null){
+      this.props.getStatusRequest(token).then(()=>{
+        if(this.props.status.valid){ // if session is valid. go to channel
           browserHistory.push('/channel');
         }
       });
+    }
   }
   componentWillMount() {
 
@@ -158,8 +183,8 @@ const mapStateToProps = (state) => {
 };
 const mapDispatchToProps = (dispatch) => {
   return {
-    getStatusRequest: () => {
-      return dispatch(getStatusRequest());
+    getStatusRequest: (token) => {
+      return dispatch(getStatusRequest(token));
     },
     signoutRequest: () => {
       return dispatch(signoutRequest());

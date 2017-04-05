@@ -13,6 +13,8 @@ class Home extends Component{
       success : false,
       activeItem : '',
       modalOpen : false,
+      username : '',
+      password: '',
     };
     this.addNotification = this.addNotification.bind(this);
   }
@@ -28,10 +30,10 @@ class Home extends Component{
     });
   }
   handleChange = (e) => {
-    if(e.target.name === 'id')
-      this.setState({id: e.target.value});
-    else if(e.target.name ==='pw')
-      this.setState({pw: e.target.value});
+    if(e.target.name === 'username')
+      this.setState({username: e.target.value});
+    else if(e.target.name ==='password')
+      this.setState({password: e.target.value});
   }
   handleOpen = () => {
     this.setState({
@@ -45,23 +47,24 @@ class Home extends Component{
   }
   handleSignin = (e) => {
     e.preventDefault();
-    this.props.signinRequest(this.state.id,this.state.pw)
+    this.props.signinRequest(this.state.username,this.state.password)
       .then(() => {
         if(this.props.signin.status === 'SUCCESS') {
+          /*
           let signinData = {
             isSignedIn: true,
             id: this.state.id,
             nickname: this.props.nickname,
             isAdmin: false,
           };
-          document.cookie = 'key=' + btoa(JSON.stringify(signinData));
+          document.cookie = 'key=' + btoa(JSON.stringify(signinData));*/
           this.handleClose();
           browserHistory.push('/channel');
           return true;
         }
         else{
           this.addNotification('Incorrect username or password','warning','bc');
-          this.setState({pw : ''});
+          this.setState({password : ''});
           return false;
         }
       });
@@ -74,8 +77,8 @@ class Home extends Component{
                           <Modal.Header>Sign in</Modal.Header>
                           <Modal.Content>
                             <Form>
-                              <Form.Input name='id' label='ID' placeholder='id' type='text' onChange={this.handleChange}/>
-                              <Form.Input name='pw' label='Password' type='password' onChange={this.handleChange}/>
+                              <Form.Input name='username' label='Username' placeholder='username' type='text' onChange={this.handleChange}/>
+                              <Form.Input name='password' label='Password' type='password' onChange={this.handleChange}/>
                             </Form>
                             <Modal.Description>
                               <p>Don't have account yet?&nbsp;<Link to='/signup'>Sign up here</Link>&nbsp;instead.</p>
@@ -122,8 +125,8 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    signinRequest: (id, pw) => {
-      return dispatch(signinRequest(id,pw));
+    signinRequest: (username, password) => {
+      return dispatch(signinRequest(username,password));
     },
     getStatusRequest: () => {
       return dispatch(getStatusRequest());

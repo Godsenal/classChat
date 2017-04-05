@@ -51,9 +51,9 @@ ReactDOM.render(
   <Provider store={store}>
       <Router history={browserHistory}>
         <Route path="/" component={App} >
+          <Route path="signup" component={Signup} />
           <IndexRoute component={Home} />
           <Route path="signin" component={Signin} />
-          <Route path="signup" component={Signup} />
           <Route path="search" component={SearchView} />
           <Route path="notice" component={ListView} />
           <Route path="channel" component={Chat}>

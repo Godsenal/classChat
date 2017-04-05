@@ -8,6 +8,7 @@ import express from 'express';
 import session from 'express-session';
 import socketEvents from './socketEvents';
 
+const passport = require('passport');
 const MongoStore = require('connect-mongo')(session);
 
 
@@ -24,8 +25,8 @@ mongoose.connect(config.dbUrl);
 const app = express();
 
 
-app.use(bodyParser.json());
 
+/* USING SESSION
 app.use(session({
   secret: 'Godsenal!3737',
   saveUninitialized: false,
@@ -42,7 +43,15 @@ app.use(sassMiddleware({
 }));
 */
 
+const localSignupStrategy = require('./passport/local-signup');
+const localSigninStrategy = require('./passport/local-signin');
+passport.use('local-signup', localSignupStrategy);
+passport.use('local-signin', localSigninStrategy);
 
+
+app.use( bodyParser.urlencoded({ extended: true }) );
+app.use(bodyParser.json());
+app.use(passport.initialize());
 
 
 app.use('/', express.static(path.join(__dirname, './../public'))); // 정적인 페이지 로드

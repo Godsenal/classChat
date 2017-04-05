@@ -48,6 +48,7 @@ class Chat extends React.Component {
   componentDidMount() {
     /*direct connect without signin*/
     /* Get Singin Status First */
+    /*
     function getCookie(name){
       var value = '; '+ document.cookie;
       var parts = value.split('; ' + name + '=');
@@ -66,8 +67,12 @@ class Chat extends React.Component {
     if(!signinData.isSignedIn){
       browserHistory.push('/');
     }
-
-    this.props.getStatusRequest().then(()=>{
+    */
+    let token = localStorage.getItem('token') || null;
+    if(token === null){
+      browserHistory.push('/');
+    }
+    this.props.getStatusRequest(token).then(()=>{
       if(!this.props.status.valid){
 
         browserHistory.push('/');
@@ -203,21 +208,18 @@ class Chat extends React.Component {
   handleSignout(){
     var status = this.props.status;
 
-    this.props.signoutRequest().then(
-      () => {
-        this.props.socket.emit('leave channel', this.props.activeChannel.id, status.currentUser);
-        this.props.socket.emit('disconnected',this.props.status);
-        Materialize.toast('Good Bye!', 2000);
-        let signinData = {
-          isSignedIn: false,
-          id: '',
-          nickname: '',
-          isAdmin: false,
-        };
-        document.cookie = 'key=' + btoa(JSON.stringify(signinData));
-      }
+    this.props.signoutRequest();
+    this.props.socket.emit('leave channel', this.props.activeChannel.id, status.currentUser);
+    this.props.socket.emit('disconnected',this.props.status);
+    Materialize.toast('Good Bye!', 2000);
+    let signinData = {
+      isSignedIn: false,
+      id: '',
+      nickname: '',
+      isAdmin: false,
+    };
+    //document.cookie = 'key=' + btoa(JSON.stringify(signinData));
 
-    );
   }
   handleSearchClick(){
     this.props.searchChannel('*').then(() => {
@@ -313,8 +315,8 @@ const mapDispatchToProps = (dispatch) => {
     receiveSocket: (socketID) => {
       return dispatch(receiveSocket(socketID));
     },
-    getStatusRequest: () => {
-      return dispatch(getStatusRequest());
+    getStatusRequest: (token) => {
+      return dispatch(getStatusRequest(token));
     },
     receiveRawMessage: (message) => {
       return dispatch(receiveRawMessage(message));

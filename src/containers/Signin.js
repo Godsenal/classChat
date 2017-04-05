@@ -27,14 +27,15 @@ class Signin extends Component{
 
     this.props.signinRequest(id,pw)
       .then(() => {
-        if(this.props.status === 'SUCCESS') {
+        if(this.props.signin.status === 'SUCCESS') {
           let signinData = {
             isSignedIn: true,
-            id: id,
+            username: id,
             nickname: this.props.nickname,
             isAdmin: false,
           };
-          document.cookie = 'key=' + btoa(JSON.stringify(signinData));
+          localStorage.setItem('id_token', this.props.status.token);
+          //document.cookie = 'key=' + btoa(JSON.stringify(signinData));
           Materialize.toast('Welcome ' + id + '!', 2000);
           browserHistory.push('/channel');
           return true;
@@ -91,12 +92,14 @@ Signin.defaultProps = {
 };
 Signin.propTypes = {
   signinRequest: PropTypes.func.isRequired,
-  status: PropTypes.string.isRequired,
+  status: PropTypes.object.isRequired,
+  signin: PropTypes.object.isRequired,
   nickname: PropTypes.string.isRequired,
 };
 const mapStateToProps = (state) => {
   return {
-    status: state.authentication.signin.status,
+    signin: state.authentication.signin,
+    status: state.authentication.status,
   };
 };
 

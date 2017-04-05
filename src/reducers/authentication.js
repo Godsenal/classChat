@@ -15,11 +15,12 @@ const initialState = {
   status: {
     err: 'ERROR',
     errCode: -1,
-    valid: false,
+    valid: localStorage.getItem('token') ? true : false,
     isSignedIn: false,
     isAdmin: false,
     currentUser: '',
     currentUserNickname: '',
+    token : '',
   },
 };
 
@@ -45,14 +46,21 @@ export default function authentication(state, action) {
       status: {
         isSignedIn: { $set: true },
         isAdmin: { $set: action.isAdmin},
-        currentUser: { $set: action.id },
-        currentUserNickname: { $set: action.nickname}
+        currentUser: { $set: action.username },
+        currentUserNickname: { $set: action.nickname},
+        token: { $set: action.token},
+        valid: { $set:true},
       }
     });
   case types.AUTH_SIGNIN_FAILURE:
     return update(state, {
       signin: {
+        isSignedIn: { $set: false },
+        currentUser: { $set: '' },
+        currentUserNickname: { $set: ''},
+        token: { $set: ''},
         status: { $set: 'FAILURE' },
+        valid: { $set:false},
         err: { $set: action.err},
         errCode: { $set: action.code}
       }
@@ -92,7 +100,7 @@ export default function authentication(state, action) {
       status: {
         valid: { $set: true },
         isAdmin: { $set: action.isAdmin},
-        currentUser: { $set: action.id },
+        currentUser: { $set: action.username },
         currentUserNickname: { $set: action.nickname}
       }
     });
