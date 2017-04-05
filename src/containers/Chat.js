@@ -78,7 +78,7 @@ class Chat extends React.Component {
             var findChannel = this.props.channels.filter((channel) => {return channel.id === '1';});
             var publicChannel = findChannel[0];
             this.props.changeChannel(publicChannel);
-            this.props.listMessage(this.props.activeChannel.id,true,-1).then(()=>{
+            this.props.listMessage(this.props.activeChannel.id,true,'-1').then(()=>{
             this.props.socket.emit('chat mounted');
             this.props.socket.emit('join channel',this.props.activeChannel.id, this.props.status.currentUser, this.props.activeChannel.participants);
             this.props.socket.emit('storeClientInfo',this.props.status);
@@ -109,11 +109,16 @@ class Chat extends React.Component {
     });
 
   }
-  changeActiveChannel(channel, isLeave = false) { // leave가 true라면 this.props.socket전송할 participants를 보내줌.
-    this.props.socket.emit('leave channel', this.props.activeChannel.id, this.props.status.currentUser, isLeave, this.props.activeChannel.participants);
-    this.props.socket.emit('join channel',channel.id, this.props.status.currentUser, channel.participants);
+  changeActiveChannel(channel) { // leave가 true라면 this.props.socket전송할 participants를 보내줌.
+    this.props.socket.emit('join channel',channel.id, this.props.status.currentUser);
     this.props.changeChannel(channel);
-    this.props.listMessage(channel.id, true, -1);
+    var result = channel.id in this.props.list;
+
+    if(!result){
+      this.props.listMessage(channel.id, true, '-1');
+    }else{
+      this.props.listMessage(channel.id, false, '-1');
+    }
   }
   addMessage(message){
     let types = 'message';
@@ -186,6 +191,7 @@ class Chat extends React.Component {
   }
   handleLeaveChannel(){
     var activeChannel = this.props.activeChannel; // ui를 위해 먼저 채널을 이동.
+    this.props.socket.emit('leave channel', this.props.activeChannel.id, this.props.status.currentUser, true);
     this.changeActiveChannel(this.props.channels[0], true);
     this.props.leaveChannel(activeChannel.id, this.props.status.currentUser)
       .then(()=>{
@@ -269,6 +275,7 @@ class Chat extends React.Component {
                       addMessage={this.addMessage}
                       addGroup={this.handleAddGroup}
                       leaveChannel={this.handleLeaveChannel}
+                      list={this.props.list}
                       currentUser={this.props.status.currentUser}/>
         </div>
       </div>:isLoading}
@@ -286,6 +293,7 @@ const mapStateToProps = (state) => {
     channelListStatus: state.channel.list.status,
     channelLeave : state.channel.leave,
     messages: state.message.list.messages,
+    list: state.message.list,
     isLast: state.message.list.isLast,
     status: state.authentication.status,
     isAdmin : state.authentication.status.isAdmin,

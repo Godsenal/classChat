@@ -83,15 +83,15 @@ export function addMessage(message) {
 export function listMessage(channelID, isInitial, topMessageID = '-1') {
   return (dispatch) => {
     dispatch({type: MESSAGE_LIST});
-    var messageID = -1;
-    if(!isInitial)
-      messageID = topMessageID;
-    messageID = messageID.toString();
+    var messageID = topMessageID;
+    if(!isInitial && (topMessageID === '-1')){
+      return dispatch({type: MESSAGE_LIST_SUCCESS, channelID, isInitial, topMessageID});
+    }
     return axios.get(`api/message/list/${channelID}/${messageID}`)
             .then((res) => {
-              dispatch({type: MESSAGE_LIST_SUCCESS, messages: res.data.messages, isInitial});
+              dispatch({type: MESSAGE_LIST_SUCCESS, messages: res.data.messages, channelID, isInitial, topMessageID});
             }).catch((err) => {
-              dispatch({type: MESSAGE_LIST_FAILURE, err: err.res.data.error});
+              dispatch({type: MESSAGE_LIST_FAILURE, err: err.res.data.error, code: err.res.data.code});
             });
   };
 }//밑에처럼 바꾸기
@@ -106,7 +106,7 @@ export function filterMessage(channelID, types, topMessageID = '-1') {
             .then((res) => {
               dispatch({type: MESSAGE_FILTER_SUCCESS, messages: res.data.messages, topMessageID: topMessageID});
             }).catch((err) => {
-              dispatch({type: MESSAGE_FILTER_FAILURE, err: err.res.data.error});
+              dispatch({type: MESSAGE_FILTER_FAILURE, err: err.res.data.error, code: err.res.data.code});
             });
   };
 }

@@ -16,7 +16,7 @@ const initialState = {
   },
   list: {
     status: 'INIT',
-    messages: [],
+    channelMessages: [], // array of object( {id: '', messages: []})
     isLast : false,
     err: 'ERROR',
     errCode: -1,
@@ -40,7 +40,15 @@ export default function message(state, action) {
   case types.ROW_MESSAGE_RECEIVE:
     //효율적이게 뒤에서 찾아보도록 생각해볼 것.
     var matchIndex = -1;
-    state.list.messages.map((message,i)=>{
+    if(!(action.message.channelID in state.list)){
+      return update(state, {
+        receive: {
+          status: { $set: 'SUCCESS' },
+          message: { $set: action.message}
+        }
+      });
+    }
+    state.list[action.message.channelID].messages.map((message,i)=>{
       if(message.date === new Date(action.message.created).setHours(0,0,0,0))
         matchIndex = i;
     });
@@ -61,7 +69,9 @@ export default function message(state, action) {
           message: { $set: action.message}
         },
         list: {
-          messages: {$push: [newData]}
+          [action.message.channelID]:{
+            messages: {$push: [newData]}
+          }
         }
       });
     }
@@ -72,16 +82,18 @@ export default function message(state, action) {
           message: { $set: action.message}
         },
         list: {
-          messages: {
-            [matchIndex]: {
-              id:{
-                $set: [action.message.id]
-              },
-              date:{
-                $set: new Date(action.message.created).setHours(0,0,0,0)
-              },
-              messages:{
-                $push: [action.message]
+          [action.message.channelID]:{
+            messages: {
+              [matchIndex]: {
+                id:{
+                  $set: [action.message.id]
+                },
+                date:{
+                  $set: new Date(action.message.created).setHours(0,0,0,0)
+                },
+                messages:{
+                  $push: [action.message]
+                }
               }
             }
           }
@@ -90,7 +102,7 @@ export default function message(state, action) {
     }
   case types.MESSAGE_ADD: // 보내는 사람은 데이터에 등록되기전에 먼저 보기 위해서.
     var matchAddIndex = -1;
-    state.list.messages.map((message,i)=>{ // 현재 메시지랑 날짜가 같은 Date Object를 찾음.
+    state.list[action.message.channelID].messages.map((message,i)=>{ // 현재 메시지랑 날짜가 같은 Date Object를 찾음.
       if(message.date === new Date(action.message.created).setHours(0,0,0,0))
         matchAddIndex = i;
     });
@@ -106,10 +118,12 @@ export default function message(state, action) {
         add: {
           status: { $set: 'WAITING' },
           message: { $set: action.message},
-          waitingMessages: { $push: [{dateIndex: state.list.messages.length, messageIndex: 0}]}
+          waitingMessages: { $push: [{channelID: action.message.channelID, dateIndex: state.list[action.message.channelID].messages.length, messageIndex: 0}]}
         }, // 새로 push들어가는 메시지이기 때문에 date group에서의 위치는 제일 마지막. messageIndex는 처음 들어가는 것이기 때문에 0
         list: {
-          messages: { $push: [newData]}
+          [action.message.channelID]:{
+            messages: { $push: [newData]}
+          }
         }
       });
     }
@@ -118,19 +132,21 @@ export default function message(state, action) {
         add: {
           status: { $set: 'WAITING' },
           message: { $set: action.message},
-          waitingMessages: { $push: [{dateIndex: matchAddIndex, messageIndex: state.list.messages[matchAddIndex].messages.length}]}
+          waitingMessages: { $push: [{channelID: action.message.channelID, dateIndex: matchAddIndex, messageIndex: state.list[action.message.channelID].messages[matchAddIndex].messages.length}]}
         },
         list: {
-          messages: {
-            [matchAddIndex]: {
-              id:{
-                $set: [action.message.id]
-              },
-              date:{
-                $set: new Date(action.message.created).setHours(0,0,0,0)
-              },
-              messages:{
-                $push: [action.message]
+          [action.message.channelID]:{
+            messages: {
+              [matchAddIndex]: {
+                id:{
+                  $set: [action.message.id]
+                },
+                date:{
+                  $set: new Date(action.message.created).setHours(0,0,0,0)
+                },
+                messages:{
+                  $push: [action.message]
+                }
               }
             }
           }
@@ -141,17 +157,20 @@ export default function message(state, action) {
     var waitingMessage = state.add.waitingMessages.shift();
     var dateIndex = waitingMessage.dateIndex;
     var messageIndex = waitingMessage.messageIndex;
+    var channelIndex = waitingMessage.channelID;
     return update(state, {
       add: {
         status: { $set: 'SUCCESS'},
         message: { $set: action.message},
       },
       list: {
-        messages: {
-          [dateIndex]:{
-            messages:{
-              [messageIndex]:{
-                $set: action.message
+        [channelIndex]:{
+          messages: {
+            [dateIndex]:{
+              messages:{
+                [messageIndex]:{
+                  $set: action.message
+                }
               }
             }
           }
@@ -162,15 +181,18 @@ export default function message(state, action) {
     var waitingMessageFailure = state.add.waitingMessages.shift();
     var dateIndexFailure = waitingMessageFailure.dateIndex;
     var messageIndexFailure = waitingMessageFailure.messageIndex;
+    var channelIndexFailure = waitingMessageFailure.channelID;
     return update(state, {
       add: {
         status: { $set: 'SUCCESS'}
       },
       list: {
         messages: {
-          [dateIndexFailure]:{
-            messages:{
-              $splice: [[messageIndexFailure,1]]
+          [channelIndexFailure]:{
+            [dateIndexFailure]:{
+              messages:{
+                $splice: [[messageIndexFailure,1]]
+              }
             }
           }
         }
@@ -188,8 +210,13 @@ export default function message(state, action) {
 
     var divByDate = [];
     var divided = {};
-
-
+    if(!action.isInitial && (action.topMessageID === '-1')){ // 처음 불러오는게 아니면서 topMessageID값이 없을 때, 기본 가지고있는 state 값 반환.
+      return update(state,{
+        list:{
+          status:{$set: 'SUCCESS'}
+        },
+      });
+    }
     action.messages.map((message) => { // message의 date를 비교해서 date,id,messages를 가지고있는 array를 만듬.
       if(!_.isEmpty(divided) && (divided.date!==new Date(message.created).setHours(0,0,0,0))){
         divByDate.push(divided);
@@ -212,23 +239,26 @@ export default function message(state, action) {
     if(!_.isEmpty(divided))
       divByDate.push(divided);
 
-    if(action.isInitial){ // 첫 데이터 불러오기면 그냥 set
+    if(action.isInitial&&(action.topMessageID === '-1')){ // 첫 데이터 불러오기면 그냥 set
       divByDate.reverse();
-      return update(state, {
+      let channelMesssagesObj = {messages: divByDate, isLast: action.messages.length < 30};
+      state = update(state, {
         list: {
           status: { $set: 'SUCCESS' },
-          messages: { $set: divByDate },
-          isLast: { $set: action.messages.length < 30}
+          [action.channelID]: { $set : channelMesssagesObj},
         }
       });
+      return state;
     }else{ //old메시지 인데 list에 이미 같은날짜의 데이터가 있으면 넣어주고 old메시지는 삭제.
-      if(divByDate[0].date === state.list.messages[0].date){
-        divByDate[0].messages.push(...state.list.messages[0].messages);
+      if(divByDate[0].date === state.list[action.channelID].messages[0].date){
+        divByDate[0].messages.push(...state.list[action.channelID].messages[0].messages);
         state = update(state,{
           list:{
-            messages:{
-              [0]:{
-                $set : divByDate[0]
+            [action.channelID]:{
+              messages:{
+                [0]:{
+                  $set : divByDate[0]
+                }
               }
             }
           }
@@ -238,8 +268,10 @@ export default function message(state, action) {
       return update(state, {
         list: {
           status: { $set: 'SUCCESS' },
-          messages: { $unshift: divByDate },
-          isLast: { $set: action.messages.length < 30}
+          [action.channelID]:{
+            messages: { $unshift: divByDate },
+            isLast: { $set: action.messages.length < 30},
+          },
         }
       });
     }

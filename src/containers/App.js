@@ -32,6 +32,14 @@ class App extends Component{
     if(this.props.notification !== nextProps.notification)
       this.addNotification(nextProps.notification);
   }
+  componentDidMount() {
+    this.props.getStatusRequest()
+      .then(()=>{
+        if(this.props.status.valid){
+          browserHistory.push('/channel');
+        }
+      });
+  }
   componentWillMount() {
 
 

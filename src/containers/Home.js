@@ -17,12 +17,7 @@ class Home extends Component{
     this.addNotification = this.addNotification.bind(this);
   }
   componentDidMount() {
-    this.props.getStatusRequest()
-      .then(()=>{
-        if(this.props.status.valid){
-          browserHistory.push('/channel');
-        }
-      });
+
   }
   addNotification(message, level, position) {
     this.notificationSystem.addNotification({

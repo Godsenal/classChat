@@ -46,26 +46,26 @@ class ChatView extends Component{
                 <Loader indeterminate >Preparing Messages</Loader>
               </Dimmer>
             </Segment>;
-    const chatView =
+    const chatView = this.props.activeChannel.id in this.props.list?
             <div>
               <ChatHeader {...this.props.activeChannel} toggleMenu={this.toggleMenu} leaveChannel={this.props.leaveChannel} currentUser={this.props.currentUser}/>
               <MessageList isMobile={this.props.isMobile}
                            listMessage={this.props.listMessage}
                            activeChannel={this.props.activeChannel}
-                           messages={this.props.messages}
+                           messages={this.props.list[this.props.activeChannel.id].messages}
                            messageAddStatus={this.props.messageAddStatus}
                            messageReceive={this.props.messageReceive}
                            messageListStatus={this.props.messageListStatus}
-                           isLast={this.props.isLast}
+                           isLast={this.props.list[this.props.activeChannel.id].isLast}
                            currentUser={this.props.currentUser}
                            setInitial={this.setInitial}
                            addGroup={this.props.addGroup}/>
               <InputMessage addMessage={this.addMessage} addGroup={this.props.addGroup} activeChannel={this.props.activeChannel} currentUser={this.props.currentUser}/>
-            </div>;
+            </div>:null;
     const view = ((this.props.messageListStatus !== 'SUCCESS')&&(this.state.isInitial))?loadingView:chatView;
     return(
       <Sidebar.Pushable as='div'>
-        <Sidebar as={Segment} animation='overlay' direction='right' width='wide' visible={this.state.menu} style={{'background':'#B3B2AD'}} icon='labeled' vertical inverted>
+        <Sidebar as={Segment} animation='overlay' direction='right' width='wide' visible={this.state.menu} style={{'background':'#EFECCA'}} icon='labeled' vertical inverted>
           <Menu fixed='top'>
             <Menu.Item name='닫기' onClick={this.toggleMenu}/>
             <Dropdown item icon='filter' simple>

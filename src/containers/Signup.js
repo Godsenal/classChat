@@ -23,22 +23,14 @@ class Signup extends Component{
     this.handleSignup = this.handleSignup.bind(this);
   }
   componentDidMount() {
-    this.props.getStatusRequest()
+    this.props.listChannel('*','CHANNEL')
       .then(()=>{
-        if(this.props.status.valid){
-          browserHistory.push('/channel');
-        }
-        else{
-          this.props.listChannel('*','CHANNEL')
-            .then(()=>{
-              this.setState({
-                channelOptions: this.props.channelList.channels.map((channel, index) => {
-                  var option = {key : index, value : channel.id, text : channel.name};
-                  return option;
-                })
-              });
-            });
-        }
+        this.setState({
+          channelOptions: this.props.channelList.channels.map((channel, index) => {
+            var option = {key : index, value : channel.id, text : channel.name};
+            return option;
+          })
+        });
       });
 
   }

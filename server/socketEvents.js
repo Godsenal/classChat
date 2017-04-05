@@ -22,24 +22,18 @@ exports = module.exports = function (io) {
       console.log('user disconnected');
     });
     /* USER LEAVE ROOM */
-    socket.on('leave channel', function(channelID, participant, isLeave = false, participants = []) { // 소켓만 나갈 때
+    socket.on('leave channel', function(channelID, participant, isLeave = false) { // 소켓만 나갈 때
       if(isLeave){
-        participants.map(function(element){
-          if(participant !== element){
-            socket.broadcast.to(clients[element]).emit('receive new participant', channelID, participant, isLeave);
-          }
-        });
+        socket.broadcast.to(channelID).emit('receive new participant', channelID, participant, isLeave);
+
+        socket.leave(channelID);
       }
-      socket.leave(channelID);
     });
     /* USER JOIN ROOM */
-    socket.on('join channel', function(channelID, participant, participants) {
-      socket.join(channelID);
-      participants.map(function(element){
-        if(participant !== element){
-          socket.broadcast.to(clients[element]).emit('receive new participant', channelID, participant, false);
-        }
-      });
+    socket.on('join channel', function(channelID, participant) {
+      socket.join(channelID); // 이미 들어왔다면 무시됨.
+      if(io.nsps['/'].adapter.rooms[channelID] !== 'undefined')
+        socket.broadcast.to(channelID).emit('receive new participant', channelID, participant, false);
     });
     /* NEW MESSAGE */
     socket.on('new message', function(message) {
@@ -57,7 +51,7 @@ exports = module.exports = function (io) {
     });
     /* NEW PREIVATE CHANNEL(GROUP, DIRECT) */
     socket.on('new private channel', function(participants,channel) {
-      participants.forEach(function(element){
+      participants.map(function(element){
         socket.broadcast.to(clients[element]).emit('receive private channel', channel);
       });
     });

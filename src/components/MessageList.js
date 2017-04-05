@@ -41,11 +41,13 @@ class MessageList extends Component {
 
   };
   handleScroll(){
+
     if((!this.props.isLast)&&(this.messagesContainer.scrollTop == 0) && (!this.isLoading)){
       this.isLoading = true;
       this.height = this.messagesContainer.scrollHeight;
       this.top = this.messagesContainer.scrollTop;
       this.props.setInitial(false);
+
       this.props.listMessage(this.props.activeChannel.id,false,this.props.messages[0].id)
         .then(() => {
           this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight - (this.height - this.top);
@@ -87,7 +89,7 @@ class MessageList extends Component {
             <DateMessage key={message.id} currentUser={this.props.currentUser} addGroup={this.props.addGroup} {...message} />
           );
         }));
-    const loadingView = ( this.isLoading === true ?
+    const loadingView = ( (this.isLoading === true)&&(!this.props.isLast) ?
                           <Segment className={styles.receiveOld} basic>
                             <Dimmer active inverted>
                               <Loader>Loading</Loader>
@@ -107,6 +109,9 @@ class MessageList extends Component {
     );
   }
 }
+MessageList.defaultProps = {
+  messages: [],
+};
 MessageList.propTypes = {
   isMobile : PropTypes.bool.isRequired,
   messages : PropTypes.array.isRequired,
