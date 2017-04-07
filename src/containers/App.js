@@ -56,6 +56,10 @@ class App extends Component{
       return ;
     }
     */
+    /* INIT ENVIRONMENT */
+    this.handleWindowSizeChange();
+    window.addEventListener('resize', this.handleWindowSizeChange);
+    /* CHECK TOKEN VALID */
     let token = localStorage.getItem('token') || null;
     if(token !== null){
       this.props.getStatusRequest(token).then(()=>{
@@ -65,20 +69,18 @@ class App extends Component{
       });
     }
   }
-  componentWillMount() {
-
-
-    this.props.initEnvironment();
-    //window.addEventListener('resize', this.handleWindowSizeChange);
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.handleWindowSizeChange);
   }
-  /*handleWindowSizeChange = () => {
+  handleWindowSizeChange = () => {
     this.props.initEnvironment();
-  };*/
+  };
   toggleSide = () => {
     this.setState({
       side : !this.state.side,
     });
   }
+
   handleSignout(){
     this.props.signoutRequest().then(
       () => {
@@ -145,9 +147,10 @@ class App extends Component{
                               </nav>
                             </div>);*/
 
+    const {screenHeight, screenWidth} = this.props.environment;
 
     return(
-      <div>
+      <div style={{'height':{screenHeight}+'px', 'width':{screenWidth}+'px', 'overflowX':'hidden', 'overflowY':'hidden'}}>
         {this.props.children && React.cloneElement(this.props.children, {
           socket
         })}

@@ -75,6 +75,7 @@ class MessageList extends Component {
   }
   render () {
     const mobileStyle = this.props.isMobile?styles.messageListContainerMobile:styles.messageListContainer;
+    const mobileHeight = this.props.isMobile?this.props.screenHeight*0.7+'px':this.props.screenHeight*0.75+'px';
     const isEmpty = (this.props.messages.length === 0 ? true : false);
     const messageList = ( isEmpty ?
       <div className={styles.emptyChat}>
@@ -86,7 +87,7 @@ class MessageList extends Component {
         :
         this.props.messages.map((message) => {
           return (
-            <DateMessage key={message.id} currentUser={this.props.currentUser} addGroup={this.props.addGroup} {...message} />
+            <DateMessage key={message.id} screenHeight={this.props.screenHeight} currentUser={this.props.currentUser} addGroup={this.props.addGroup} {...message} />
           );
         }));
     const loadingView = ( (this.isLoading === true)&&(!this.props.isLast) ?
@@ -101,7 +102,7 @@ class MessageList extends Component {
                           </div>
                           ));
     return(
-      <div className={mobileStyle} ref={(ref) => {this.messagesContainer = ref;}} onScroll={this.handleScroll}>
+      <div style={{'height':mobileHeight, 'overflowY':'scroll', 'overflowX':'hidden', 'outline':0}} ref={(ref) => {this.messagesContainer = ref;}} onScroll={this.handleScroll}>
         {loadingView}
         {messageList}
         <NotificationSystem ref={ref => this.notificationSystem = ref} />

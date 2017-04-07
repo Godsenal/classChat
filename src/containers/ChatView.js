@@ -40,6 +40,7 @@ class ChatView extends Component{
   // div 바로 다음. <ChannelList channels={this.props.channels} changeActiveChannel={this.changeActiveChannel} />
   render(){
     const loaderStyle = this.props.isMobile?styles.messageLoaderMobile:styles.messageLoader;
+    const mobileHeight = this.props.isMobile?this.props.screenHeight-113:this.props.screenHeight;
     const loadingView =
             <Segment basic className={loaderStyle}>
               <Dimmer active inverted>
@@ -47,20 +48,26 @@ class ChatView extends Component{
               </Dimmer>
             </Segment>;
     const chatView = this.props.activeChannel.id in this.props.list?
-            <div>
+            <div className={styles.chatBody} style={{'maxHeight':mobileHeight +'px'}}>
               <ChatHeader {...this.props.activeChannel} toggleMenu={this.toggleMenu} leaveChannel={this.props.leaveChannel} currentUser={this.props.currentUser}/>
-              <MessageList isMobile={this.props.isMobile}
-                           listMessage={this.props.listMessage}
-                           activeChannel={this.props.activeChannel}
-                           messages={this.props.list[this.props.activeChannel.id].messages}
-                           messageAddStatus={this.props.messageAddStatus}
-                           messageReceive={this.props.messageReceive}
-                           messageListStatus={this.props.messageListStatus}
-                           isLast={this.props.list[this.props.activeChannel.id].isLast}
-                           currentUser={this.props.currentUser}
-                           setInitial={this.setInitial}
-                           addGroup={this.props.addGroup}/>
+              <div className={styles.messageBody}>
+                    <MessageList isMobile={this.props.isMobile}
+                                 screenHeight={mobileHeight}
+                                 listMessage={this.props.listMessage}
+                                 activeChannel={this.props.activeChannel}
+                                 messages={this.props.list[this.props.activeChannel.id].messages}
+                                 messageAddStatus={this.props.messageAddStatus}
+                                 messageReceive={this.props.messageReceive}
+                                 messageListStatus={this.props.messageListStatus}
+                                 isLast={this.props.list[this.props.activeChannel.id].isLast}
+                                 currentUser={this.props.currentUser}
+                                 setInitial={this.setInitial}
+                                 addGroup={this.props.addGroup}/>
+                             </div>
+              <div className={styles.inputBody}>
               <InputMessage addMessage={this.addMessage} addGroup={this.props.addGroup} activeChannel={this.props.activeChannel} currentUser={this.props.currentUser}/>
+              </div>
+
             </div>:null;
     const view = ((this.props.messageListStatus !== 'SUCCESS')&&(this.state.isInitial))?loadingView:chatView;
     return(

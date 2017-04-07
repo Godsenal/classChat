@@ -177,7 +177,7 @@ class InputMessage extends React.Component {
       <NotificationSystem ref={ref => this.notificationSystem = ref} />
     </Modal>;
     return(
-      <div className={styles.messageInputContainer}>
+      <div className={styles.messageInputContainer} >
         {inputView}
         {groupModal}
         {directModal}

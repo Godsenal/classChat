@@ -244,9 +244,11 @@ class Chat extends React.Component {
                       </Segment>;
     const layoutStyle = isMobile?styles.flexLayoutMobile:styles.flexLayout;
     const sidebarStyle = isMobile?styles.chatSidebarMobile:styles.chatSidebar;
+    const chatViewStyle = isMobile?styles.chatViewMobile:styles.chatView;
+    //style={{'height':{screenHeight}+'px', 'width':{screenWidth}+'px', 'overflowX':'hidden', 'overflowY':'hidden'}}
     return(
-      <div>
-      {status.valid?<div className={layoutStyle} style={{'height':{screenHeight}}}>
+      <div style={{'height':{screenHeight}+'px', 'width':{screenWidth}+'px', 'overflowX':'hidden', 'overflowY':'hidden'}}>
+      {status.valid?<div className={layoutStyle} >
         <SearchModal isOpen={this.state.searchModal}
                      results={this.props.search.results}
                      handleJoinChannel = {this.handleJoinChannel}
@@ -263,8 +265,9 @@ class Chat extends React.Component {
                    isMobile={isMobile}
                    listChannel={this.props.listChannel}/>
         </div>
-        <div className={styles.chatView}>
+        <div className={chatViewStyle} >
             <ChatView isMobile={isMobile}
+                      screenHeight={screenHeight}
                       activeChannel={this.props.activeChannel}
                       messageListStatus={this.props.messageListStatus}
                       messageAddStatus={this.props.messageAddStatus}
@@ -279,7 +282,7 @@ class Chat extends React.Component {
                       leaveChannel={this.handleLeaveChannel}
                       list={this.props.list}
                       currentUser={this.props.status.currentUser}/>
-        </div>
+                  </div>
       </div>:isLoading}
     </div>
     );

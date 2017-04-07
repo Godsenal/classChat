@@ -33,7 +33,7 @@ class Sidebar extends React.Component {
               </Dimmer>
             </Segment>;
     const responsiveView = (this.props.isMobile?
-      <Menu attached inverted>
+      <Menu attached inverted fluid widths={4}>
         <Dropdown className={styles.balooFont} item text={this.props.status.currentUser}>
           <Dropdown.Menu>
             <Dropdown.Item>My Profile</Dropdown.Item>

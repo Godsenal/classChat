@@ -41,25 +41,23 @@ class ChatHeader extends React.Component {
       directName = filterName[0] + '님과의 채팅';
     }
     return(
-      <div>
+      <div className={styles.chatHeader}>
         {searchModal}
-        <div className={styles.chatHeader}>
           <span className={styles.chatHeaderName} size='massive'><Icon name='comments outline'/>#{directName}</span>
-          <Dropdown pointing text={participants.length.toString()+'명'} button icon='group' labeled className='icon' >
+          <Dropdown compact pointing text={participants.length.toString()+'명'} button icon='group' labeled className='icon' >
             <Dropdown.Menu>
               {this.props.participants.map((participant) => {
                 return(<Dropdown.Item key={participant} text={participant} />);
               })}
             </Dropdown.Menu>
           </Dropdown>
-          <Button icon color='black' onClick={this.showModal}>
+          <Button compact icon color='black' onClick={this.showModal}>
             <Icon name='search' />
           </Button>
           {outBtn}
-          <Button icon onClick={this.props.toggleMenu}>
+          <Button compact icon onClick={this.props.toggleMenu}>
             <Icon name='list layout' />
           </Button>
-        </div>
         <Divider/>
       </div>
     );

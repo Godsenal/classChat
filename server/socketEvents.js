@@ -51,9 +51,10 @@ exports = module.exports = function (io) {
     });
     /* NEW PREIVATE CHANNEL(GROUP, DIRECT) */
     socket.on('new private channel', function(participants,channel) {
-      participants.map(function(element){
+      participants.forEach(function(element){
         socket.broadcast.to(clients[element]).emit('receive private channel', channel);
       });
+
     });
     /* USER SIGNUP */
     socket.on('signup participant', function(channels, userName){
