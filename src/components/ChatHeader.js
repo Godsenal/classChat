@@ -29,7 +29,7 @@ class ChatHeader extends React.Component {
                             <Button positive icon='checkmark' labelPosition='right' content='Yes' />
                           </Modal.Actions>
                         </Modal>;
-    const outBtn = type !== 'CHANNEL' ?<Button icon primary onClick={leaveChannel}>
+    const outBtn = type !== 'CHANNEL' ?<Button icon primary compact onClick={leaveChannel}>
                                         <Icon name='sign out' />
                                       </Button>:null;
     var directName = name;

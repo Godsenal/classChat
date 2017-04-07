@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 import accounts from '../models/accounts';
-import config = from '../config.js';
+import config from '../config.js';
 
 
 /**

@@ -5,7 +5,7 @@ import {Segment, Dimmer, Loader} from 'semantic-ui-react';
 import uuid from 'node-uuid';
 import moment from 'moment';
 
-import {receiveRawMessage, addMessage, listMessage, filterMessage} from '../actions/message';
+import {receiveRawMessage, addMessage, listMessage, filterMessage, deleteReceiveMessage} from '../actions/message';
 import {addChannel,
         changeChannel,
         listChannel,
@@ -94,13 +94,19 @@ class Chat extends React.Component {
               this.props.receiveRawParticipant(channelID, participant, isLeave)
             );
             this.props.socket.on('new bc message', (message) =>{
-              this.props.receiveRawMessage(message);
+              let isActive = false;
+              if(this.props.activeChannel.id === message.channelID){
+                isActive = true;
+              }
+              this.props.receiveRawMessage(message, isActive);
             });
             this.props.socket.on('receive private channel', (channel) =>{
               this.props.receiveRawChannel(channel);
-              if(channel.type === 'GROUP'){
+              if(channel.type === 'GROUP'){ //초대 받으면 자동으로 Join
+                this.props.socket.emit('join channel',channel.id, this.props.status.currentUser);
                 this.props.addNotification({message:'새로운 그룹이 생성되었습니다!', level:'info', position:'bl',uuid: `${Date.now()}${uuid.v4()}`});
               }else if(channel.type ==='DIRECT'){
+                this.props.socket.emit('join channel',channel.id, this.props.status.currentUser);
                 this.props.addNotification({message:'1:1 채널이 추가되었습니다!', level:'info', position:'bl',uuid: `${Date.now()}${uuid.v4()}`});
               }
             });
@@ -116,8 +122,9 @@ class Chat extends React.Component {
   }
   changeActiveChannel(channel) { // leave가 true라면 this.props.socket전송할 participants를 보내줌.
     this.props.socket.emit('join channel',channel.id, this.props.status.currentUser);
+    this.props.deleteReceiveMessage(channel.id); // delete message  from stack
     this.props.changeChannel(channel);
-    var result = channel.id in this.props.list;
+    var result = channel.id in this.props.list; //현재 세션에서 들어갔던 채널인지 아닌지.(state에 저장되어있는지 아닌지)
 
     if(!result){
       this.props.listMessage(channel.id, true, '-1');
@@ -247,8 +254,8 @@ class Chat extends React.Component {
     const chatViewStyle = isMobile?styles.chatViewMobile:styles.chatView;
     //style={{'height':{screenHeight}+'px', 'width':{screenWidth}+'px', 'overflowX':'hidden', 'overflowY':'hidden'}}
     return(
-      <div style={{'height':{screenHeight}+'px', 'width':{screenWidth}+'px', 'overflowX':'hidden', 'overflowY':'hidden'}}>
-      {status.valid?<div className={layoutStyle} >
+      <div style={{'height':screenHeight+'px', 'width':screenWidth+'px', 'overflowX':'hidden', 'overflowY':'hidden'}}>
+      {status.valid?<div className={layoutStyle} style={{'height':screenHeight+'px', 'width':screenWidth+'px', 'overflowX':'hidden', 'overflowY':'hidden'}}>
         <SearchModal isOpen={this.state.searchModal}
                      results={this.props.search.results}
                      handleJoinChannel = {this.handleJoinChannel}
@@ -263,7 +270,8 @@ class Chat extends React.Component {
                    handleSignout={this.handleSignout}
                    handleSearchClick={this.handleSearchClick}
                    isMobile={isMobile}
-                   listChannel={this.props.listChannel}/>
+                   listChannel={this.props.listChannel}
+                   messageReceive={this.props.messageReceive}/>
         </div>
         <div className={chatViewStyle} >
             <ChatView isMobile={isMobile}
@@ -321,8 +329,8 @@ const mapDispatchToProps = (dispatch) => {
     getStatusRequest: (token) => {
       return dispatch(getStatusRequest(token));
     },
-    receiveRawMessage: (message) => {
-      return dispatch(receiveRawMessage(message));
+    receiveRawMessage: (message, isActive) => {
+      return dispatch(receiveRawMessage(message, isActive));
     },
     receiveRawChannel: (channel) => {
       return dispatch(receiveRawChannel(channel));
@@ -338,6 +346,9 @@ const mapDispatchToProps = (dispatch) => {
     },
     filterMessage: (channelID, types, topMessageId) => {
       return dispatch(filterMessage(channelID, types, topMessageId));
+    },
+    deleteReceiveMessage: (channelID) => {
+      return dispatch(deleteReceiveMessage(channelID));
     },
     changeChannel: (channel) => {
       return dispatch(changeChannel(channel));

@@ -1,5 +1,5 @@
 import React,{Component, PropTypes} from 'react';
-import {Icon, Dimmer, Loader, Segment} from 'semantic-ui-react';
+import {Icon, Dimmer, Loader, Segment, Button} from 'semantic-ui-react';
 import moment from 'moment';
 import NotificationSystem from 'react-notification-system';
 import {DateMessage} from './';
@@ -11,6 +11,7 @@ class MessageList extends Component {
     super();
     this.state = {
       newMessage : false,
+      isBottom : true,
     };
     this.scrollToBottom = this.scrollToBottom.bind(this);
     this.handleScroll = this.handleScroll.bind(this);
@@ -41,7 +42,12 @@ class MessageList extends Component {
 
   };
   handleScroll(){
-
+    if(this.messagesContainer.scrollHeight - this.messagesContainer.scrollTop > this.messagesContainer.offsetHeight * 2){
+      this.setState({isBottom: false});
+    }
+    else{
+      this.setState({isBottom: true});
+    }
     if((!this.props.isLast)&&(this.messagesContainer.scrollTop == 0) && (!this.isLoading)){
       this.isLoading = true;
       this.height = this.messagesContainer.scrollHeight;
@@ -58,6 +64,10 @@ class MessageList extends Component {
         });
     }
   }
+  handleDownClick = () => {
+    this.scrollToBottom();
+    this.setState({isBottom: true});
+  }
   componentDidMount() {
     this.isLoading = false;
     this.scrollToBottom();
@@ -66,7 +76,7 @@ class MessageList extends Component {
   }
   componentDidUpdate(prevProps) {
     if(prevProps.messages !== this.props.messages){
-      if((prevProps.messageReceive !== this.props.messageReceive)&&(this.messagesContainer.scrollTop < this.messagesContainer.scrollHeight - this.messagesContainer.clientHeight * 2 ) ){
+      if((prevProps.messageReceive.message !== this.props.messageReceive.message)&&(this.messagesContainer.scrollTop < this.messagesContainer.scrollHeight - this.messagesContainer.clientHeight * 2 ) ){
         this.addNotification();
       }else if(!this.isLoading){
         this.scrollToBottom();
@@ -74,11 +84,9 @@ class MessageList extends Component {
     }
   }
   render () {
-    const mobileStyle = this.props.isMobile?styles.messageListContainerMobile:styles.messageListContainer;
-    const mobileHeight = this.props.isMobile?this.props.screenHeight*0.7+'px':this.props.screenHeight*0.75+'px';
     const isEmpty = (this.props.messages.length === 0 ? true : false);
     const messageList = ( isEmpty ?
-      <div className={styles.emptyChat}>
+      <div className={styles.emptyChat} style={{'overflowY':'scroll', 'overflowX':'hidden', 'outline':0}}>
         <h1>
           <Icon size='huge' name='comments outline' /><br/>아직 메시지가 없습니다.<br/>
         </h1>
@@ -87,7 +95,7 @@ class MessageList extends Component {
         :
         this.props.messages.map((message) => {
           return (
-            <DateMessage key={message.id} screenHeight={this.props.screenHeight} currentUser={this.props.currentUser} addGroup={this.props.addGroup} {...message} />
+            <DateMessage key={message.id} currentUser={this.props.currentUser} addGroup={this.props.addGroup} {...message} />
           );
         }));
     const loadingView = ( (this.isLoading === true)&&(!this.props.isLast) ?
@@ -101,10 +109,19 @@ class MessageList extends Component {
                             <span className={styles.receiveOldText}>Get Old Messages</span>
                           </div>
                           ));
+    const bottomBtn = !this.state.isBottom?
+                      <Button
+                        style={{'position': 'absolute','right':'10px','bottom':'5px' }}
+                        onClick={this.handleDownClick}
+                        circular
+                        color='red'
+                        icon='arrow down' />
+                      :null;
     return(
-      <div style={{'height':mobileHeight, 'overflowY':'scroll', 'overflowX':'hidden', 'outline':0}} ref={(ref) => {this.messagesContainer = ref;}} onScroll={this.handleScroll}>
+      <div style={{'overflowY':'scroll', 'overflowX':'hidden', 'outline':0}} ref={(ref) => {this.messagesContainer = ref;}} onScroll={this.handleScroll}>
         {loadingView}
         {messageList}
+        {bottomBtn}
         <NotificationSystem ref={ref => this.notificationSystem = ref} />
       </div>
     );

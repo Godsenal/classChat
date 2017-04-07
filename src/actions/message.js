@@ -9,6 +9,7 @@ import {
     MESSAGE_FILTER_SUCCESS,
     MESSAGE_FILTER_FAILURE,
     ROW_MESSAGE_RECEIVE,
+    RECEIVE_MESSAGE_DELETE
 } from './ActionTypes';
 
 import axios from 'axios';
@@ -16,13 +17,19 @@ import axios from 'axios';
 /* NOT REQUIRED FETCH ACTION */
 
 
-export function receiveRawMessage(message) {
+export function receiveRawMessage(message, isActive = false) {
   return {
     type: ROW_MESSAGE_RECEIVE,
-    message
+    message,
+    isActive
   };
 }
-
+export function deleteReceiveMessage(channelID) {
+  return {
+    type: RECEIVE_MESSAGE_DELETE,
+    channelID
+  };
+}
 
 /*
 export function typing(username) {

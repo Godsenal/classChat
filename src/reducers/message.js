@@ -36,9 +36,22 @@ export default function message(state, action) {
   }
 
   switch(action.type) {
+        /* Delete Receive message stack by changing channel */
+  case types.RECEIVE_MESSAGE_DELETE:
+    if(!(action.channelID in state.receive)){
+      return state;
+    }
+    else{
+      return update(state, {
+        receive: {
+          [action.channelID]: {$set: []}
+        }
+      });
+    }
         /* Recieve Message in Client*/
   case types.ROW_MESSAGE_RECEIVE:
-    //효율적이게 뒤에서 찾아보도록 생각해볼 것.
+
+
     var matchIndex = -1;
     if(!(action.message.channelID in state.list)){
       return update(state, {
@@ -47,7 +60,25 @@ export default function message(state, action) {
           message: { $set: action.message}
         }
       });
+    }else{
+      if(!action.isActive){
+        if(action.message.channelID in state.receive){
+          state = update(state, {
+            receive: {
+              [action.message.channelID]:{$push:[action.message]}
+            }
+          });
+        }
+        else{
+          state = update(state, {
+            receive: {
+              [action.message.channelID]:{$set:[action.message]}
+            }
+          });
+        }
+      }
     }
+    //효율적이게 뒤에서 찾아보도록 생각해볼 것.
     state.list[action.message.channelID].messages.map((message,i)=>{
       if(message.date === new Date(action.message.created).setHours(0,0,0,0))
         matchIndex = i;
@@ -66,7 +97,7 @@ export default function message(state, action) {
       return update(state, {
         receive: {
           status: { $set: 'SUCCESS' },
-          message: { $set: action.message}
+          message: { $set: action.message},
         },
         list: {
           [action.message.channelID]:{
@@ -79,7 +110,7 @@ export default function message(state, action) {
       return update(state, {
         receive: {
           status: { $set: 'SUCCESS' },
-          message: { $set: action.message}
+          message: { $set: action.message},
         },
         list: {
           [action.message.channelID]:{

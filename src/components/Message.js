@@ -64,6 +64,8 @@ class Message extends Component {
               key={this.props.userName}
               hoverable
               flowing
+              hideOnScroll
+              on='click'
               trigger={<span style={{'fontWeight':'bold'}}>{this.props.userName}</span>}>
               {myMessage}
             </Popup>
