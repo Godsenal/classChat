@@ -1,6 +1,6 @@
 import React,{Component, PropTypes} from 'react';
 import ReactDOM from 'react-dom';
-import {Popup, Button, Image, Icon, Loader, Segment } from 'semantic-ui-react';
+import {Popup, Button, Image, Icon,  Segment, Divider } from 'semantic-ui-react';
 import moment from 'moment';
 import styles from '../Style.css';
 
@@ -10,7 +10,27 @@ class Message extends Component {
     this.state = {
       imageStatus : 'loading',
       hiddenImage : true,
+      isReceived : false,
+      isLastDate : false,
     };
+  }
+  componentDidMount() {
+
+    if (this.props.isReceived) {
+      if(this.message ){
+        this.setState({isReceived: true});
+        var messageNode = ReactDOM.findDOMNode(this.message);
+        this.props.scrollIntoView(messageNode);
+      }
+    }
+
+    if(this.props.lastDateID === this.props.id){
+      if(this.unReadMessage){
+        this.setState({isLastDate: true});
+        var unReadNode = ReactDOM.findDOMNode(this.unReadMessage);
+        this.props.scrollIntoDate(unReadNode);
+      }
+    }
   }
   handleImageLoad = () => {
     this.setState({ imageStatus: 'loaded' }); // onload
@@ -34,6 +54,7 @@ class Message extends Component {
     };
     this.props.addGroup(group);
   }
+
   render () {
     const myMessage = (this.props.currentUser === this.props.userName)?
       <div>HI {this.props.currentUser}</div>
@@ -53,8 +74,14 @@ class Message extends Component {
                                target='_blank'
                                src={`/files/${this.props.url}`}/>
                       </Segment>;
+    const unReadMessage = !this.state.isReceived?null:<Divider horizontal>여기까지 읽으셨습니다.</Divider>;
+    const lastDateMessage = !this.state.isLastDate?null:<Divider horizontal >마지막 접속일 {moment(localStorage.getItem('lastAccess')).format('MMMM Do YYYY, h:mm:ss a')} 이후 메시지.</Divider>;
     return(
-      <div>
+      <div ref = {ref => this.message = ref}>
+        <div ref = {ref => this.unReadMessage = ref}>
+        {unReadMessage}
+        {lastDateMessage}
+        </div>
         <div className={waitingStyle}>
           <div className={styles.messageImg}>
             <img className={styles.messageImg} src='https://semantic-ui.com/images/avatar/small/matt.jpg'/>
@@ -78,6 +105,7 @@ class Message extends Component {
   }
 }
 Message.defaultProps = {
+  id: '',
   userName : '',
   created : moment().format(),
   contents : '',
@@ -88,6 +116,7 @@ Message.defaultProps = {
   url : '',
 };
 Message.propTypes = {
+  id : PropTypes.string.isRequired,
   userName : PropTypes.string.isRequired,
   created : PropTypes.string.isRequired,
   contents : PropTypes.string.isRequired,
@@ -96,5 +125,9 @@ Message.propTypes = {
   isWaiting : PropTypes.bool.isRequired,
   types : PropTypes.string.isRequired,
   url : PropTypes.string.isRequired,
+  isReceived : PropTypes.bool.isRequired,
+  scrollIntoView : PropTypes.func.isRequired,
+  scrollIntoDate :PropTypes.func.isRequired,
+  lastDateID : PropTypes.string.isRequired,
 };
 export default Message;

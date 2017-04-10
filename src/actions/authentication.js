@@ -13,6 +13,7 @@ import {
 } from './ActionTypes';
 
 import axios from 'axios';
+import moment from 'moment';
 
 /* dispatch안에는 action 객체가 들어가고 state 는 redux에서 알아서 관리
    err말고 error을 쓰는 이유는, 기본 err과 겹치는 것을  피하기 위해 */
@@ -65,6 +66,7 @@ export function getStatusRequest(token) {
 export function signoutRequest() {
   return (dispatch) => {
     localStorage.removeItem('token');
+    localStorage.setItem('lastAccess',moment().format());
     var url = window.location.origin;
     window.location.replace(url);
     dispatch({type: AUTH_SIGNOUT});
@@ -80,7 +82,6 @@ export function signoutRequest() {
   };*/
   };
 }
-
 export function receiveSocket(socketID) {
   return {
     type: AUTH_SOCKET_RECEIVE,

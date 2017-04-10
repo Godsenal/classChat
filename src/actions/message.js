@@ -9,7 +9,8 @@ import {
     MESSAGE_FILTER_SUCCESS,
     MESSAGE_FILTER_FAILURE,
     ROW_MESSAGE_RECEIVE,
-    RECEIVE_MESSAGE_DELETE
+    RECEIVE_MESSAGE_DELETE,
+    LASTDATEID_MESSAGE_DELETE
 } from './ActionTypes';
 
 import axios from 'axios';
@@ -30,7 +31,12 @@ export function deleteReceiveMessage(channelID) {
     channelID
   };
 }
-
+export function deleteLastDateID(channelID) {
+  return {
+    type: LASTDATEID_MESSAGE_DELETE,
+    channelID
+  };
+}
 /*
 export function typing(username) {
   return {
@@ -90,18 +96,22 @@ export function addMessage(message) {
 export function listMessage(channelID, isInitial, topMessageID = '-1') {
   return (dispatch) => {
     dispatch({type: MESSAGE_LIST});
-    var messageID = topMessageID;
     if(!isInitial && (topMessageID === '-1')){
       return dispatch({type: MESSAGE_LIST_SUCCESS, channelID, isInitial, topMessageID});
     }
-    return axios.get(`api/message/list/${channelID}/${messageID}`)
+
+    let url = `api/message/list/${channelID}/${topMessageID}`;
+    if(isInitial&&(topMessageID !== '-1')){ // 처음불러오는건데, topMessageID 가 -1이 아닐때.(Date로 불러올 때)
+      url = `api/message/listdate/${channelID}/${topMessageID}`;
+    }
+    return axios.get(url)
             .then((res) => {
-              dispatch({type: MESSAGE_LIST_SUCCESS, messages: res.data.messages, channelID, isInitial, topMessageID});
+              dispatch({type: MESSAGE_LIST_SUCCESS, messages: res.data.messages, channelID, isInitial, topMessageID, lastDateID: res.data.lastDateID});
             }).catch((err) => {
               dispatch({type: MESSAGE_LIST_FAILURE, err: err.res.data.error, code: err.res.data.code});
             });
   };
-}//밑에처럼 바꾸기
+}
 
 /* FILTER MESSAGE */
 

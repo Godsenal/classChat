@@ -48,10 +48,39 @@ export default function message(state, action) {
         }
       });
     }
+  case types.LASTDATEID_MESSAGE_DELETE: // date를 이용해 메시지 불러올 때 사용하던 lastdate를 ''으로 초기화.
+    if(!(action.channelID in state.list)){
+      return state;
+    }
+    else{
+      return update(state, {
+        list: {
+          [action.channelID]:{
+            lastDateID: {$set: ''}
+          }
+        }
+      });
+    }
         /* Recieve Message in Client*/
   case types.ROW_MESSAGE_RECEIVE:
 
 
+    if(!action.isActive){
+      if(action.message.channelID in state.receive){
+        state = update(state, {
+          receive: {
+            [action.message.channelID]:{$push:[action.message]}
+          }
+        });
+      }
+      else{
+        state = update(state, {
+          receive: {
+            [action.message.channelID]:{$set:[action.message]}
+          }
+        });
+      }
+    }
     var matchIndex = -1;
     if(!(action.message.channelID in state.list)){
       return update(state, {
@@ -60,23 +89,6 @@ export default function message(state, action) {
           message: { $set: action.message}
         }
       });
-    }else{
-      if(!action.isActive){
-        if(action.message.channelID in state.receive){
-          state = update(state, {
-            receive: {
-              [action.message.channelID]:{$push:[action.message]}
-            }
-          });
-        }
-        else{
-          state = update(state, {
-            receive: {
-              [action.message.channelID]:{$set:[action.message]}
-            }
-          });
-        }
-      }
     }
     //효율적이게 뒤에서 찾아보도록 생각해볼 것.
     state.list[action.message.channelID].messages.map((message,i)=>{
@@ -139,7 +151,6 @@ export default function message(state, action) {
     });
     action.message.isWaiting = true; //서버에 저장된게 아직 아니므로 waiting.
     if(matchAddIndex < 0){ // Match되는게 없을 경우 push함.
-
       let newData = {
         id : action.message.id,
         date : new Date(action.message.created).setHours(0,0,0,0),
@@ -270,17 +281,17 @@ export default function message(state, action) {
     if(!_.isEmpty(divided))
       divByDate.push(divided);
 
-    if(action.isInitial&&(action.topMessageID === '-1')){ // 첫 데이터 불러오기면 그냥 set
+    if(action.isInitial){ // 첫 데이터 불러오기면 그냥 set
       divByDate.reverse();
-      let channelMesssagesObj = {messages: divByDate, isLast: action.messages.length < 30};
-      state = update(state, {
+      let channelMesssagesObj = {messages: divByDate, isLast: action.messages.length < 30, lastDateID: action.lastDateID};
+      return state = update(state, {
         list: {
           status: { $set: 'SUCCESS' },
           [action.channelID]: { $set : channelMesssagesObj},
         }
       });
-      return state;
-    }else{ //old메시지 인데 list에 이미 같은날짜의 데이터가 있으면 넣어주고 old메시지는 삭제.
+    }
+    else{ //old메시지 인데 list에 이미 같은날짜의 데이터가 있으면 넣어주고 old메시지는 삭제.
       if(divByDate[0].date === state.list[action.channelID].messages[0].date){
         divByDate[0].messages.push(...state.list[action.channelID].messages[0].messages);
         state = update(state,{

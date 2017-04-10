@@ -38,50 +38,84 @@ class MessageList extends Component {
   }
   scrollToBottom = () => {
     const messagesContainer = this.messagesContainer;
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
-
+    if(messagesContainer){
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
   };
   handleScroll(){
-    if(this.messagesContainer.scrollHeight - this.messagesContainer.scrollTop > this.messagesContainer.offsetHeight * 2){
-      this.setState({isBottom: false});
-    }
-    else{
-      this.setState({isBottom: true});
-    }
-    if((!this.props.isLast)&&(this.messagesContainer.scrollTop == 0) && (!this.isLoading)){
-      this.isLoading = true;
-      this.height = this.messagesContainer.scrollHeight;
-      this.top = this.messagesContainer.scrollTop;
-      this.props.setInitial(false);
+    const messagesContainer = this.messagesContainer;
+    if(messagesContainer){
+      if(messagesContainer.scrollHeight - messagesContainer.scrollTop > messagesContainer.offsetHeight * 2){
+        this.setState({isBottom: false});
+      }
+      else{
+        this.setState({isBottom: true});
+      }
+      if((!this.props.isLast)&&(messagesContainer.scrollTop == 0) && (!this.isLoading)){
+        this.isLoading = true;
+        this.height = messagesContainer.scrollHeight;
+        this.top = messagesContainer.scrollTop;
+        this.props.setInitial(false);
 
-      this.props.listMessage(this.props.activeChannel.id,false,this.props.messages[0].id)
-        .then(() => {
-          this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight - (this.height - this.top);
-          this.isLoading = false;
-        })
-        .catch(()=>{
-          console.log('old Message load Failure');
-        });
+        this.props.listMessage(this.props.activeChannel.id,false,this.props.messages[0].id)
+          .then(() => {
+            messagesContainer.scrollTop = messagesContainer.scrollHeight - (this.height - this.top);
+            this.isLoading = false;
+          })
+          .catch(()=>{
+            console.log('old Message load Failure');
+          });
+      }
     }
   }
   handleDownClick = () => {
     this.scrollToBottom();
     this.setState({isBottom: true});
   }
-  componentDidMount() {
-    this.isLoading = false;
-    this.scrollToBottom();
-
-
-  }
-  componentDidUpdate(prevProps) {
-    if(prevProps.messages !== this.props.messages){
-      if((prevProps.messageReceive.message !== this.props.messageReceive.message)&&(this.messagesContainer.scrollTop < this.messagesContainer.scrollHeight - this.messagesContainer.clientHeight * 2 ) ){
-        this.addNotification();
-      }else if(!this.isLoading){
-        this.scrollToBottom();
+  scrollIntoView = (domNode) => {
+    //domNode.scrollIntoView(true);
+    if(domNode){
+      if(this.isReceived !== 'DONE'  && (this.isLastDate !== 'DONE')){
+        this.isReceived = 'DONE';
+        domNode.scrollIntoView(false);
+        this.props.deleteReceiveMessage(this.props.activeChannel.id);
       }
     }
+  }
+  scrollIntoDate = (domNode) => {
+    if(domNode){
+      if(this.isLastDate !== 'DONE'){
+        this.isLastDate = 'DONE';
+        domNode.scrollIntoView(false);
+        this.props.deleteLastDateID(this.props.activeChannel.id);
+      }
+    }
+  }
+  componentDidMount() { //채널 처음 들어왔을 때.
+    this.isLoading = false;
+    this.isReceived = 'INIT';
+    if(this.isLastDate !== 'DONE')
+      this.scrollToBottom();
+  }
+  componentDidUpdate(prevProps) {//다른 채널 들어갈 때 && 들어왔던 채널에 들어올때
+
+    const messagesContainer = this.messagesContainer;
+    if(messagesContainer){
+      if(prevProps.messages !== this.props.messages){
+        if(prevProps.messageReceive.message !== this.props.messageReceive.message && (messagesContainer.scrollHeight - messagesContainer.scrollTop > this.messagesContainer.offsetHeight * 2)){
+          this.addNotification();
+        }else if(!this.isLoading && (this.isReceived !== 'DONE') && (this.isLastDate !== 'DONE') ){/*&& !isReceived*/
+          this.scrollToBottom();
+        }
+      }
+      if(prevProps.activeChannel.id !== this.props.activeChannel.id){ //채널이 바뀔 때 이건 INIT해줘야함. 이렇게함으로써 메시지 add할 때 scrollbottom 가능.
+        this.isReceived = 'INIT';
+        this.isLastDate = 'INIT';
+      }
+    }
+    /*if(isReceived){
+      this.props.deleteReceiveMessage(this.props.activeChannel.id);
+    }*/
   }
   render () {
     const isEmpty = (this.props.messages.length === 0 ? true : false);
@@ -95,7 +129,14 @@ class MessageList extends Component {
         :
         this.props.messages.map((message) => {
           return (
-            <DateMessage key={message.id} currentUser={this.props.currentUser} addGroup={this.props.addGroup} {...message} />
+            <DateMessage key={message.id}
+                         currentUser={this.props.currentUser}
+                         addGroup={this.props.addGroup}
+                         receivedMessage={this.props.activeChannel.id in this.props.messageReceive?this.props.messageReceive[this.props.activeChannel.id].shift():{}}
+                         lastDateID={this.props.lastDateID}
+                         scrollIntoView={this.scrollIntoView}
+                         scrollIntoDate={this.scrollIntoDate}
+                         {...message} />
           );
         }));
     const loadingView = ( (this.isLoading === true)&&(!this.props.isLast) ?
@@ -129,6 +170,7 @@ class MessageList extends Component {
 }
 MessageList.defaultProps = {
   messages: [],
+  lastDateID: '',
 };
 MessageList.propTypes = {
   isMobile : PropTypes.bool.isRequired,
@@ -137,7 +179,10 @@ MessageList.propTypes = {
   messageListStatus : PropTypes.string.isRequired,
   messageAddStatus : PropTypes.string.isRequired,
   messageReceive : PropTypes.object.isRequired,
+  deleteReceiveMessage : PropTypes.func.isRequired,
+  deleteLastDateID : PropTypes.func.isRequired,
   isLast : PropTypes.bool.isRequired,
+  lastDateID : PropTypes.string.isRequired,
   setInitial : PropTypes.func.isRequired,
   listMessage : PropTypes.func.isRequired,
   activeChannel: PropTypes.object.isRequired,

@@ -54,12 +54,15 @@ class ChatView extends Component{
                     <MessageList isMobile={this.props.isMobile}
                                  screenHeight={mobileHeight}
                                  listMessage={this.props.listMessage}
+                                 deleteReceiveMessage={this.props.deleteReceiveMessage}
+                                 deleteLastDateID={this.props.deleteLastDateID}
                                  activeChannel={this.props.activeChannel}
                                  messages={this.props.list[this.props.activeChannel.id].messages}
                                  messageAddStatus={this.props.messageAddStatus}
                                  messageReceive={this.props.messageReceive}
                                  messageListStatus={this.props.messageListStatus}
                                  isLast={this.props.list[this.props.activeChannel.id].isLast}
+                                 lastDateID={this.props.list[this.props.activeChannel.id].lastDateID}
                                  currentUser={this.props.currentUser}
                                  setInitial={this.setInitial}
                                  addGroup={this.props.addGroup}/>

@@ -25,13 +25,13 @@ router.get('/', function(req, res) {
 // query DB for messages for a specific channel
 router.get('/list/:channelID/:messageID', function(req, res) {
   if(req.params.messageID === '-1'){
-    messages.find({$and: [{channelID: req.params.channelID},{id : {$gt: req.params.messageID}}]})
+    messages.find({$and: [{channelID: req.params.channelID},{id : {$gt: req.params.messageID}}]}) // just find all?
             .sort({id : -1})
             .limit(30)
             .exec((err, messages)=>{
               if(err) {
                 console.log(err);
-                return res.status(500).json({error: 'internal server error', code: 1});
+                return res.status(500).json({error: 'cannot get initial message from db', code: 1});
               }
               res.json({messages});
             });
@@ -43,11 +43,41 @@ router.get('/list/:channelID/:messageID', function(req, res) {
             .exec((err, messages)=>{
               if(err) {
                 console.log(err);
-                return res.status(500).json({error: 'internal server error', code: 1});
+                return res.status(500).json({error: 'cannot get old message from db', code: 2});
               }
               res.json({messages});
             });
   }
+});
+//get message list by date
+router.get('/listdate/:channelID/:lastdate', function(req, res){
+  messages.find({$and: [{channelID: req.params.channelID},{created : {$gte: req.params.lastdate}}]})
+          .sort({id : -1})
+          .exec((err,dateMessages)=>{
+            if(err) {
+              console.log(err);
+              return res.status(500).json({error: 'cannot get lastdate message from db', code: 3});
+            }
+            let lastDate = dateMessages.slice(-1)[0]; // if messages is empty, lastDate's value is 'undefined'
+            let lastDateID = '';
+            if(typeof lastDate !== 'undefined'){
+              lastDateID = lastDate.id;
+            }
+            if(dateMessages.length < 30){
+              messages.find({channelID: req.params.channelID})
+                      .sort({id : -1})
+                      .limit(30)
+                      .exec((err,normalMesssages)=>{
+                        if(err) {
+                          console.log(err);
+                          return res.status(500).json({error: 'cannot get lastdate message from db', code: 3});
+                        }
+                        return res.json({messages: normalMesssages, lastDateID});
+                      });
+            }else{
+              return res.json({messages: dateMessages, lastDateID});
+            }
+          });
 });
   //get filtered message
 router.get('/filter/:channelID/:messageID/:types', function(req, res){

@@ -5,7 +5,7 @@ import {Segment, Dimmer, Loader} from 'semantic-ui-react';
 import uuid from 'node-uuid';
 import moment from 'moment';
 
-import {receiveRawMessage, addMessage, listMessage, filterMessage, deleteReceiveMessage} from '../actions/message';
+import {receiveRawMessage, addMessage, listMessage, filterMessage, deleteReceiveMessage, deleteLastDateID} from '../actions/message';
 import {addChannel,
         changeChannel,
         listChannel,
@@ -40,10 +40,15 @@ class Chat extends React.Component {
     this.handleAddGroup = this.handleAddGroup.bind(this);
   }
   //App 에서의 getStatusRequest가 ComponentDidMount에서 실행이 되어야 여기서 sign data를 사용이 가능..
-  componentWillMount(){
 
+  onUnload = () => {
+    localStorage.setItem('lastAccess',moment().format());
+    this.props.socket.emit('disconnected',this.props.status);
   }
-
+  componentWillUnmount() {
+    this.props.socket.emit('disconnected',this.props.status);
+    window.removeEventListener('beforeunload', this.onUnload);
+  }
 
   componentDidMount() {
     /*direct connect without signin*/
@@ -69,7 +74,7 @@ class Chat extends React.Component {
     }
     */
     let token = localStorage.getItem('token') || null;
-    if(token === null){
+    if(token === null){ // if localStorage doesn't have token.
       browserHistory.push('/');
     }
     this.props.getStatusRequest(token).then(()=>{
@@ -78,15 +83,17 @@ class Chat extends React.Component {
         browserHistory.push('/');
       }
       else{
+        window.addEventListener('beforeunload', this.onUnload); // 브라우저 닫기 전에 실행할 것(lastAccess time저장)
+        let lastAccess = localStorage.getItem('lastAccess') || -1;
         this.props.listChannel(this.props.status.currentUser)
           .then(()=>{
             var findChannel = this.props.channels.filter((channel) => {return channel.id === '1';});
             var publicChannel = findChannel[0];
             this.props.changeChannel(publicChannel);
-            this.props.listMessage(this.props.activeChannel.id,true,'-1').then(()=>{
+            this.props.listMessage(this.props.activeChannel.id,true,lastAccess).then(()=>{
             this.props.socket.emit('chat mounted');
-            this.props.socket.emit('join channel',this.props.activeChannel.id, this.props.status.currentUser, this.props.activeChannel.participants);
             this.props.socket.emit('storeClientInfo',this.props.status);
+            this.props.socket.emit('join channel',this.props.channels, this.props.status.currentUser, this.props.activeChannel.participants);
             this.props.socket.on('receive signup participant', (channels, userName) => {
               this.props.receiveRawSignupParticipant(channels, userName);
             });
@@ -103,10 +110,10 @@ class Chat extends React.Component {
             this.props.socket.on('receive private channel', (channel) =>{
               this.props.receiveRawChannel(channel);
               if(channel.type === 'GROUP'){ //초대 받으면 자동으로 Join
-                this.props.socket.emit('join channel',channel.id, this.props.status.currentUser);
+                this.props.socket.emit('join channel',[channel], this.props.status.currentUser);
                 this.props.addNotification({message:'새로운 그룹이 생성되었습니다!', level:'info', position:'bl',uuid: `${Date.now()}${uuid.v4()}`});
               }else if(channel.type ==='DIRECT'){
-                this.props.socket.emit('join channel',channel.id, this.props.status.currentUser);
+                this.props.socket.emit('join channel',[channel], this.props.status.currentUser);
                 this.props.addNotification({message:'1:1 채널이 추가되었습니다!', level:'info', position:'bl',uuid: `${Date.now()}${uuid.v4()}`});
               }
             });
@@ -121,13 +128,14 @@ class Chat extends React.Component {
 
   }
   changeActiveChannel(channel) { // leave가 true라면 this.props.socket전송할 participants를 보내줌.
-    this.props.socket.emit('join channel',channel.id, this.props.status.currentUser);
-    this.props.deleteReceiveMessage(channel.id); // delete message  from stack
+    this.props.socket.emit('join channel',[channel], this.props.status.currentUser);
     this.props.changeChannel(channel);
+    this.props.deleteReceiveMessage(this.props.activeChannel.id);
     var result = channel.id in this.props.list; //현재 세션에서 들어갔던 채널인지 아닌지.(state에 저장되어있는지 아닌지)
 
     if(!result){
-      this.props.listMessage(channel.id, true, '-1');
+      let lastAccess = localStorage.getItem('lastAccess')|| '-1'; // get lass Accessed time
+      this.props.listMessage(channel.id, true, lastAccess);
     }else{
       this.props.listMessage(channel.id, false, '-1');
     }
@@ -280,6 +288,8 @@ class Chat extends React.Component {
                       messageListStatus={this.props.messageListStatus}
                       messageAddStatus={this.props.messageAddStatus}
                       messageReceive={this.props.messageReceive}
+                      deleteReceiveMessage={this.props.deleteReceiveMessage}
+                      deleteLastDateID={this.props.deleteLastDateID}
                       listMessage={this.props.listMessage}
                       filterMessage={this.handleFilterMessage}
                       messages={this.props.messages}
@@ -349,6 +359,9 @@ const mapDispatchToProps = (dispatch) => {
     },
     deleteReceiveMessage: (channelID) => {
       return dispatch(deleteReceiveMessage(channelID));
+    },
+    deleteLastDateID: (channelID) =>{
+      return dispatch(deleteLastDateID(channelID));
     },
     changeChannel: (channel) => {
       return dispatch(changeChannel(channel));

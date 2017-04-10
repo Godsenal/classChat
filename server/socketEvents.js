@@ -30,10 +30,13 @@ exports = module.exports = function (io) {
       }
     });
     /* USER JOIN ROOM */
-    socket.on('join channel', function(channelID, participant) {
-      socket.join(channelID); // 이미 들어왔다면 무시됨.
-      if(io.nsps['/'].adapter.rooms[channelID] !== 'undefined')
-        socket.broadcast.to(channelID).emit('receive new participant', channelID, participant, false);
+    socket.on('join channel', function(channels, participant) { // 배열로 받은 channel에 한번에 join
+      channels.map((channel) => {
+        var channelID = channel.id;
+        socket.join(channelID); // 이미 들어왔다면 무시됨.
+        if(io.nsps['/'].adapter.rooms[channelID] !== 'undefined')
+          socket.broadcast.to(channelID).emit('receive new participant', channelID, participant, false);
+      });
     });
     /* NEW MESSAGE */
     socket.on('new message', function(message) {
