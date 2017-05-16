@@ -16,14 +16,6 @@ class Message extends Component {
   }
   componentDidMount() {
 
-    if (this.props.isReceived) {
-      if(this.message ){
-        this.setState({isReceived: true});
-        var messageNode = ReactDOM.findDOMNode(this.message);
-        this.props.scrollIntoView(messageNode);
-      }
-    }
-
     if(this.props.lastDateID === this.props.id){
       if(this.unReadMessage){
         this.setState({isLastDate: true});
@@ -31,6 +23,15 @@ class Message extends Component {
         this.props.scrollIntoDate(unReadNode);
       }
     }
+    else if (this.props.isReceived) {
+      if(this.message ){
+        this.setState({isReceived: true});
+        var messageNode = ReactDOM.findDOMNode(this.message);
+        this.props.scrollIntoView(messageNode);
+      }
+    }
+
+
   }
   handleImageLoad = () => {
     this.setState({ imageStatus: 'loaded' }); // onload

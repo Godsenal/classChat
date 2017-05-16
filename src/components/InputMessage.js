@@ -1,6 +1,8 @@
 import React, { PropTypes } from 'react';
-import {Button, Select, Input, Modal} from 'semantic-ui-react';
+import {Button, Select, Input, Modal, Dropdown} from 'semantic-ui-react';
 import NotificationSystem from 'react-notification-system';
+import { MentionsInput, Mention } from 'react-mentions';
+import mentionStyle from './mentionStyle';
 import styles from '../Style.css';
 
 class InputMessage extends React.Component {
@@ -13,15 +15,17 @@ class InputMessage extends React.Component {
           return participant;
         }
       }).map((participant, index) => {
-        var option = {key : index, value : participant, text : participant};
+        var option = {id: participant, display: participant, key : index, value : participant, text : participant};
         return option;
       }),
       selected:[],
+      selectedMention:[],
       input:'',
       groupName: '',
     };
     this.handleKeyPress= this.handleKeyPress.bind(this);
     this.handleChange = this.handleChange.bind(this);
+    this.handleMentionChange = this.handleMentionChange.bind(this);
     this.addNotification = this.addNotification.bind(this);
   }
   componentWillReceiveProps(nextProps){ // participant가 새로 추가되었을 때 바로 변경. +1은 자기자신 제외한거 다시 더한거.
@@ -47,11 +51,26 @@ class InputMessage extends React.Component {
   handleChange(e){
     this.setState({[`${e.target.name}`]: e.target.value});
   }
+  handleMentionChange(e, newValue, newPlainTextValue, mentions){
+    let selectedMention = mentions.map((mention)=>{
+      return mention.id;
+    });
+    this.setState({
+      input: e.target.value,
+      selectedMention
+    });
+  }
   handleKeyPress = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
+      if(this.state.selectedMention.length !== 0){
+        this.props.handleMention(this.state.selectedMention);
+      }
       this.props.addMessage(this.state.input);
-      this.setState({input : ''});
+      this.setState({
+        input : '',
+        selectedMention : [],
+      });
     }
   }
   handleGroupClick = () => {
@@ -61,7 +80,7 @@ class InputMessage extends React.Component {
     this.setState({type : 'image'});
   }
   handleFileClick = () => {
-    this.setState({type : 'file'});
+    this.file.click();
   }
   handleInit = () => {
     this.setState({type : 'input'});
@@ -120,19 +139,33 @@ class InputMessage extends React.Component {
     const {type, selectOption, groupName, input} = this.state;
     const inputView =
       <div>
-        <Button.Group floated='left'>
-          <label htmlFor="user" className="ui icon button" onClick={this.handleDirectClick}>
-            <i className="user icon"></i></label>
-          <label htmlFor="group" className="ui icon button" onClick={this.handleGroupClick}>
-            <i className="group icon"></i></label>
-          <label htmlFor="image" className="ui icon button">
-            <i className="image icon"></i></label>
-          <input type="file" id="image" style={{'display':'none'}} onChange={this.handleFile}/>
-          <label htmlFor="file" className="ui icon button">
-            <i className="file icon"></i></label>
-          <input type="file" id="file" style={{'display':'none'}} onChange={this.handleFile}/>
-        </Button.Group>
-        <textArea className={styles.messageInput} name='input' value={input} type ='file' onChange={this.handleChange} onKeyPress={this.handleKeyPress}/>
+        <Dropdown style={{'position': 'absolute', 'zIndex': 100, 'height':40}}icon='plus' upward button className='icon'>
+          <Dropdown.Menu>
+            <Dropdown.Item onClick={this.handleDirectClick}>1:1채팅</Dropdown.Item>
+            <Dropdown.Item onClick={this.handleGroupClick}>그룹채팅</Dropdown.Item>
+            <Dropdown.Item onClick={this.handleFileClick}>이미지/파일 전송</Dropdown.Item>
+
+          </Dropdown.Menu>
+        </Dropdown>
+        <input type='file' ref={(ref)=>{this.file = ref;}} style={{'display':'none'}}/>
+        <MentionsInput className={styles.messageInput}
+                       markup='#[__display__]'
+                       value={input}
+                       style={mentionStyle}
+                       onChange={this.handleMentionChange}
+                       onKeyPress={this.handleKeyPress}>
+            <Mention trigger="#"
+                     type='user'
+                     data={selectOption}
+                     appendSpaceOnAdd={true}
+                     renderSuggestion={ (entry, search, highlightedDisplay) => {
+                       return(
+                         <div >
+                           {highlightedDisplay}
+                         </div>);
+                     }}/>
+        </MentionsInput>
+
       </div>;
     const groupModal =
     <Modal open={type === 'group'} size='small' onClose={this.handleInit}>
@@ -190,12 +223,14 @@ InputMessage.defaultProps = {
   activeChannel : {participant : []},
   addMessage : '',
   addGroup : ()=> {console.log('prop Error');},
+  handleMention : () => {console.log('prop Error');},
   currentUser : '',
 };
 InputMessage.propTypes ={
   activeChannel : PropTypes.object.isRequired,
   addMessage : PropTypes.func.isRequired,
   addGroup : PropTypes.func.isRequired,
+  handleMention : PropTypes.func.isRequired,
   currentUser : PropTypes.string.isRequired,
 };
 

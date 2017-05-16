@@ -45,6 +45,12 @@ class MessageList extends Component {
   handleScroll(){
     const messagesContainer = this.messagesContainer;
     if(messagesContainer){
+      //새로 들어왔을 때 scroll이 바닥으로 가면 새로들어왔다는 상태 멈춤.
+      if(messagesContainer.scrollTop + messagesContainer.offsetHeight == messagesContainer.scrollHeight){
+
+        this.isReceived = 'INIT';
+        this.isLastDate = 'INIT';
+      }
       if(messagesContainer.scrollHeight - messagesContainer.scrollTop > messagesContainer.offsetHeight * 2){
         this.setState({isBottom: false});
       }
@@ -75,7 +81,7 @@ class MessageList extends Component {
   scrollIntoView = (domNode) => {
     //domNode.scrollIntoView(true);
     if(domNode){
-      if(this.isReceived !== 'DONE'  && (this.isLastDate !== 'DONE')){
+      if(this.isReceived !== 'DONE'){
         this.isReceived = 'DONE';
         domNode.scrollIntoView(false);
         this.props.deleteReceiveMessage(this.props.activeChannel.id);
@@ -102,17 +108,23 @@ class MessageList extends Component {
     const messagesContainer = this.messagesContainer;
     if(messagesContainer){
       if(prevProps.messages !== this.props.messages){
-        if(prevProps.messageReceive.message !== this.props.messageReceive.message && (messagesContainer.scrollHeight - messagesContainer.scrollTop > this.messagesContainer.offsetHeight * 2)){
+        if((prevProps.messageReceive.message !== this.props.messageReceive.message) && (messagesContainer.scrollHeight - messagesContainer.scrollTop > this.messagesContainer.offsetHeight * 2)){
           this.addNotification();
         }else if(!this.isLoading && (this.isReceived !== 'DONE') && (this.isLastDate !== 'DONE') ){/*&& !isReceived*/
           this.scrollToBottom();
         }
+
+        if(prevProps.messageAddStatus !== this.props.messageAddStatus){
+          this.scrollToBottom();
+        }
+
       }
       if(prevProps.activeChannel.id !== this.props.activeChannel.id){ //채널이 바뀔 때 이건 INIT해줘야함. 이렇게함으로써 메시지 add할 때 scrollbottom 가능.
         this.isReceived = 'INIT';
         this.isLastDate = 'INIT';
       }
     }
+
     /*if(isReceived){
       this.props.deleteReceiveMessage(this.props.activeChannel.id);
     }*/
@@ -159,7 +171,7 @@ class MessageList extends Component {
                         icon='arrow down' />
                       :null;
     return(
-      <div style={{'overflowY':'scroll', 'overflowX':'hidden', 'outline':0}} ref={(ref) => {this.messagesContainer = ref;}} onScroll={this.handleScroll}>
+      <div style={{'overflowY':'auto', 'overflowX':'hidden', 'outline':0}} ref={(ref) => {this.messagesContainer = ref;}} onScroll={this.handleScroll}>
         {loadingView}
         {messageList}
         {bottomBtn}

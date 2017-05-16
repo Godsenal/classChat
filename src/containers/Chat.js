@@ -30,6 +30,7 @@ class Chat extends React.Component {
 
     this.handleSignout = this.handleSignout.bind(this);
     this.addMessage = this.addMessage.bind(this);
+    this.handleMention = this.handleMention.bind(this);
     this.handleFilterMessage = this.handleFilterMessage.bind(this);
     this.changeActiveChannel = this.changeActiveChannel.bind(this);
     this.handleSearchClick = this.handleSearchClick.bind(this);
@@ -44,6 +45,33 @@ class Chat extends React.Component {
   onUnload = () => {
     localStorage.setItem('lastAccess',moment().format());
     this.props.socket.emit('disconnected',this.props.status);
+  }
+  checkNotification = () => {
+    if (!("Notification" in window)) {
+      alert("This browser does not support desktop notification");
+    }
+
+    // Let's check whether notification permissions have already been granted
+    else if (Notification.permission === "granted") {
+      // If it's okay let's create a notification
+      var notification = new Notification("Hi there!");
+    }
+
+    // Otherwise, we need to ask the user for permission
+    else if (Notification.permission !== 'denied') {
+      Notification.requestPermission(function (permission) {
+        // If the user accepts, let's create a notification
+        if (permission === "granted") {
+          var notification = new Notification("Hi there!");
+        }
+      });
+    }
+  }
+  spawnNotification = (title = 'classChat', body) => {
+    var options = {
+      body: body
+    };
+    var n = new Notification(title,options);
   }
   componentWillUnmount() {
     this.props.socket.emit('disconnected',this.props.status);
@@ -73,6 +101,7 @@ class Chat extends React.Component {
       browserHistory.push('/');
     }
     */
+    this.checkNotification();
     let token = localStorage.getItem('token') || null;
     if(token === null){ // if localStorage doesn't have token.
       browserHistory.push('/');
@@ -91,37 +120,44 @@ class Chat extends React.Component {
             var publicChannel = findChannel[0];
             this.props.changeChannel(publicChannel);
             this.props.listMessage(this.props.activeChannel.id,true,lastAccess).then(()=>{
-            this.props.socket.emit('chat mounted');
-            this.props.socket.emit('storeClientInfo',this.props.status);
-            this.props.socket.emit('join channel',this.props.channels, this.props.status.currentUser, this.props.activeChannel.participants);
-            this.props.socket.on('receive signup participant', (channels, userName) => {
-              this.props.receiveRawSignupParticipant(channels, userName);
+              this.props.socket.emit('chat mounted');
+              this.props.socket.emit('storeClientInfo',this.props.status);
+              this.props.socket.emit('join channel',this.props.channels, this.props.status.currentUser, this.props.activeChannel.participants);
+              this.props.socket.on('receive signup participant', (channels, userName) => {
+                this.props.receiveRawSignupParticipant(channels, userName);
+              });
+              this.props.socket.on('receive new participant', (channelID, participant, isLeave) =>
+                this.props.receiveRawParticipant(channelID, participant, isLeave)
+              );
+              this.props.socket.on('new bc message', (message) =>{
+                let isActive = false;
+                if(this.props.activeChannel.id === message.channelID){
+                  isActive = true;
+                }
+                this.props.receiveRawMessage(message, isActive);
+              });
+              this.props.socket.on('receive mention', (channel, username) => {
+                let title = channel + '채널\n';
+                let body = username+'님이 당신을 mention 하였습니다.';
+                this.spawnNotification(title,body);
+              });
+              this.props.socket.on('receive private channel', (channel) =>{
+                this.props.receiveRawChannel(channel);
+                if(channel.type === 'GROUP'){ //초대 받으면 자동으로 Join
+                  this.props.socket.emit('join channel',[channel], this.props.status.currentUser);
+                  this.spawnNotification('classChat','새로운 그룹이 생성되었습니다!');
+                  this.props.addNotification({message:'새로운 그룹이 생성되었습니다!', level:'info', position:'bl',uuid: `${Date.now()}${uuid.v4()}`});
+                }else if(channel.type ==='DIRECT'){
+                  this.props.socket.emit('join channel',[channel], this.props.status.currentUser);
+                  this.spawnNotification('classChat','1:1 채널이 생성되었습니다!');
+                  this.props.addNotification({message:'1:1 채널이 추가되었습니다!', level:'info', position:'bl',uuid: `${Date.now()}${uuid.v4()}`});
+                }
+              });
+              this.props.socket.on('receive socket', socketID =>
+                this.props.receiveSocket(socketID)
+              );
             });
-            this.props.socket.on('receive new participant', (channelID, participant, isLeave) =>
-              this.props.receiveRawParticipant(channelID, participant, isLeave)
-            );
-            this.props.socket.on('new bc message', (message) =>{
-              let isActive = false;
-              if(this.props.activeChannel.id === message.channelID){
-                isActive = true;
-              }
-              this.props.receiveRawMessage(message, isActive);
-            });
-            this.props.socket.on('receive private channel', (channel) =>{
-              this.props.receiveRawChannel(channel);
-              if(channel.type === 'GROUP'){ //초대 받으면 자동으로 Join
-                this.props.socket.emit('join channel',[channel], this.props.status.currentUser);
-                this.props.addNotification({message:'새로운 그룹이 생성되었습니다!', level:'info', position:'bl',uuid: `${Date.now()}${uuid.v4()}`});
-              }else if(channel.type ==='DIRECT'){
-                this.props.socket.emit('join channel',[channel], this.props.status.currentUser);
-                this.props.addNotification({message:'1:1 채널이 추가되었습니다!', level:'info', position:'bl',uuid: `${Date.now()}${uuid.v4()}`});
-              }
-            });
-            this.props.socket.on('receive socket', socketID =>
-              this.props.receiveSocket(socketID)
-            );
           });
-        });
       }
 
     });
@@ -161,6 +197,9 @@ class Chat extends React.Component {
         console.log('failed to add Message');
       });
 
+  }
+  handleMention(participants){
+    this.props.socket.emit('new mention',this.props.activeChannel.name,this.props.status.currentUser,participants);
   }
   handleFilterMessage(channelID, types){
     this.props.filterMessage(channelID, types);
@@ -297,6 +336,7 @@ class Chat extends React.Component {
                       isLast={this.props.isLast}
                       addMessage={this.addMessage}
                       addGroup={this.handleAddGroup}
+                      handleMention={this.handleMention}
                       leaveChannel={this.handleLeaveChannel}
                       list={this.props.list}
                       currentUser={this.props.status.currentUser}/>

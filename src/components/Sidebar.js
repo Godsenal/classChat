@@ -107,7 +107,7 @@ class Sidebar extends React.Component {
                               active={activeChannel.id === channel.id}
                               key={channel.id}
                               onClick={()=>this.handleChannelClick(channel)}>
-                              {label}
+                              {activeChannel.id === channel.id?null:label}
                               <Icon name='hashtag'/>{channel.name}</Menu.Item>);}
         })}
       <Menu.Item header className={styles.balooFont}>GROUPS</Menu.Item>
@@ -120,7 +120,7 @@ class Sidebar extends React.Component {
                               active={activeChannel.id === channel.id}
                               key={channel.id}
                               onClick={()=>this.handleChannelClick(channel)}>
-                              {label}
+                              {activeChannel.id === channel.id?null:label}
                               <Icon name='group'/>{channel.name}</Menu.Item>);}
         })}
       <Menu.Item header className={styles.balooFont}>1:1</Menu.Item>
@@ -138,7 +138,7 @@ class Sidebar extends React.Component {
                               active={activeChannel.id === channel.id}
                               key={channel.id}
                               onClick={()=>this.handleChannelClick(channel)}>
-                              {label}
+                              {activeChannel.id === channel.id?null:label}
                               <Icon name='user'/>{directName}</Menu.Item>);}
         })}
       <Menu.Item className={styles.balooFont} name='search' onClick={this.handleSearchClick}>

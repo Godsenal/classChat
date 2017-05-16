@@ -88,7 +88,7 @@ class Home extends Component{
                             <Button primary type='submit' onClick={this.handleSignin}>Sign in</Button>
                           </Modal.Actions>
                           <NotificationSystem ref={ref => this.notificationSystem = ref} />
-                        </Modal>
+                        </Modal>;
     return(
       <div>
         <Menu attached='top'>

@@ -16,6 +16,8 @@ var messageSchema = new Schema({
   id: String,
   channelID: String,
   contents: String,
+  types: { type: String, default: 'message' },
+  url: { type: String, default: '' },
   userName: Object,
   created: { type: Date, default: Date.now }
 });

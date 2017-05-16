@@ -46,6 +46,12 @@ exports = module.exports = function (io) {
     socket.on('new channel', function(channel) {
       socket.broadcast.emit('receive channel', channel);
     });
+    /* NEW MENTION */
+    socket.on('new mention', function(channel,username,participants) {
+      participants.forEach(function(element){
+        socket.broadcast.to(clients[element]).emit('receive mention',channel,username);
+      });
+    });
     socket.on('typing', function (data) {
       socket.broadcast.to(data.channel).emit('typing bc', data.user);
     });

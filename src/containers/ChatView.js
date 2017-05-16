@@ -68,7 +68,11 @@ class ChatView extends Component{
                                  addGroup={this.props.addGroup}/>
                              </div>
               <div className={styles.inputBody}>
-              <InputMessage addMessage={this.addMessage} addGroup={this.props.addGroup} activeChannel={this.props.activeChannel} currentUser={this.props.currentUser}/>
+              <InputMessage addMessage={this.addMessage}
+                            handleMention={this.props.handleMention}
+                            addGroup={this.props.addGroup}
+                            activeChannel={this.props.activeChannel}
+                            currentUser={this.props.currentUser}/>
               </div>
 
             </div>:null;
