@@ -329,7 +329,7 @@ export default function message(state, action) {
   case types.MESSAGE_FILTER:
     return update(state, {
       filter: {
-        status: { $set: 'WAITING'}
+        status: { $set: 'WAITING'},
       },
     });
   case types.MESSAGE_FILTER_SUCCESS:
@@ -394,6 +394,13 @@ export default function message(state, action) {
         status: { $set: 'FAILURE' },
         err: { $set: action.err },
         errCode: { $set: action.code}
+      }
+    });
+  case types.RESET_MESSAGE_FILTER:
+    return update(state, {
+      filter: {
+        status: { $set: 'INIT' },
+        messages: { $set: []},
       }
     });
   default:

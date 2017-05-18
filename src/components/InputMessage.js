@@ -139,7 +139,7 @@ class InputMessage extends React.Component {
     const {type, selectOption, groupName, input} = this.state;
     const inputView =
       <div>
-        <Dropdown style={{'position': 'absolute', 'zIndex': 100, 'height':40}}icon='plus' upward button className='icon'>
+        <Dropdown style={{'position': 'absolute', 'zIndex': 100, 'height':40}} icon='plus' upward button className='icon'>
           <Dropdown.Menu>
             <Dropdown.Item onClick={this.handleDirectClick}>1:1채팅</Dropdown.Item>
             <Dropdown.Item onClick={this.handleGroupClick}>그룹채팅</Dropdown.Item>

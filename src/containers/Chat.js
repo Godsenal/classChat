@@ -5,7 +5,7 @@ import {Segment, Dimmer, Loader} from 'semantic-ui-react';
 import uuid from 'node-uuid';
 import moment from 'moment';
 
-import {receiveRawMessage, addMessage, listMessage, filterMessage, deleteReceiveMessage, deleteLastDateID} from '../actions/message';
+import {receiveRawMessage, addMessage, listMessage, filterMessage, deleteReceiveMessage, deleteLastDateID, resetFilter} from '../actions/message';
 import {addChannel,
         changeChannel,
         listChannel,
@@ -54,7 +54,8 @@ class Chat extends React.Component {
     // Let's check whether notification permissions have already been granted
     else if (Notification.permission === "granted") {
       // If it's okay let's create a notification
-      var notification = new Notification("Hi there!");
+      let message = this.props.status.currentUser +'님 안녕하세요!';
+      var notification = new Notification(message);
     }
 
     // Otherwise, we need to ask the user for permission
@@ -62,7 +63,8 @@ class Chat extends React.Component {
       Notification.requestPermission(function (permission) {
         // If the user accepts, let's create a notification
         if (permission === "granted") {
-          var notification = new Notification("Hi there!");
+          let message = this.props.status.currentUser +'님 안녕하세요!';
+          var notification = new Notification(message);
         }
       });
     }
@@ -101,7 +103,6 @@ class Chat extends React.Component {
       browserHistory.push('/');
     }
     */
-    this.checkNotification();
     let token = localStorage.getItem('token') || null;
     if(token === null){ // if localStorage doesn't have token.
       browserHistory.push('/');
@@ -114,6 +115,7 @@ class Chat extends React.Component {
       else{
         window.addEventListener('beforeunload', this.onUnload); // 브라우저 닫기 전에 실행할 것(lastAccess time저장)
         let lastAccess = localStorage.getItem('lastAccess') || -1;
+        this.checkNotification();
         this.props.listChannel(this.props.status.currentUser)
           .then(()=>{
             var findChannel = this.props.channels.filter((channel) => {return channel.id === '1';});
@@ -331,6 +333,7 @@ class Chat extends React.Component {
                       deleteLastDateID={this.props.deleteLastDateID}
                       listMessage={this.props.listMessage}
                       filterMessage={this.handleFilterMessage}
+                      resetFilter={this.props.resetFilter}
                       messages={this.props.messages}
                       messageFilter={this.props.messageFilter}
                       isLast={this.props.isLast}
@@ -430,6 +433,9 @@ const mapDispatchToProps = (dispatch) => {
     receiveRawSignupParticipant: (channels, userName) => {
       return dispatch(receiveRawSignupParticipant(channels, userName));
     },
+    resetFilter: () => {
+      return dispatch(resetFilter());
+    }
   };
 };
 

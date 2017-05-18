@@ -29,13 +29,17 @@ class ChatView extends Component{
     });
   }
   toggleMenu = () => {
+    this.props.resetFilter();
     this.setState({
       menu: !this.state.menu,
     });
   }
-  handleFilter = (e) => {
-    this.props.filterMessage(this.props.activeChannel.id, e.target.id);
-    this.setState({filter: e.target.id});
+  //왜인지 모르겠지만 e.target.name을 받아올때도 있고 못받아올때도 있음.
+  handleFilterApp = (e) => {
+    this.props.filterMessage(this.props.activeChannel.id, 'application');
+  }
+  handleFilterImg = (e) => {
+    this.props.filterMessage(this.props.activeChannel.id, 'image');
   }
   // div 바로 다음. <ChannelList channels={this.props.channels} changeActiveChannel={this.changeActiveChannel} />
   render(){
@@ -49,33 +53,42 @@ class ChatView extends Component{
             </Segment>;
     const chatView = this.props.activeChannel.id in this.props.list?
             <div className={styles.chatBody} style={{'height':mobileHeight+'px'}}>
-              <ChatHeader {...this.props.activeChannel} toggleMenu={this.toggleMenu} leaveChannel={this.props.leaveChannel} currentUser={this.props.currentUser}/>
+              <ChatHeader {...this.props.activeChannel}
+                          toggleMenu={this.toggleMenu}
+                          leaveChannel={this.props.leaveChannel}
+                          currentUser={this.props.currentUser}/>
               <div className={styles.messageBody}>
-                    <MessageList isMobile={this.props.isMobile}
-                                 screenHeight={mobileHeight}
-                                 listMessage={this.props.listMessage}
-                                 deleteReceiveMessage={this.props.deleteReceiveMessage}
-                                 deleteLastDateID={this.props.deleteLastDateID}
-                                 activeChannel={this.props.activeChannel}
-                                 messages={this.props.list[this.props.activeChannel.id].messages}
-                                 messageAddStatus={this.props.messageAddStatus}
-                                 messageReceive={this.props.messageReceive}
-                                 messageListStatus={this.props.messageListStatus}
-                                 isLast={this.props.list[this.props.activeChannel.id].isLast}
-                                 lastDateID={this.props.list[this.props.activeChannel.id].lastDateID}
-                                 currentUser={this.props.currentUser}
-                                 setInitial={this.setInitial}
-                                 addGroup={this.props.addGroup}/>
-                             </div>
-              <div className={styles.inputBody}>
-              <InputMessage addMessage={this.addMessage}
-                            handleMention={this.props.handleMention}
-                            addGroup={this.props.addGroup}
-                            activeChannel={this.props.activeChannel}
-                            currentUser={this.props.currentUser}/>
+                <MessageList isMobile={this.props.isMobile}
+                             screenHeight={mobileHeight}
+                             listMessage={this.props.listMessage}
+                             deleteReceiveMessage={this.props.deleteReceiveMessage}
+                             deleteLastDateID={this.props.deleteLastDateID}
+                             activeChannel={this.props.activeChannel}
+                             messages={this.props.list[this.props.activeChannel.id].messages}
+                             messageAddStatus={this.props.messageAddStatus}
+                             messageReceive={this.props.messageReceive}
+                             messageListStatus={this.props.messageListStatus}
+                             isLast={this.props.list[this.props.activeChannel.id].isLast}
+                             lastDateID={this.props.list[this.props.activeChannel.id].lastDateID}
+                             currentUser={this.props.currentUser}
+                             setInitial={this.setInitial}
+                             addGroup={this.props.addGroup}/>
               </div>
-
+              <div className={styles.inputBody}>
+                <InputMessage addMessage={this.addMessage}
+                              handleMention={this.props.handleMention}
+                              addGroup={this.props.addGroup}
+                              activeChannel={this.props.activeChannel}
+                              currentUser={this.props.currentUser}/>
+              </div>
             </div>:null;
+    const filterView = this.props.messageFilter.status === 'INIT'?null:
+            this.props.messageFilter.status==='WAITING'?loadingView:
+            (this.props.messageFilter.status==='SUCCESS')&&(this.props.messageFilter.messages.length!==0)?
+            this.props.messageFilter.messages.map((message) => {
+              return <FilterDateMessage key={message.id} {...message} currentUser={this.props.currentUser} />;}):<div>empty</div>;
+
+
     const view = ((this.props.messageListStatus !== 'SUCCESS')&&(this.state.isInitial))?loadingView:chatView;
     return(
       <Sidebar.Pushable as='div'>
@@ -84,17 +97,15 @@ class ChatView extends Component{
             <Menu.Item name='닫기' onClick={this.toggleMenu}/>
             <Dropdown item icon='filter' simple>
               <Dropdown.Menu>
-                <Dropdown.Item icon='file' text='File' id='application' onClick={this.handleFilter}/>
-                <Dropdown.Item icon='image' text='Image' id='image' onClick={this.handleFilter}/>
+                <Dropdown.Item icon='file' text='File' id='application' onClick={this.handleFilterApp}/>
+                <Dropdown.Item icon='image' text='Image' id='image' onClick={this.handleFilterImg}/>
               </Dropdown.Menu>
             </Dropdown>
             <Menu.Item>
               <Input className='icon' icon='search' placeholder='Search...' />
             </Menu.Item>
           </Menu>
-          {this.props.messageFilter.status === 'SUCCESS'&&this.props.messageFilter.messages.map((message) => {
-            return <FilterDateMessage key={message.id} {...message} currentUser={this.props.currentUser} />;
-          })}
+          {filterView}
         </Sidebar>
         <Sidebar.Pusher>
           {view}
@@ -117,6 +128,7 @@ ChatView.defaultProps = {
   isLast : false,
   listMessage : () => {console.log('ChatView props Error');},
   addMessage : () => {console.log('ChatView props Error');},
+  resetFilter : () => {console.log('ChatView props Error');},
 };
 ChatView.propTypes = {
   isMobile : PropTypes.bool.isRequired,
@@ -132,5 +144,6 @@ ChatView.propTypes = {
   isLast : PropTypes.bool.isRequired,
   listMessage : PropTypes.func.isRequired,
   addMessage : PropTypes.func.isRequired,
+  resetFilter: PropTypes.func.isRequired,
 };
 export default ChatView;

@@ -14,7 +14,7 @@ export default ({
       bottom:0,
       backgroundColor: 'white',
       border: '1px solid rgba(0,0,0,0.15)',
-      fontSize: 10,
+      fontSize: 16,
     },
 
     item: {

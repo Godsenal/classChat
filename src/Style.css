@@ -151,11 +151,12 @@
   min-width: 1px;
 }
 .chatHeader{
-  -webkit-box-flex-basis: 53px;
-  -webkit-flex-basis: 53px;
-  -moz-flex-basis: 53px;
-  -ms-flex-preferred-size: 53px;
-  flex-basis: 53px;
+  -webkit-box-flex-basis: 5rem;
+  -webkit-flex-basis: 5rem;
+  -moz-flex-basis: 5rem;
+  -ms-flex-preferred-size: 5rem;
+  flex-basis: 5rem;
+  min-height: 5rem;
   z-index: 201;
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
@@ -165,14 +166,13 @@
   display: -webkit-flex;     /* NEW - Chrome */
   display: flex;
   align-items: center;
-  font-size: 1rem;
-  margin-top: 1rem;
+  font-size: 16px;
   border-radius: 1px;
 
 }
 .chatHeaderName{
   font-family: 'Baloo Bhaina','Nanum Gothic', cursive;
-  font-size: 2rem;
+  font-size: 30px;
   margin-left: 30px;
   flex: 2;
 }

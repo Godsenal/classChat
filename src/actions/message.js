@@ -10,7 +10,8 @@ import {
     MESSAGE_FILTER_FAILURE,
     ROW_MESSAGE_RECEIVE,
     RECEIVE_MESSAGE_DELETE,
-    LASTDATEID_MESSAGE_DELETE
+    LASTDATEID_MESSAGE_DELETE,
+    RESET_MESSAGE_FILTER
 } from './ActionTypes';
 
 import axios from 'axios';
@@ -35,6 +36,11 @@ export function deleteLastDateID(channelID) {
   return {
     type: LASTDATEID_MESSAGE_DELETE,
     channelID
+  };
+}
+export function resetFilter(){
+  return {
+    type: RESET_MESSAGE_FILTER,
   };
 }
 /*

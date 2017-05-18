@@ -17,6 +17,20 @@ class MessageList extends Component {
     this.handleScroll = this.handleScroll.bind(this);
     this.addNotification = this.addNotification.bind(this);
   }
+  shouldComponentUpdate(nextProps, nextState) {
+    if(this.props.messages !== nextProps.messages){
+      return true;
+    }
+    else if(this.props.activeChannel.id !== nextProps.activeChannel.id){
+      return true;
+    }
+    else if(this.state.isBottom !== nextState.isBottom){
+      return true;
+    }
+    else{
+      return false;
+    }
+  }
   addNotification() {
     this.notificationSystem.addNotification({
       children:(
@@ -104,7 +118,6 @@ class MessageList extends Component {
       this.scrollToBottom();
   }
   componentDidUpdate(prevProps) {//다른 채널 들어갈 때 && 들어왔던 채널에 들어올때
-
     const messagesContainer = this.messagesContainer;
     if(messagesContainer){
       if(prevProps.messages !== this.props.messages){
