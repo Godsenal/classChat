@@ -44,20 +44,20 @@ class ChatHeader extends React.Component {
       <div className={styles.chatHeader}>
         {searchModal}
           <span className={styles.chatHeaderName} size='massive'><Icon name='comments outline'/>#{directName}</span>
-          <Dropdown compact pointing text={participants.length.toString()+'명'} button icon='group' labeled className='icon' >
-            <Dropdown.Menu>
-              {this.props.participants.map((participant) => {
-                return(<Dropdown.Item key={participant} text={participant} />);
-              })}
-            </Dropdown.Menu>
-          </Dropdown>
-          <Button compact icon color='black' onClick={this.showModal}>
-            <Icon name='search' />
-          </Button>
-          {outBtn}
-          <Button compact icon onClick={this.props.toggleMenu}>
-            <Icon name='list layout' />
-          </Button>
+          {this.props.isSearch?<Button icon='close' onClick={this.props.toggleSearch}/>:
+            <div>
+              <Dropdown compact pointing text={participants.length.toString()+'명'} button icon='group' labeled className='icon' >
+                <Dropdown.Menu>
+                  {this.props.participants.map((participant) => {
+                    return(<Dropdown.Item key={participant} text={participant} />);
+                  })}
+                </Dropdown.Menu>
+              </Dropdown>
+              <Button compact icon color='black' onClick={this.props.toggleSearch}>
+                <Icon name='search' />
+              </Button>
+              {outBtn}
+            </div>}
         <Divider/>
       </div>
     );
@@ -70,13 +70,17 @@ ChatHeader.propTypes = {
   leaveChannel : PropTypes.func.isRequired,
   type : PropTypes.string.isRequired,
   currentUser : PropTypes.string.isRequired,
+  toggleSearch : PropTypes.func.isRequired,
+  isSearch : PropTypes.bool.isRequired,
 };
 ChatHeader.defaultProps = {
   name : '',
   participants : [],
   id : '',
-  leaveChannel : () => console.log('props error(leaveChannel)'),
+  leaveChannel : () => console.log('props error(ChatHeader)'),
   type : 'CHANNEL',
   currentUser : '',
+  toggleSearch : () => console.log('props error(ChatHeader)'),
+  isSearch: false,
 };
 export default ChatHeader;

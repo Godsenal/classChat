@@ -203,8 +203,8 @@ class Chat extends React.Component {
   handleMention(participants){
     this.props.socket.emit('new mention',this.props.activeChannel.name,this.props.status.currentUser,participants);
   }
-  handleFilterMessage(channelID, types){
-    this.props.filterMessage(channelID, types);
+  handleFilterMessage(channelID, types, topMessageID, searchWord){
+    this.props.filterMessage(channelID, types, topMessageID, searchWord);
   }
   handleAddChannel(channel){
     channel.channelID = this.props.activeChannel.id;
@@ -397,8 +397,8 @@ const mapDispatchToProps = (dispatch) => {
     listMessage: (channelID, isInitial, topMessageId) => {
       return dispatch(listMessage(channelID, isInitial, topMessageId));
     },
-    filterMessage: (channelID, types, topMessageId) => {
-      return dispatch(filterMessage(channelID, types, topMessageId));
+    filterMessage: (channelID, types, topMessageId, searchWord) => {
+      return dispatch(filterMessage(channelID, types, topMessageId, searchWord));
     },
     deleteReceiveMessage: (channelID) => {
       return dispatch(deleteReceiveMessage(channelID));

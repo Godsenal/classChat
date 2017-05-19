@@ -1,10 +1,15 @@
 import React, { PropTypes } from 'react';
-import {Button, Select, Input, Modal, Dropdown} from 'semantic-ui-react';
+import {Button, Select, Input, Modal, Dropdown, Grid, Icon} from 'semantic-ui-react';
 import NotificationSystem from 'react-notification-system';
 import { MentionsInput, Mention } from 'react-mentions';
 import mentionStyle from './mentionStyle';
 import styles from '../Style.css';
 
+const searchOption = [
+  { key: 'contents', text: '내용', value: 'contents' },
+  { key: 'username', text: '작성자', value: 'username' },
+  { key: 'date', text: '날짜', value: 'date' },
+];
 class InputMessage extends React.Component {
   constructor(props){
     super(props);
@@ -23,7 +28,7 @@ class InputMessage extends React.Component {
       input:'',
       groupName: '',
     };
-    this.handleKeyPress= this.handleKeyPress.bind(this);
+    this.handleKeyDown= this.handleKeyDown.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.handleMentionChange = this.handleMentionChange.bind(this);
     this.addNotification = this.addNotification.bind(this);
@@ -39,6 +44,7 @@ class InputMessage extends React.Component {
         return option;
       }),});
     }
+
   }
   addNotification(message, level, position) {
     this.notificationSystem.addNotification({
@@ -48,8 +54,12 @@ class InputMessage extends React.Component {
       autoDismiss: 2,
     });
   }
-  handleChange(e){
+  handleChange(e, dropdown){
+    if(dropdown){
+      this.setState({[`${dropdown.name}`]: dropdown.value});
+    }
     this.setState({[`${e.target.name}`]: e.target.value});
+
   }
   handleMentionChange(e, newValue, newPlainTextValue, mentions){
     let selectedMention = mentions.map((mention)=>{
@@ -60,7 +70,7 @@ class InputMessage extends React.Component {
       selectedMention
     });
   }
-  handleKeyPress = (e) => {
+  handleKeyDown = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       if(this.state.selectedMention.length !== 0){
@@ -71,6 +81,11 @@ class InputMessage extends React.Component {
         input : '',
         selectedMention : [],
       });
+    }
+
+    if (e.metaKey && e.shiftKey && (e.key==='f' || e.key ==='F')) {
+      e.preventDefault();
+      this.props.toggleSearch();
     }
   }
   handleGroupClick = () => {
@@ -136,7 +151,7 @@ class InputMessage extends React.Component {
   }
   //<Select multiple selection search placeholder='그룹에 초대할 사람' options={participantsOptions} onChange={this.selectedItem}/>
   render () {
-    const {type, selectOption, groupName, input} = this.state;
+    const {type, selectOption, groupName, input, searchFilter} = this.state;
     const inputView =
       <div>
         <Dropdown style={{'position': 'absolute', 'zIndex': 100, 'height':40}} icon='plus' upward button className='icon'>
@@ -147,13 +162,13 @@ class InputMessage extends React.Component {
 
           </Dropdown.Menu>
         </Dropdown>
-        <input type='file' ref={(ref)=>{this.file = ref;}} style={{'display':'none'}}/>
+        <input ref={ref => this.file=ref} type='file' style={{'display':'none'}} onChange={this.handleFile}/>
         <MentionsInput className={styles.messageInput}
                        markup='#[__display__]'
                        value={input}
                        style={mentionStyle}
                        onChange={this.handleMentionChange}
-                       onKeyPress={this.handleKeyPress}>
+                       onKeyDown={this.handleKeyDown}>
             <Mention trigger="#"
                      type='user'
                      data={selectOption}
@@ -167,6 +182,7 @@ class InputMessage extends React.Component {
         </MentionsInput>
 
       </div>;
+
     const groupModal =
     <Modal open={type === 'group'} size='small' onClose={this.handleInit}>
       <Modal.Header>그룹 추가</Modal.Header>
@@ -225,6 +241,8 @@ InputMessage.defaultProps = {
   addGroup : ()=> {console.log('prop Error');},
   handleMention : () => {console.log('prop Error');},
   currentUser : '',
+  isSearch : false,
+  toggleSearch : () => {console.log('prop Error');},
 };
 InputMessage.propTypes ={
   activeChannel : PropTypes.object.isRequired,
@@ -232,6 +250,8 @@ InputMessage.propTypes ={
   addGroup : PropTypes.func.isRequired,
   handleMention : PropTypes.func.isRequired,
   currentUser : PropTypes.string.isRequired,
+  isSearch : PropTypes.bool.isRequired,
+  toggleSearch : PropTypes.func.isRequired,
 };
 
 export default InputMessage;

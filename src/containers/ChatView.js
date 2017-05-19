@@ -1,24 +1,43 @@
 import React, { Component, PropTypes } from 'react';
 import {Dimmer, Loader,  Segment, Sidebar, Button, Dropdown, Menu, Icon, Input } from 'semantic-ui-react';
-
+import moment from 'moment';
 
 import {MessageList, ChatHeader, InputMessage, FilterDateMessage} from '../components';
 import styles from '../Style.css';
+
+const searchOption = [
+  { key: 'message', text: '내용', value: 'message' },
+  { key: 'userName', text: '작성자', value: 'userName' },
+  { key: 'date', text: '날짜', value: 'date' },
+  { key: 'application', text: '파일', value: 'application' },
+  { key: 'image', text: '이미지', value: 'image' },
+];
 
 class ChatView extends Component{
   constructor(){
     super();
     this.state = {
+      isSearch : false,
       isInitial : true,
-      menu : false,
-      filter : '',
+      selectOption : [],
+      searchFilter: 'message',
+      searchWord: '',
     };
     this.setInitial = this.setInitial.bind(this);
     this.addMessage = this.addMessage.bind(this);
   }
   componentWillReceiveProps(nextProps){
     if(this.props.activeChannel !== nextProps.activeChannel)
-      this.setState({isInitial : true});
+      this.setState({isInitial : true, isSearch : false});
+
+    if(this.state.selectOption!== nextProps.activeChannel.participants){
+      this.setState({
+        selectOption : nextProps.activeChannel.participants.map((participant, index) => {
+          var option = {key : index, value : participant, text : participant};
+          return option;
+        }),
+      });
+    }
   }
   addMessage(message){
     this.props.addMessage(message);
@@ -28,10 +47,10 @@ class ChatView extends Component{
       isInitial,
     });
   }
-  toggleMenu = () => {
+  toggleSearch = () => {
     this.props.resetFilter();
     this.setState({
-      menu: !this.state.menu,
+      isSearch : !this.state.isSearch,
     });
   }
   //왜인지 모르겠지만 e.target.name을 받아올때도 있고 못받아올때도 있음.
@@ -41,8 +60,39 @@ class ChatView extends Component{
   handleFilterImg = (e) => {
     this.props.filterMessage(this.props.activeChannel.id, 'image');
   }
+  handleSearchFilter = (e,filter) => {
+    this.setState({
+      searchFilter: filter.value,
+      searchWord: '',
+    });
+  }
+  handleSearchKeyDown = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      this.props.resetFilter();
+      this.props.filterMessage(this.props.activeChannel.id, this.state.searchFilter,'-1',this.state.searchWord);
+    }
+  }
+  handleSearchMore = () => {
+    //마지막이 아닐 때, filter state에 저장되어 있는 대로(마지막 검색 결과) 그 위부터 다시 검색.
+    if(!this.props.messageFilter.isLast){
+      this.props.filterMessage(this.props.activeChannel.id, this.props.messageFilter.types,this.props.messageFilter.messages[0].id,this.props.messageFilter.searchWord);
+    }
+
+  }
+  handleChange = (e, dropdown) => {
+    if(dropdown){
+      this.props.filterMessage(this.props.activeChannel.id, 'userName','-1',dropdown.value);
+    }
+    else{
+      this.setState({[`${e.target.name}`]: e.target.value});
+    }
+
+
+  }
   // div 바로 다음. <ChannelList channels={this.props.channels} changeActiveChannel={this.changeActiveChannel} />
   render(){
+    const {isSearch, searchFilter, selectOption, searchWord} = this.state;
     const loaderStyle = this.props.isMobile?styles.messageLoaderMobile:styles.messageLoader;
     const mobileHeight = this.props.isMobile?this.props.screenHeight-60:this.props.screenHeight;
     const loadingView =
@@ -54,7 +104,8 @@ class ChatView extends Component{
     const chatView = this.props.activeChannel.id in this.props.list?
             <div className={styles.chatBody} style={{'height':mobileHeight+'px'}}>
               <ChatHeader {...this.props.activeChannel}
-                          toggleMenu={this.toggleMenu}
+                          isSearch={this.state.isSearch}
+                          toggleSearch={this.toggleSearch}
                           leaveChannel={this.props.leaveChannel}
                           currentUser={this.props.currentUser}/>
               <div className={styles.messageBody}>
@@ -76,36 +127,44 @@ class ChatView extends Component{
               </div>
               <div className={styles.inputBody}>
                 <InputMessage addMessage={this.addMessage}
+                              toggleSearch={this.toggleSearch}
                               handleMention={this.props.handleMention}
                               addGroup={this.props.addGroup}
                               activeChannel={this.props.activeChannel}
                               currentUser={this.props.currentUser}/>
               </div>
             </div>:null;
+
+    const filterLoadingView = <Segment inverted attached='top' basic textAlign='center'><Icon size='huge' loading name='spinner' /></Segment>;
+    const filterEmptyView = <Segment inverted attached='top' basic textAlign='center'><Icon size='huge' name='terminal' />검색 결과가 없습니다.</Segment>;
     const filterView = this.props.messageFilter.status === 'INIT'?null:
-            this.props.messageFilter.status==='WAITING'?loadingView:
+            this.props.messageFilter.status==='WAITING'?filterLoadingView:
             (this.props.messageFilter.status==='SUCCESS')&&(this.props.messageFilter.messages.length!==0)?
             this.props.messageFilter.messages.map((message) => {
-              return <FilterDateMessage key={message.id} {...message} currentUser={this.props.currentUser} />;}):<div>empty</div>;
-
+              return <FilterDateMessage key={message.id} {...message} currentUser={this.props.currentUser} />;}):filterEmptyView;
 
     const view = ((this.props.messageListStatus !== 'SUCCESS')&&(this.state.isInitial))?loadingView:chatView;
     return(
       <Sidebar.Pushable as='div'>
-        <Sidebar as={Segment} animation='overlay' direction='right' width='wide' visible={this.state.menu} style={{'background':'#EFECCA'}} icon='labeled' vertical inverted>
-          <Menu fixed='top'>
-            <Menu.Item name='닫기' onClick={this.toggleMenu}/>
-            <Dropdown item icon='filter' simple>
-              <Dropdown.Menu>
-                <Dropdown.Item icon='file' text='File' id='application' onClick={this.handleFilterApp}/>
-                <Dropdown.Item icon='image' text='Image' id='image' onClick={this.handleFilterImg}/>
-              </Dropdown.Menu>
-            </Dropdown>
-            <Menu.Item>
-              <Input className='icon' icon='search' placeholder='Search...' />
-            </Menu.Item>
-          </Menu>
-          {filterView}
+        <Sidebar as='div' animation='overlay' direction='right' width='very wide' visible={isSearch} style={{'background':'#EFECCA'}} icon='labeled'>
+            <Menu attached='top'>
+              <Menu.Item name='닫기' onClick={this.toggleSearch}/>
+              <Menu.Item>
+                <Dropdown  placeholder='검색 카테고리' labeled options={searchOption} defaultValue='message' onChange={this.handleSearchFilter}/>
+              </Menu.Item>
+              <Menu.Item>
+                {searchFilter=='userName'?
+                  <Dropdown  className={styles.searchInput} placeholder='유저명' labeled search selection options={selectOption} name='search' onChange={this.handleChange}/>:
+                  searchFilter=='date'?
+                  <input  type='date' ref={input => input && input.focus()} className={styles.searchInput} name='searchWord' value={searchWord} onChange={this.handleChange} onKeyDown={this.handleSearchKeyDown}/>:
+                  <input  ref={input => input && input.focus()} className={styles.searchInput} name='searchWord' value={searchWord} onChange={this.handleChange} onKeyDown={this.handleSearchKeyDown}/>}
+              </Menu.Item>
+            </Menu>
+            {filterView?
+              <div>
+                {this.props.messageFilter.isLast?null:<Segment style={{'cursor': 'pointer'}} secondary basic attached textAlign='center' onClick={this.handleSearchMore}>더 가져오기</Segment>}
+                {filterView}
+              </div>:null}
         </Sidebar>
         <Sidebar.Pusher>
           {view}
@@ -129,6 +188,7 @@ ChatView.defaultProps = {
   listMessage : () => {console.log('ChatView props Error');},
   addMessage : () => {console.log('ChatView props Error');},
   resetFilter : () => {console.log('ChatView props Error');},
+  messageFilter: {},
 };
 ChatView.propTypes = {
   isMobile : PropTypes.bool.isRequired,
@@ -145,5 +205,6 @@ ChatView.propTypes = {
   listMessage : PropTypes.func.isRequired,
   addMessage : PropTypes.func.isRequired,
   resetFilter: PropTypes.func.isRequired,
+  messageFilter: PropTypes.object.isRequired,
 };
 export default ChatView;

@@ -27,6 +27,9 @@ class MessageList extends Component {
     else if(this.state.isBottom !== nextState.isBottom){
       return true;
     }
+    else if(this.props.messageListStatus !== nextProps.messageListStatus){
+      return true;
+    }
     else{
       return false;
     }

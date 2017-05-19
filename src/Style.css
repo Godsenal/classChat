@@ -278,6 +278,30 @@
     -ms-user-select: auto;
     user-select: auto;
 }
+.searchInput{
+  margin-left: 1.2rem;
+  min-height: 2.625rem;
+  height: 40px;
+  max-height: 11.25rem;
+  border: 2px solid #E0E0E0;
+  border-radius: .375rem;
+  outline: 0;
+  background: #fff;
+  resize: none;
+  box-shadow: none;
+  color: #3D3C40;
+  font-family: 'Nanum Gothic', sans-serif;
+  font-size: 1.2rem;
+  line-height: 1.2rem;
+  padding-top: .5625rem;
+  padding-right: 1rem;
+  padding-left: 1rem;
+  padding-bottom: .5625rem;
+  -webkit-user-select: auto;
+  -moz-user-select: auto;
+  -ms-user-select: auto;
+  user-select: auto;
+}
 .chatImg{
   width: 100%;
   height: auto;

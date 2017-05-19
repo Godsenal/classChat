@@ -8,6 +8,9 @@ import {
     MESSAGE_FILTER,
     MESSAGE_FILTER_SUCCESS,
     MESSAGE_FILTER_FAILURE,
+    MESSAGE_SEARCH,
+    MESSAGE_SEARCH_SUCCESS,
+    MESSAGE_SEARCH_FAILURE,
     ROW_MESSAGE_RECEIVE,
     RECEIVE_MESSAGE_DELETE,
     LASTDATEID_MESSAGE_DELETE,
@@ -120,16 +123,17 @@ export function listMessage(channelID, isInitial, topMessageID = '-1') {
 }
 
 /* FILTER MESSAGE */
-
-export function filterMessage(channelID, types, topMessageID = '-1') {
+export function filterMessage(channelID, types = 'message', topMessageID = '-1', searchWord) {
   return (dispatch) => {
     dispatch({type: MESSAGE_FILTER});
     var messageID = topMessageID;
-    return axios.get(`api/message/filter/${channelID}/${messageID}/${types}`)
+    return axios.get(`api/message/filter/${channelID}/${messageID}/${types}/${searchWord}`)
             .then((res) => {
-              dispatch({type: MESSAGE_FILTER_SUCCESS, messages: res.data.messages, topMessageID: topMessageID});
+              dispatch({type: MESSAGE_FILTER_SUCCESS, messages: res.data.messages, topMessageID: topMessageID, types, searchWord});
             }).catch((err) => {
               dispatch({type: MESSAGE_FILTER_FAILURE, err: err.res.data.error, code: err.res.data.code});
             });
   };
 }
+
+/* SEARCH MESSAGE */
