@@ -15,6 +15,7 @@ import DateMessage from './DateMessage';
 import InputMessage from './InputMessage';
 import FilterMessage from './FilterMessage';
 import FilterDateMessage from './FilterDateMessage';
+import SearchSidebar from './SearchSidebar';
 
 export {
         Header,
@@ -33,5 +34,6 @@ export {
         DateMessage,
         InputMessage,
         FilterMessage,
-        FilterDateMessage
+        FilterDateMessage,
+        SearchSidebar,
       };
