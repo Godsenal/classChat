@@ -45,7 +45,7 @@ export default function message(state, action) {
   }
 
   switch(action.type) {
-        /* Delete Receive message stack by changing channel */
+        /* Delete Receive message stack for changing channel */
   case types.RECEIVE_MESSAGE_DELETE:
     if(!(action.channelID in state.receive)){
       return state;
@@ -74,7 +74,7 @@ export default function message(state, action) {
   case types.ROW_MESSAGE_RECEIVE:
 
 
-    if(!action.isActive){
+    if(!action.isActive){ // 내가 속해있지만 현재 active 아닌 채널에서 온 메시지.
       if(action.message.channelID in state.receive){
         state = update(state, {
           receive: {
@@ -269,14 +269,14 @@ export default function message(state, action) {
         },
       });
     }
-
-    if(action.messages.length === 0 && action.topMessageID !== '-1'){ // message가 없는데 처음불러오는게 아닐때(에러대비)
+    if(action.messages.length === 0 && !action.isInitial){ // message가 없는데 처음불러오는게 아닐때(에러대비)
       return update(state,{
         list:{
           status:{$set: 'SUCCESS'},
           [action.channelID]:{
             isLast:{$set: true},
-          }
+            messages:{$set: []},
+          },
         },
       });
     }

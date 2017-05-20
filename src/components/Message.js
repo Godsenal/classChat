@@ -17,21 +17,16 @@ class Message extends Component {
   componentDidMount() {
     if(this.props.lastDateID === this.props.id){
       if(this.unReadMessage){
-        this.setState({isLastDate: true});
         var unReadNode = ReactDOM.findDOMNode(this.unReadMessage);
         this.props.scrollIntoDate(unReadNode);
       }
     }
-    else if (this.props.isReceived && this.props.lastDateID === '') {
+    else if (this.props.isReceived) {
       if(this.message ){
-        this.setState({isReceived: true});
-        var messageNode = ReactDOM.findDOMNode(this.message);
+        var messageNode = ReactDOM.findDOMNode(this.unReadMessage);
         this.props.scrollIntoView(messageNode);
       }
     }
-
-
-
   }
   handleImageLoad = () => {
     this.setState({ imageStatus: 'loaded' }); // onload
@@ -75,8 +70,9 @@ class Message extends Component {
                                target='_blank'
                                src={`/files/${this.props.url}`}/>
                       </Segment>;
-    const unReadMessage = !this.state.isReceived?null:<Divider horizontal>여기까지 읽으셨습니다.</Divider>;
-    const lastDateMessage = !this.state.isLastDate?null:<Divider horizontal >마지막 접속일 {moment(localStorage.getItem('lastAccess')).format('MMMM Do YYYY, h:mm:ss a')} 이후 메시지.</Divider>;
+    const lastDateMessage = this.props.lastDateID === this.props.id?<Divider horizontal >마지막 접속일 {moment(localStorage.getItem('lastAccess')).format('MMMM Do YYYY, h:mm:ss a')} 이후 메시지.</Divider>:null;
+    const unReadMessage = this.props.isReceived&&!lastDateMessage?<Divider horizontal>여기까지 읽으셨습니다.</Divider>:null;
+
     return(
       <div ref = {ref => this.message = ref}>
         <div ref = {ref => this.unReadMessage = ref}>

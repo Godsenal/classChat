@@ -5,11 +5,7 @@ import { MentionsInput, Mention } from 'react-mentions';
 import mentionStyle from './mentionStyle';
 import styles from '../Style.css';
 
-const searchOption = [
-  { key: 'contents', text: '내용', value: 'contents' },
-  { key: 'username', text: '작성자', value: 'username' },
-  { key: 'date', text: '날짜', value: 'date' },
-];
+
 class InputMessage extends React.Component {
   constructor(props){
     super(props);
@@ -28,11 +24,11 @@ class InputMessage extends React.Component {
       input:'',
       groupName: '',
     };
-    this.handleKeyDown= this.handleKeyDown.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.handleMentionChange = this.handleMentionChange.bind(this);
     this.addNotification = this.addNotification.bind(this);
   }
+
   componentWillReceiveProps(nextProps){ // participant가 새로 추가되었을 때 바로 변경. +1은 자기자신 제외한거 다시 더한거.
     if(this.state.selectOption.length+1 !== nextProps.activeChannel.participants.length){
       this.setState({selectOption : nextProps.activeChannel.participants.filter((participant) => {
@@ -70,13 +66,15 @@ class InputMessage extends React.Component {
       selectedMention
     });
   }
-  handleKeyDown = (e) => {
+  handleKeyPress = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       if(this.state.selectedMention.length !== 0){
         this.props.handleMention(this.state.selectedMention);
       }
+
       this.props.addMessage(this.state.input);
+
       this.setState({
         input : '',
         selectedMention : [],
@@ -168,7 +166,7 @@ class InputMessage extends React.Component {
                        value={input}
                        style={mentionStyle}
                        onChange={this.handleMentionChange}
-                       onKeyDown={this.handleKeyDown}>
+                       onKeyPress={this.handleKeyPress}>
             <Mention trigger="#"
                      type='user'
                      data={selectOption}

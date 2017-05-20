@@ -55,7 +55,7 @@ class Chat extends React.Component {
     else if (Notification.permission === "granted") {
       // If it's okay let's create a notification
       let message = this.props.status.currentUser +'님 안녕하세요!';
-      var notification = new Notification(message);
+      this.spawnNotification('classChat',message);
     }
 
     // Otherwise, we need to ask the user for permission
@@ -64,7 +64,7 @@ class Chat extends React.Component {
         // If the user accepts, let's create a notification
         if (permission === "granted") {
           let message = this.props.status.currentUser +'님 안녕하세요!';
-          var notification = new Notification(message);
+          this.spawnNotification('classChat',message);
         }
       });
     }
@@ -74,6 +74,8 @@ class Chat extends React.Component {
       body: body
     };
     var n = new Notification(title,options);
+
+    setTimeout(n.close.bind(n), 4000);
   }
   componentWillUnmount() {
     this.props.socket.emit('disconnected',this.props.status);
@@ -168,11 +170,12 @@ class Chat extends React.Component {
   changeActiveChannel(channel) { // leave가 true라면 this.props.socket전송할 participants를 보내줌.
     this.props.socket.emit('join channel',[channel], this.props.status.currentUser);
     this.props.changeChannel(channel);
-    this.props.deleteReceiveMessage(this.props.activeChannel.id);
+    this.props.deleteLastDateID(this.props.activeChannel.id); // 마지막 접속 날짜 표시를 위한 데이터를 비움.
+    this.props.deleteReceiveMessage(this.props.activeChannel.id); // 마지막 읽은 메시지 표시를 위한 데이터를 비움.
     var result = channel.id in this.props.list; //현재 세션에서 들어갔던 채널인지 아닌지.(state에 저장되어있는지 아닌지)
 
     if(!result){
-      let lastAccess = localStorage.getItem('lastAccess')|| '-1'; // get lass Accessed time
+      let lastAccess = localStorage.getItem('lastAccess')|| '-1'; // get last Accessed time
       this.props.listMessage(channel.id, true, lastAccess);
     }else{
       this.props.listMessage(channel.id, false, '-1');

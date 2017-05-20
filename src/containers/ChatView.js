@@ -24,7 +24,6 @@ class ChatView extends Component{
       searchWord: '',
     };
     this.setInitial = this.setInitial.bind(this);
-    this.addMessage = this.addMessage.bind(this);
   }
   componentWillReceiveProps(nextProps){
     if(this.props.activeChannel !== nextProps.activeChannel)
@@ -38,9 +37,6 @@ class ChatView extends Component{
         }),
       });
     }
-  }
-  addMessage(message){
-    this.props.addMessage(message);
   }
   setInitial(isInitial){
     this.setState({
@@ -67,21 +63,26 @@ class ChatView extends Component{
     });
   }
   handleSearchKeyDown = (e) => {
+    if(this.state.searchWord === 0 || !this.state.searchWord.trim()){
+      return;
+    }
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      this.props.resetFilter();
-      this.props.filterMessage(this.props.activeChannel.id, this.state.searchFilter,'-1',this.state.searchWord);
+      this.isMore = false;
+      this.props.filterMessage(this.props.activeChannel.id, this.state.searchFilter,'-1',this.state.searchWord.trim());
     }
   }
   handleSearchMore = () => {
     //마지막이 아닐 때, filter state에 저장되어 있는 대로(마지막 검색 결과) 그 위부터 다시 검색.
     if(!this.props.messageFilter.isLast){
+      this.isMore = true;
       this.props.filterMessage(this.props.activeChannel.id, this.props.messageFilter.types,this.props.messageFilter.messages[0].id,this.props.messageFilter.searchWord);
     }
 
   }
   handleChange = (e, dropdown) => {
     if(dropdown){
+      this.isMore = false;
       this.props.filterMessage(this.props.activeChannel.id, 'userName','-1',dropdown.value);
     }
     else{
@@ -126,7 +127,7 @@ class ChatView extends Component{
                              addGroup={this.props.addGroup}/>
               </div>
               <div className={styles.inputBody}>
-                <InputMessage addMessage={this.addMessage}
+                <InputMessage addMessage={this.props.addMessage}
                               toggleSearch={this.toggleSearch}
                               handleMention={this.props.handleMention}
                               addGroup={this.props.addGroup}
@@ -134,20 +135,21 @@ class ChatView extends Component{
                               currentUser={this.props.currentUser}/>
               </div>
             </div>:null;
-
+    // Lazy List를 잘 표현하기 위한 작업
     const filterLoadingView = <Segment inverted attached='top' basic textAlign='center'><Icon size='huge' loading name='spinner' /></Segment>;
     const filterEmptyView = <Segment inverted attached='top' basic textAlign='center'><Icon size='huge' name='terminal' />검색 결과가 없습니다.</Segment>;
     const filterView = this.props.messageFilter.status === 'INIT'?null:
-            this.props.messageFilter.status==='WAITING'?filterLoadingView:
-            (this.props.messageFilter.status==='SUCCESS')&&(this.props.messageFilter.messages.length!==0)?
+            this.props.messageFilter.status==='SUCCESS' && this.props.messageFilter.messages.length===0?filterEmptyView:
+            this.props.messageFilter.status==='WAITING'&&!this.isMore?filterLoadingView:
+            this.props.messageFilter.messages.length!==0? // length 가 0 이 아닐 때는 원래있던거 보여줌.Lazy list하기 위해서.
             this.props.messageFilter.messages.map((message) => {
-              return <FilterDateMessage key={message.id} {...message} currentUser={this.props.currentUser} />;}):filterEmptyView;
+              return <FilterDateMessage key={message.id} {...message} currentUser={this.props.currentUser} />;}):null;
 
     const view = ((this.props.messageListStatus !== 'SUCCESS')&&(this.state.isInitial))?loadingView:chatView;
     return(
-      <Sidebar.Pushable as='div'>
-        <Sidebar as='div' animation='overlay' direction='right' width='very wide' visible={isSearch} style={{'background':'#EFECCA'}} icon='labeled'>
-            <Menu attached='top'>
+      <Sidebar.Pushable as='div' style={{'height':mobileHeight+'px', 'overflow':'hidden'}}>
+        <Sidebar as={Segment} style={{'background':'#EFECCA'}} compact animation='overlay' direction='right' width='very wide' visible={isSearch} icon='labeled'>
+            <Menu attached='top' style={{'height':'10%'}}>
               <Menu.Item name='닫기' onClick={this.toggleSearch}/>
               <Menu.Item>
                 <Dropdown  placeholder='검색 카테고리' labeled options={searchOption} defaultValue='message' onChange={this.handleSearchFilter}/>
@@ -156,13 +158,20 @@ class ChatView extends Component{
                 {searchFilter=='userName'?
                   <Dropdown  className={styles.searchInput} placeholder='유저명' labeled search selection options={selectOption} name='search' onChange={this.handleChange}/>:
                   searchFilter=='date'?
-                  <input  type='date' ref={input => input && input.focus()} className={styles.searchInput} name='searchWord' value={searchWord} onChange={this.handleChange} onKeyDown={this.handleSearchKeyDown}/>:
-                  <input  ref={input => input && input.focus()} className={styles.searchInput} name='searchWord' value={searchWord} onChange={this.handleChange} onKeyDown={this.handleSearchKeyDown}/>}
+                  <input  type='date' className={styles.searchInput} name='searchWord' value={searchWord} onChange={this.handleChange} onKeyDown={this.handleSearchKeyDown}/>:
+                  <input  ref={input => this.textInput = input} className={styles.searchInput} name='searchWord' value={searchWord} onChange={this.handleChange} onKeyDown={this.handleSearchKeyDown}/>}
               </Menu.Item>
             </Menu>
             {filterView?
-              <div>
-                {this.props.messageFilter.isLast?null:<Segment style={{'cursor': 'pointer'}} secondary basic attached textAlign='center' onClick={this.handleSearchMore}>더 가져오기</Segment>}
+              <div style={{'overflowY':'auto', 'overflowX':'hidden','height':'90%'}}>
+                {this.props.messageFilter.isLast?null:
+                  this.props.messageFilter.status==='WAITING'&&this.isMore?
+                  <Segment secondary basic attached textAlign='center'>
+                    <Icon size='huge' loading name='spinner' />
+                  </Segment>
+                :<Segment style={{'cursor': 'pointer'}} secondary basic attached textAlign='center' onClick={this.handleSearchMore}>
+                  더 가져오기
+                 </Segment>}
                 {filterView}
               </div>:null}
         </Sidebar>

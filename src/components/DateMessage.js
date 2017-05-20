@@ -9,7 +9,7 @@ class DateMessage extends React.Component {
   }
   render () {
     const {receivedMessage} = this.props;
-    const receivedID = receivedMessage ? receivedMessage.id:false ;
+    const receivedID = receivedMessage.length !== 0 ? receivedMessage[0].id:false ;
     return(
       <div>
         <Divider horizontal>{moment(this.props.date).format('LL')}</Divider>
@@ -31,7 +31,7 @@ class DateMessage extends React.Component {
 DateMessage.propTypes = {
   date : PropTypes.number.isRequired,
   messages : PropTypes.array.isRequired,
-  receivedMessage : PropTypes.object.isRequired,
+  receivedMessage : PropTypes.array.isRequired,
   currentUser : PropTypes.string.isRequired,
   addGroup : PropTypes.func.isRequired,
   scrollIntoView : PropTypes.func.isRequired,
@@ -42,7 +42,7 @@ DateMessage.propTypes = {
 DateMessage.defaultProps = {
   date : 0,
   messages : [],
-  receivedMessage : {},
+  receivedMessage : [],
   currentUser : '',
   addGroup : () => {console.log('props Error');},
   scrollIntoView : () => {console.log('props Error(DateMessage)');},
