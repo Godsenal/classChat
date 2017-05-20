@@ -79,7 +79,7 @@ class SearchSidebar extends Component {
             this.props.messageFilter.status==='WAITING'&&!this.isMore?filterLoadingView:
             this.props.messageFilter.messages.length!==0? // length 가 0 이 아닐 때는 원래있던거 보여줌.Lazy list하기 위해서.
             this.props.messageFilter.messages.map((message) => {
-              return <FilterDateMessage key={message.id} {...message} currentUser={this.props.currentUser} />;}):null;
+              return <FilterDateMessage key={message.id} {...message} currentUser={this.props.currentUser} jumpMessage={this.props.jumpMessage}/>;}):null;
 
     return(
       <Sidebar as={Segment} style={{'background':'#EFECCA'}} compact animation='overlay' direction='right' width='very wide' visible={this.props.isSearch} icon='labeled'>
@@ -117,6 +117,7 @@ class SearchSidebar extends Component {
 SearchSidebar.defaultProps = {
   messageFilter: {},
   filterMessage: ()=>{console.log('SearchSidebar props error');},
+  jumpMessage: ()=>{console.log('SearchSidebar props error');},
   activeChannel: {},
   currentUser: '',
   toggleSearch: ()=>{console.log('SearchSidebar props error');},
@@ -125,6 +126,7 @@ SearchSidebar.defaultProps = {
 SearchSidebar.propTypes = {
   messageFilter: PropTypes.object.isRequired,
   filterMessage : PropTypes.func.isRequired,
+  jumpMessage : PropTypes.func.isRequired,
   activeChannel : PropTypes.object.isRequired,
   currentUser : PropTypes.string.isRequired,
   toggleSearch : PropTypes.func.isRequired,

@@ -1,6 +1,6 @@
 import React,{Component, PropTypes} from 'react';
 import {connect} from 'react-redux';
-import {Header, Icon, Menu, Modal, Form, Button} from 'semantic-ui-react';
+import {Header, Icon,Segment, Menu, Modal, Form, Button, Image, Divider} from 'semantic-ui-react';
 import {Link, browserHistory} from 'react-router';
 import NotificationSystem from 'react-notification-system';
 
@@ -45,8 +45,24 @@ class Home extends Component{
       modalOpen: false,
     });
   }
+  handleKeyPress = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      this.handleSignin();
+    }
+  }
   handleSignin = (e) => {
-    e.preventDefault();
+    if(e){
+      e.preventDefault();
+    }
+    if(this.state.username == ''){
+      this.addNotification('아이디를 입력해주세요.','warning','bc');
+      return;
+    }
+    if(this.state.password == ''){
+      this.addNotification('비밀번호를 입력해주세요.','warning','bc');
+      return;
+    }
     this.props.signinRequest(this.state.username,this.state.password)
       .then(() => {
         if(this.props.signin.status === 'SUCCESS') {
@@ -63,7 +79,7 @@ class Home extends Component{
           return true;
         }
         else{
-          this.addNotification('Incorrect username or password','warning','bc');
+          this.addNotification('아이디나 비밀번호가 잘못되었습니다.','warning','bc');
           this.setState({password : ''});
           return false;
         }
@@ -74,32 +90,51 @@ class Home extends Component{
   render () {
     const {activeItem, modalOpen} = this.state;
     const signinModal = <Modal className={styles.signinModal} open={modalOpen} onClose={this.handleClose} dimmer='blurring' size='small'>
-                          <Modal.Header>Sign in</Modal.Header>
+                          <Modal.Header style={{'textAlign':'center'}}>로그인</Modal.Header>
                           <Modal.Content>
                             <Form>
-                              <Form.Input name='username' label='Username' placeholder='username' type='text' onChange={this.handleChange}/>
-                              <Form.Input name='password' label='Password' type='password' onChange={this.handleChange}/>
+                              <Form.Input name='username' label='아이디' placeholder='아이디' type='text' onChange={this.handleChange} onKeyPress={this.handleKeyPress}/>
+                              <Form.Input name='password' label='비밀번호' placeholder='비밀번호' type='password' onChange={this.handleChange} onKeyPress={this.handleKeyPress}/>
                             </Form>
                             <Modal.Description>
-                              <p>Don't have account yet?&nbsp;<Link to='/signup'>Sign up here</Link>&nbsp;instead.</p>
+                              <p>아직 아이디가 없으신가요?  &nbsp;<Link to='/signup'><b>여기</b></Link>서&nbsp; 회원가입 하세요.</p>
                             </Modal.Description>
                           </Modal.Content>
                           <Modal.Actions>
-                            <Button primary type='submit' onClick={this.handleSignin}>Sign in</Button>
+                            <Button primary basic type='submit' onClick={this.handleSignin}>로그인</Button>
                           </Modal.Actions>
                           <NotificationSystem ref={ref => this.notificationSystem = ref} />
                         </Modal>;
     return(
       <div>
-        <Menu attached='top'>
-          <Menu.Item name='signin' position='right' active={activeItem === 'signin'} onClick={this.handleOpen} />
+        <Menu inverted style={{'borderRadius':0,'backgroundColor':'#1E1E20'}}  attached='top' borderless>
+          <Menu.Item className={styles.logo}><a href='/'><Image size='mini' inline src='/assets/images/logo/favicon-96x96.png'/>클래스 챗</a></Menu.Item>
+          <Menu.Menu position='right'>
+            <Menu.Item ><Button basic inverted color='olive' onClick={this.handleOpen}>로그인</Button></Menu.Item>
+            <Menu.Item ><Button basic inverted color='teal' onClick={this.handleOpen}>회원가입</Button></Menu.Item>
+          </Menu.Menu>
         </Menu>
-        <Header as='h2' icon textAlign='center'>
-          <Icon name='users' circular />
-          <Header.Content>
-            Friends
-          </Header.Content>
-        </Header>
+        <div >
+          <Segment style={{'borderRadius':0,'backgroundColor':'#1E1E20'}} padded inverted textAlign='center'>
+            <span className={styles.homeHeader}>클래스&nbsp;챗</span>
+            <br/><br/><br/>
+            <Divider horizontal inverted>
+              <span className={styles.homeMain}>대학생을 위한 메신저 웹</span>
+            </Divider>
+            <br/><br/>
+            <span className={styles.homeMain}><Icon name='comment'/><Icon name='search'/><Icon name='group'/></span>
+            <br/><br/>
+            <span className={styles.homeMain}>모든 것을 여기서</span>
+
+          </Segment>
+          <Segment style={{'borderRadius':0}} basic padded textAlign='center'>
+            <Button style={{'width':'20%'}} basic color='brown' onClick={this.handleOpen}>시작하기</Button>
+
+          </Segment>
+          <Segment style={{'width':'100%','position':'absolute','bottom':0,'borderRadius':0, 'textAlign': 'right'}} basic padded>
+            <span>Copyright © Taehee Lee. All Rights Reserved.</span>
+          </Segment>
+        </div>
         {signinModal}
       </div>
     );

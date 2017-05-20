@@ -9,7 +9,7 @@ class FilterDateMessage extends React.Component {
         <Divider horizontal>{moment(this.props.date).format('LL')}</Divider>
         <List divided relaxed>
         {this.props.messages.map((message, i) => {
-          return <FilterMessage key={i} currentUser={this.props.currentUser} {...message} />;
+          return <FilterMessage key={i} currentUser={this.props.currentUser} jumpMessage={this.props.jumpMessage} {...message} />;
         })}
         </List>
       </div>

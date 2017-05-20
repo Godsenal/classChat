@@ -5,7 +5,7 @@ import {Segment, Dimmer, Loader} from 'semantic-ui-react';
 import uuid from 'node-uuid';
 import moment from 'moment';
 
-import {receiveRawMessage, addMessage, listMessage, filterMessage, deleteReceiveMessage, deleteLastDateID, resetFilter} from '../actions/message';
+import {receiveRawMessage, addMessage, listMessage, filterMessage, jumpMessage, deleteReceiveMessage, deleteLastDateID, resetFilter} from '../actions/message';
 import {addChannel,
         changeChannel,
         listChannel,
@@ -26,6 +26,8 @@ class Chat extends React.Component {
     super();
     this.state={
       searchModal: false,
+      isGranted: Notification.permission,
+      isMute : false,
     };
 
     this.handleSignout = this.handleSignout.bind(this);
@@ -46,13 +48,24 @@ class Chat extends React.Component {
     localStorage.setItem('lastAccess',moment().format());
     this.props.socket.emit('disconnected',this.props.status);
   }
+  notificationSound = () => {
+    if(!this.state.isMute){
+      var audio = new Audio('/assets/sounds/notify.mp3');
+      audio.play();
+    }
+  }
+  toggleSound = () => {
+    this.setState({
+      isMute : !this.state.isMute,
+    });
+  }
   checkNotification = () => {
-    if (!("Notification" in window)) {
+    if (!('Notification' in window)) {
       alert("This browser does not support desktop notification");
     }
 
     // Let's check whether notification permissions have already been granted
-    else if (Notification.permission === "granted") {
+    else if (Notification.permission === 'granted') {
       // If it's okay let's create a notification
       let message = this.props.status.currentUser +'님 안녕하세요!';
       this.spawnNotification('classChat',message);
@@ -62,7 +75,7 @@ class Chat extends React.Component {
     else if (Notification.permission !== 'denied') {
       Notification.requestPermission(function (permission) {
         // If the user accepts, let's create a notification
-        if (permission === "granted") {
+        if (permission === 'granted') {
           let message = this.props.status.currentUser +'님 안녕하세요!';
           this.spawnNotification('classChat',message);
         }
@@ -71,10 +84,12 @@ class Chat extends React.Component {
   }
   spawnNotification = (title = 'classChat', body) => {
     var options = {
-      body: body
+      body: body,
+      badge: '/assets/images/logo/favicon-96x96.png',
+      icon: '/assets/images/logo/favicon-96x96.png',
     };
     var n = new Notification(title,options);
-
+    this.notificationSound();
     setTimeout(n.close.bind(n), 4000);
   }
   componentWillUnmount() {
@@ -123,6 +138,7 @@ class Chat extends React.Component {
             var findChannel = this.props.channels.filter((channel) => {return channel.id === '1';});
             var publicChannel = findChannel[0];
             this.props.changeChannel(publicChannel);
+            document.title = this.props.activeChannel.name + ' | Class Chat'; // 브라우저 탭 타이틀 설정.
             this.props.listMessage(this.props.activeChannel.id,true,lastAccess).then(()=>{
               this.props.socket.emit('chat mounted');
               this.props.socket.emit('storeClientInfo',this.props.status);
@@ -146,15 +162,27 @@ class Chat extends React.Component {
                 this.spawnNotification(title,body);
               });
               this.props.socket.on('receive private channel', (channel) =>{
+                var exist = false;
+                console.log(channel);
+                this.props.channels.forEach((myChannel)=>{
+                  console.log(channel.id, myChannel.id);
+                  if(channel.id === myChannel.id){
+                    exist = true;
+                  }
+                });
                 this.props.receiveRawChannel(channel);
                 if(channel.type === 'GROUP'){ //초대 받으면 자동으로 Join
                   this.props.socket.emit('join channel',[channel], this.props.status.currentUser);
-                  this.spawnNotification('classChat','새로운 그룹이 생성되었습니다!');
-                  this.props.addNotification({message:'새로운 그룹이 생성되었습니다!', level:'info', position:'bl',uuid: `${Date.now()}${uuid.v4()}`});
+                  if(!exist){
+                    this.spawnNotification('classChat','새로운 그룹이 생성되었습니다!');
+                    this.props.addNotification({message:'새로운 그룹이 생성되었습니다!', level:'info', position:'bl',uuid: `${Date.now()}${uuid.v4()}`});
+                  }
                 }else if(channel.type ==='DIRECT'){
                   this.props.socket.emit('join channel',[channel], this.props.status.currentUser);
-                  this.spawnNotification('classChat','1:1 채널이 생성되었습니다!');
-                  this.props.addNotification({message:'1:1 채널이 추가되었습니다!', level:'info', position:'bl',uuid: `${Date.now()}${uuid.v4()}`});
+                  if(!exist){
+                    this.spawnNotification('classChat','1:1 채널이 생성되었습니다!');
+                    this.props.addNotification({message:'1:1 채널이 추가되었습니다!', level:'info', position:'bl',uuid: `${Date.now()}${uuid.v4()}`});
+                  }
                 }
               });
               this.props.socket.on('receive socket', socketID =>
@@ -170,6 +198,7 @@ class Chat extends React.Component {
   changeActiveChannel(channel) { // leave가 true라면 this.props.socket전송할 participants를 보내줌.
     this.props.socket.emit('join channel',[channel], this.props.status.currentUser);
     this.props.changeChannel(channel);
+    document.title = this.props.activeChannel.name + ' | Class Chat';
     this.props.deleteLastDateID(this.props.activeChannel.id); // 마지막 접속 날짜 표시를 위한 데이터를 비움.
     this.props.deleteReceiveMessage(this.props.activeChannel.id); // 마지막 읽은 메시지 표시를 위한 데이터를 비움.
     var result = channel.id in this.props.list; //현재 세션에서 들어갔던 채널인지 아닌지.(state에 저장되어있는지 아닌지)
@@ -315,6 +344,8 @@ class Chat extends React.Component {
                      handleSearchClose={this.handleSearchClose}/>
         <div className={sidebarStyle}>
           <Sidebar channels={this.props.channels}
+                   toggleSound={this.toggleSound}
+                   isMute={this.state.isMute}
                    changeActiveChannel={this.changeActiveChannel}
                    activeChannel={this.props.activeChannel}
                    status={this.props.status}
@@ -336,6 +367,7 @@ class Chat extends React.Component {
                       deleteLastDateID={this.props.deleteLastDateID}
                       listMessage={this.props.listMessage}
                       filterMessage={this.handleFilterMessage}
+                      jumpMessage={this.props.jumpMessage}
                       resetFilter={this.props.resetFilter}
                       messages={this.props.messages}
                       messageFilter={this.props.messageFilter}
@@ -402,6 +434,9 @@ const mapDispatchToProps = (dispatch) => {
     },
     filterMessage: (channelID, types, topMessageId, searchWord) => {
       return dispatch(filterMessage(channelID, types, topMessageId, searchWord));
+    },
+    jumpMessage: (channelID, types, topMessageID, targetID) => {
+      return dispatch(jumpMessage(channelID, types, topMessageID, targetID));
     },
     deleteReceiveMessage: (channelID) => {
       return dispatch(deleteReceiveMessage(channelID));

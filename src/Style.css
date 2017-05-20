@@ -1,6 +1,38 @@
 @import url(//fonts.googleapis.com/earlyaccess/jejugothic.css);
 @import url(http://fonts.googleapis.com/earlyaccess/nanumgothic.css);
-
+@font-face {
+  font-family: 'NanumGothicExtraBold';
+  src: url(/assets/fonts/NanumGothicExtraBold.ttf);
+}
+@font-face {
+  font-family: 'NanumBrush';
+  src: url(/assets/fonts/NanumBrush.ttf);
+}
+@font-face {
+  font-family: 'NanumGothic';
+  src: url(/assets/fonts/NanumGothic.ttf);
+}
+.logo{
+  font-family: 'NanumBrush','NanumGothicExtraBold', cursive;
+  font-size: 1.5em;
+  font-weight: bold;
+  margin: 0;
+  padding: 0;
+}
+.homeHeader{
+  font-family: 'NanumGothicExtraBold','NanumBrush', cursive;
+  font-size: 5em;
+  font-weight: bold;
+  color: #D9CB9E;
+}
+.homeMain{
+  font-family: 'NanumGothicExtraBold','NanumBrush', cursive;
+  font-size: 2em;
+}
+.signinModal{
+  font-family: 'NanumGothic','NanumBrush', cursive;
+  font-size: 2em;
+}
 .flexLayout{
   display: -webkit-box;      /* OLD - iOS 6-, Safari 3.1-6 */
   display: -moz-box;         /* OLD - Firefox 19- (buggy but mostly works) */
@@ -24,7 +56,7 @@
   overflow: hidden;
 }
 .loadingView{
-  font-family: 'Baloo Bhaina', cursive;
+  font-family: 'Baloo Bhaina','NanumGothicExtraBold', cursive;
   height: 100vh;
   display: -webkit-box;      /* OLD - iOS 6-, Safari 3.1-6 */
   display: -moz-box;         /* OLD - Firefox 19- (buggy but mostly works) */
@@ -35,7 +67,7 @@
   overflow: hidden;
 }
 .chatSidebar{
-  font-family: 'Baloo Bhaina', cursive;
+  font-family: 'Baloo Bhaina','NanumGothicExtraBold', cursive;
   -webkit-box-flex: 0 1 100px;      /* OLD - iOS 6-, Safari 3.1-6 */
   -moz-box-flex: 0 1 100px;         /* OLD - Firefox 19- */             /* For old syntax, otherwise collapses. */
   -webkit-flex: 0 100px;          /* Chrome */
@@ -43,7 +75,7 @@
   flex: 0 1 100px;
 }
 .chatSidebarMobile{
-  font-family: 'Roboto Slab', sans-serif;
+  font-family: 'Roboto Slab','NanumGothicExtraBold', sans-serif;
   -webkit-box-flex: 0 1 60px;      /* OLD - iOS 6-, Safari 3.1-6 */
   -moz-box-flex: 0 1 60px;         /* OLD - Firefox 19- */             /* For old syntax, otherwise collapses. */
   -webkit-flex: 0 1 60px;          /* Chrome */
@@ -62,7 +94,7 @@
   overflow: hidden;
 }
 .chatViewMobile{
-  font-family: 'Baloo Bhaina', cursive;
+  font-family: 'Baloo Bhaina','NanumGothicExtraBold', cursive;
   -webkit-box-flex: 0 1 auto;      /* OLD - iOS 6-, Safari 3.1-6 */
   -moz-box-flex: 0 1 auto;          /* OLD - Firefox 19- */             /* For old syntax, otherwise collapses. */
   -webkit-flex: 0 1 auto;            /* Chrome */
@@ -113,7 +145,7 @@
   height: 2.25rem;
 }
 .messageContents{
-  font-family: 'Nanum Gothic', sans-serif;
+  font-family: 'Nanum Gothic','NanumGothicExtraBold', sans-serif;
   margin-left: 1rem;
   -webkit-box-flex: 1;      /* OLD - iOS 6-, Safari 3.1-6 */
   -moz-box-flex: 1;         /* OLD - Firefox 19- */             /* For old syntax, otherwise collapses. */
@@ -321,7 +353,7 @@
   width: 15rem;
 }
 .channelLoaderMobile{
-  font-family: 'Baloo Bhaina', cursive;
+  font-family: 'Baloo Bhaina','NanumGothicExtraBold', cursive;
   height: 10vh;
 }
 .loadingImage{

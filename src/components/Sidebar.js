@@ -89,6 +89,11 @@ class Sidebar extends React.Component {
       </Menu>
         :
     <Menu style = {{'height':'100vh'}} vertical attached inverted>
+      <Menu.Item icon>
+        알림 {!this.props.isMute?
+          <Icon name='alarm outline' link onClick={this.props.toggleSound}/>
+          :<Icon name='alarm mute outline' link onClick={this.props.toggleSound}/>}
+      </Menu.Item>
       <Menu.Header >
         <Dropdown className={styles.balooFont} item text={this.props.status.currentUser}>
           <Dropdown.Menu>
@@ -166,6 +171,8 @@ Sidebar.defaultProps = {
   handleSignout : () => {console.log('sidebar props Error');},
   handleSearchClick : () => {console.log('sidebar props Error');},
   changeActiveChannel : () => {console.log('sidebar props Error');},
+  isMute : false,
+  toggleSound : () => {console.log('sidebar props Error');}
 };
 Sidebar.propTypes = {
   status : PropTypes.object.isRequired,
@@ -176,6 +183,8 @@ Sidebar.propTypes = {
   handleSignout : PropTypes.func.isRequired,
   handleSearchClick : PropTypes.func.isRequired,
   changeActiveChannel : PropTypes.func.isRequired,
+  isMute: PropTypes.bool.isRequired,
+  toggleSound : PropTypes.func.isRequired,
 };
 
 

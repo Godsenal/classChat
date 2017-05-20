@@ -13,12 +13,14 @@ class ChatView extends Component{
     this.state = {
       isSearch : false,
       isInitial : true,
+      targetID : '',
     };
     this.setInitial = this.setInitial.bind(this);
   }
   componentWillReceiveProps(nextProps){
-    if(this.props.activeChannel !== nextProps.activeChannel)
-      this.setState({isInitial : true, isSearch : false});
+    if(this.props.activeChannel !== nextProps.activeChannel){
+      this.setState({isInitial : true, isSearch : false, targetID : ''});
+    }
   }
   setInitial(isInitial){
     this.setState({
@@ -37,6 +39,22 @@ class ChatView extends Component{
   }
   handleFilterImg = (e) => {
     this.props.filterMessage(this.props.activeChannel.id, 'image');
+  }
+  handleJump = (targetID) => {
+    var topMessageID = this.props.list[this.props.activeChannel.id].messages[0].messages[0].id;
+    if(topMessageID <= targetID){
+      this.setState({
+        targetID
+      });
+    }
+    else{
+      this.props.jumpMessage(this.props.activeChannel.id,'id',topMessageID,targetID)
+        .then(()=>{
+          this.setState({
+            targetID
+          });
+        });
+    }
   }
   // div 바로 다음. <ChannelList channels={this.props.channels} changeActiveChannel={this.changeActiveChannel} />
   render(){
@@ -59,6 +77,7 @@ class ChatView extends Component{
               <div className={styles.messageBody}>
                 <MessageList isMobile={this.props.isMobile}
                              screenHeight={mobileHeight}
+                             messageJumpID={this.state.targetID}
                              listMessage={this.props.listMessage}
                              deleteReceiveMessage={this.props.deleteReceiveMessage}
                              deleteLastDateID={this.props.deleteLastDateID}
@@ -91,6 +110,7 @@ class ChatView extends Component{
                        currentUser={this.props.currentUser}
                        activeChannel={this.props.activeChannel}
                        filterMessage={this.props.filterMessage}
+                       jumpMessage={this.handleJump}
                        messageFilter={this.props.messageFilter}/>
         <Sidebar.Pusher>
           {view}
@@ -114,6 +134,7 @@ ChatView.defaultProps = {
   listMessage : () => {console.log('ChatView props Error');},
   addMessage : () => {console.log('ChatView props Error');},
   filterMessage : () => {console.log('ChatView props Error');},
+  jumpMessage : () => {console.log('ChatView props Error');},
   resetFilter : () => {console.log('ChatView props Error');},
   messageFilter: {},
 };
@@ -134,5 +155,6 @@ ChatView.propTypes = {
   resetFilter: PropTypes.func.isRequired,
   messageFilter: PropTypes.object.isRequired,
   filterMessage : PropTypes.func.isRequired,
+  jumpMessage : PropTypes.func.isRequired,
 };
 export default ChatView;

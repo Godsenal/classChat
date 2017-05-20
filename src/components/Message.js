@@ -1,6 +1,6 @@
 import React,{Component, PropTypes} from 'react';
 import ReactDOM from 'react-dom';
-import {Popup, Button, Image, Icon,  Segment, Divider } from 'semantic-ui-react';
+import {Popup, Button, Image, Icon,  Segment, Divider, Modal } from 'semantic-ui-react';
 import moment from 'moment';
 import styles from '../Style.css';
 
@@ -10,8 +10,6 @@ class Message extends Component {
     this.state = {
       imageStatus : 'loading',
       hiddenImage : true,
-      isReceived : false,
-      isLastDate : false,
     };
   }
   componentDidMount() {
@@ -24,7 +22,17 @@ class Message extends Component {
     else if (this.props.isReceived) {
       if(this.message ){
         var messageNode = ReactDOM.findDOMNode(this.unReadMessage);
-        this.props.scrollIntoView(messageNode);
+        this.props.scrollIntoReceive(messageNode);
+      }
+    }
+  }
+  componentWillReceiveProps(nextProps) { // messageJumpID 는 무조건 이미 render된 메시지 안에서 하므로
+    if(this.props.messageJumpID !== nextProps.messageJumpID){
+      if(nextProps.messageJumpID === this.props.id){
+        if(this.message){
+          var jumpNode = ReactDOM.findDOMNode(this.message);
+          this.props.scrollIntoJump(jumpNode);
+        }
       }
     }
   }
@@ -59,20 +67,24 @@ class Message extends Component {
     const contents = this.props.types === 'message'?
                     <p style={{'wordWrap':'break-word','whiteSpace':'pre-wrap'}}>{this.props.contents}</p>
                     :this.props.types === 'application'?<a href={`/api/download/${this.props.types}/${this.props.url}/${this.props.contents}`} download>
-                      <p style={{'wordWrap':'break-word','whiteSpace':'pre-wrap'}}><Icon name='file' size='huge' />{this.props.contents}</p></a>
+                      <p style={{'wordWrap':'break-word','whiteSpace':'pre-wrap'}}><Icon name='file'/>{this.props.contents}</p></a>
                       :<Segment basic compact>
-                        {this.state.hiddenImage&&<Button onClick={this.handleToggleImage}>이미지 보기</Button>}
-                        <Image size ='medium'
-                               hidden={this.state.hiddenImage}
-                               bordered
-                               as='a'
-                               href={`/image/${this.props.url}/${this.props.contents}`}
-                               target='_blank'
-                               src={`/files/${this.props.url}`}/>
+                      <Modal basic trigger={
+                          <Image inline size ='medium'
+                             bordered
+                             src={`/files/${this.props.url}`}/>
+                         }>
+                        <Modal.Content image>
+                          <Image centered src={`/files/${this.props.url}`} />
+                        </Modal.Content>
+                        <Modal.Actions>
+                          <a href={`/api/download/${this.props.types}/${this.props.url}/${this.props.contents}`} download>저장하기</a>
+                        </Modal.Actions>
+                      </Modal>
+                        <a href={`/api/download/${this.props.types}/${this.props.url}/${this.props.contents}`} download><Icon size='large' name='download' link /></a>
                       </Segment>;
     const lastDateMessage = this.props.lastDateID === this.props.id?<Divider horizontal >마지막 접속일 {moment(localStorage.getItem('lastAccess')).format('MMMM Do YYYY, h:mm:ss a')} 이후 메시지.</Divider>:null;
     const unReadMessage = this.props.isReceived&&!lastDateMessage?<Divider horizontal>여기까지 읽으셨습니다.</Divider>:null;
-
     return(
       <div ref = {ref => this.message = ref}>
         <div ref = {ref => this.unReadMessage = ref}>
@@ -111,6 +123,7 @@ Message.defaultProps = {
   isWaiting : false,
   types : 'message',
   url : '',
+  messageJumpID: '',
 };
 Message.propTypes = {
   id : PropTypes.string.isRequired,
@@ -123,8 +136,9 @@ Message.propTypes = {
   types : PropTypes.string.isRequired,
   url : PropTypes.string.isRequired,
   isReceived : PropTypes.bool.isRequired,
-  scrollIntoView : PropTypes.func.isRequired,
+  scrollIntoReceive : PropTypes.func.isRequired,
   scrollIntoDate :PropTypes.func.isRequired,
   lastDateID : PropTypes.string.isRequired,
+  messageJumpID : PropTypes.string.isRequired,
 };
 export default Message;

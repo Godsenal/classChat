@@ -30,7 +30,9 @@ class MessageList extends Component {
     if(this.props.messageListStatus !== nextProps.messageListStatus){
       return true;
     }
-
+    if(nextProps.messageJumpID !== '' && this.props.messageJumpID !== nextProps.messageJumpID){
+      return true;
+    }
     return false;
 
   }
@@ -49,7 +51,7 @@ class MessageList extends Component {
         </div>
       ),
       level: 'info',
-      position: 'br',
+      position: 'bl',
       onClick: this.scrollToBottom,
     });
   }
@@ -91,7 +93,14 @@ class MessageList extends Component {
     this.scrollToBottom();
     this.setState({isBottom: true});
   }
-  scrollIntoView = (domNode) => {
+  scrollIntoJump= (domNode) => {
+    //domNode.scrollIntoView(true);
+    if(domNode){
+      this.scrolled = true; // 안읽은 곳으로 scroll은 한번이면 되니 이것에 대한 flag 설정.
+      domNode.scrollIntoView(true);
+    }
+  }
+  scrollIntoReceive= (domNode) => {
     //domNode.scrollIntoView(true);
     if(domNode){
       if(this.isReceived !== 'DONE'){
@@ -136,7 +145,7 @@ class MessageList extends Component {
       }
       if(prevProps.activeChannel.id !== this.props.activeChannel.id){ //채널이 바뀔 때 이건 INIT해줘야함. 이렇게함으로써 메시지 add할 때 scrollbottom 가능.
         //scroll이 안읽은메시로 이동 후 cdu가 실행됨. 그러므로 여기서 삭제를 해줌.
-        if(this.isReceived !== 'DONE' && this.isLastDate !== 'DONE' ){
+        if(this.isReceived !== 'DONE' && this.isLastDate !== 'DONE' && this.isJumped !== 'DONE'){
           this.scrollToBottom();
         }
       }
@@ -156,7 +165,7 @@ class MessageList extends Component {
     //어디까지 읽었는지 확인하기 위해서 받은 메시지 중 첫번째 메시지 보내줌.
     const receivedMessage = this.props.activeChannel.id in this.props.messageReceive?this.props.messageReceive[this.props.activeChannel.id]:[];
     const messageList = ( isEmpty ?
-      <div className={styles.emptyChat} style={{'overflowY':'scroll', 'overflowX':'hidden', 'outline':0}}>
+      <div className={styles.emptyChat}>
         <h1>
           <Icon size='huge' name='comments outline' /><br/>아직 메시지가 없습니다.<br/>
         </h1>
@@ -168,9 +177,11 @@ class MessageList extends Component {
             <DateMessage key={message.id}
                          currentUser={this.props.currentUser}
                          addGroup={this.props.addGroup}
+                         messageJumpID={this.props.messageJumpID}
                          receivedMessage={receivedMessage}
                          lastDateID={this.props.lastDateID}
-                         scrollIntoView={this.scrollIntoView}
+                         scrollIntoJump={this.scrollIntoJump}
+                         scrollIntoReceive={this.scrollIntoReceive}
                          scrollIntoDate={this.scrollIntoDate}
                          {...message} />
           );

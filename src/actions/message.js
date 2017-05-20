@@ -136,4 +136,16 @@ export function filterMessage(channelID, types = 'message', topMessageID = '-1',
   };
 }
 
+/* JUMP MESSAGE */
+export function jumpMessage(channelID, types ='id', topMessageID = '-1', targetID){
+  return (dispatch) => {
+    dispatch({type: MESSAGE_LIST});
+    return axios.get(`api/message/jump/${channelID}/${topMessageID}/${types}/${targetID}`)
+            .then((res) => {
+              dispatch({type: MESSAGE_LIST_SUCCESS, messages: res.data.messages, channelID, isInitial: false, topMessageID});
+            }).catch((err) => {
+              dispatch({type: MESSAGE_LIST_FAILURE, err: err.res.data.error, code: err.res.data.code});
+            });
+  };
+}
 /* SEARCH MESSAGE */

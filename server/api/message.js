@@ -79,6 +79,18 @@ router.get('/listdate/:channelID/:lastdate', function(req, res){
             }
           });
 });
+// get list of messages to jump to targetID
+router.get('/jump/:channelID/:messageID/:types/:targetID', function(req,res){
+  messages.find({$and: [{channelID: req.params.channelID},{id: {$gte: req.params.targetID}},{id: {$lt: req.params.messageID}}]})
+    .sort({id: -1})
+    .exec((err,messages)=>{
+      if(err) {
+        console.log(err);
+        return res.status(500).json({error: 'internal server error', code:1});
+      }
+      return res.json({messages});
+    });
+});
   //get filtered message
 router.get('/filter/:channelID/:messageID/:types/:searchWord', function(req, res){
   let searchReg = '.*'+req.params.searchWord+'.*';

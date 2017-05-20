@@ -1,7 +1,11 @@
 import React, { PropTypes } from 'react'
-import {List} from 'semantic-ui-react';
+import {List, Button} from 'semantic-ui-react';
 import moment from 'moment';
 class FilterMessage extends React.Component {
+
+  handleJump = () => {
+    this.props.jumpMessage(this.props.id);
+  }
   render () {
     const {types, url, contents, created} = this.props;
     const icon = types =='application'?'file':types =='image'?'image':'comment';
@@ -10,6 +14,9 @@ class FilterMessage extends React.Component {
       :<List.Header>{this.props.contents}</List.Header>;
     return(
       <List.Item>
+        <List.Content floated='right'>
+          <Button onClick={this.handleJump}>이동</Button>
+        </List.Content>
         <List.Icon name={icon} size='small' verticalAlign='middle' />
         <List.Content>
           {header}
