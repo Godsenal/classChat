@@ -96,7 +96,15 @@ class Chat extends React.Component {
     this.props.socket.emit('disconnected',this.props.status);
     window.removeEventListener('beforeunload', this.onUnload);
   }
-
+  getCookie(name) {
+    var value = "; " + document.cookie;
+    var parts = value.split("; " + name + "=");
+    if (parts.length == 2) return parts.pop().split(";").shift();
+  }
+  deleteCookie(name) {
+  // If the cookie exists
+    document.cookie = name +'=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+  }
   componentDidMount() {
     /*direct connect without signin*/
     /* Get Singin Status First */
@@ -121,12 +129,16 @@ class Chat extends React.Component {
     }
     */
     let token = localStorage.getItem('token') || null;
-    if(token === null){ // if localStorage doesn't have token.
+    let tokenCk = this.getCookie('token'); // sign in third method
+    if(!token&& !tokenCk){ // if localStorage doesn't have token.
       browserHistory.push('/');
+    }
+    else if(tokenCk){
+      token = tokenCk;
+      this.deleteCookie('token');
     }
     this.props.getStatusRequest(token).then(()=>{
       if(!this.props.status.valid){
-
         browserHistory.push('/');
       }
       else{

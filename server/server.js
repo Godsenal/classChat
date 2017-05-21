@@ -6,6 +6,7 @@ import path from 'path';
 import bodyParser from 'body-parser';
 import express from 'express';
 import session from 'express-session';
+import cookieParser from 'cookie-parser';
 import socketEvents from './socketEvents';
 
 const passport = require('passport');
@@ -45,14 +46,26 @@ app.use(sassMiddleware({
 
 const localSignupStrategy = require('./passport/local-signup');
 const localSigninStrategy = require('./passport/local-signin');
+const facebookSigninStrategy = require('./passport/facebook-signin');
+const otherSignupStrategy = require('./passport/other-signup');
 passport.use('local-signup', localSignupStrategy);
 passport.use('local-signin', localSigninStrategy);
+passport.use('facebook-signin', facebookSigninStrategy);
+passport.use('other-signup', otherSignupStrategy);
+
+
 
 
 app.use( bodyParser.urlencoded({ extended: true }) );
 app.use(bodyParser.json());
+app.use(session({
+  secret: config.sessionSecret,
+  resave: true,
+  saveUninitialized: false
+}));
 app.use(passport.initialize());
-
+app.use(passport.session());
+app.use(cookieParser());
 
 app.use('/', express.static(path.join(__dirname, './../public'))); // 정적인 페이지 로드
 

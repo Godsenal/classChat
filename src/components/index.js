@@ -16,6 +16,8 @@ import InputMessage from './InputMessage';
 import FilterMessage from './FilterMessage';
 import FilterDateMessage from './FilterDateMessage';
 import SearchSidebar from './SearchSidebar';
+import Signin from './Signin';
+import Signup from './Signup';
 
 export {
         Header,
@@ -36,4 +38,6 @@ export {
         FilterMessage,
         FilterDateMessage,
         SearchSidebar,
+        Signin,
+        Signup,
       };

@@ -12,4 +12,5 @@ export default {
   //dbUrl : 'mongodb://localhost:27017/chatDB',
   dbUrl : 'mongodb://godsenal:xogmltjdrhd77@ds129600.mlab.com:29600/heroku_k4k7hk8l',
   jwtSecret: 'Godsenal!3737',
+  sessionSecret: 'Godsenal!3737',
 };

@@ -7,17 +7,19 @@ import passport from 'passport';
 
 router.post('/signup', (req, res, next) => {
     // CHECK USERNAME FORMAT
+
+  let emailForm = /^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/;
   let usernameForm = /^[a-zA-Z0-9]+$/;
-  if(!usernameForm.test(req.body.username) || req.body.username < 4) {
+  if(!emailForm.test(req.body.email) || req.body.email.length < 4) {
     return res.status(400).json({
-      error: 'BAD ID',
+      error: 'BAD EMAIL',
       code: 1
     });
   }
-    // CHECK NICKNAME FORMAT
-  if(!usernameForm.test(req.body.nickname)) {
+    // CHECK USERNAME FORMAT
+  if(!usernameForm.test(req.body.username) || req.body.username.length < 4) {
     return res.status(400).json({
-      error: 'BAD NICKNAME',
+      error: 'BAD USERNAME',
       code: 3
     });
   }
@@ -31,20 +33,29 @@ router.post('/signup', (req, res, next) => {
   }
   passport.authenticate('local-signup', (err) => {
     if (err) {
+      console.log(err);
       if (err.name === 'MongoError' && err.code === 11000) {
         // the 11000 Mongo code is for a duplication email error
         // the 409 HTTP status code is for conflict error
-        return res.status(409).json({
+        return res.status(400).json({
           success: false,
-          error: 'This username is already taken.',
-          code : 4
+          error: 'MONGO ERROR.',
+          code : 6
         });
       }
-      console.log(err);
+      if (err.code === 4 || err.code === 5) {
+        // the 11000 Mongo code is for a duplication email error
+        // the 409 HTTP status code is for conflict error
+        return res.status(400).json({
+          success: false,
+          error: err.name,
+          code : err.code
+        });
+      }
       return res.status(400).json({
         success: false,
         error: 'Could not process the form.',
-        code: 5,
+        code: 7,
       });
     }
 
@@ -55,6 +66,54 @@ router.post('/signup', (req, res, next) => {
 
 });
 
+router.post('/signup/otherauth', (req, res, next) => {
+    // CHECK USERNAME FORMAT
+  let usernameForm = /^[a-zA-Z0-9]+$/;
+
+    // CHECK USERNAME FORMAT
+
+  if(!usernameForm.test(req.body.username) || req.body.username.length < 4) {
+    return res.status(400).json({
+      error: 'BAD USERNAME',
+      code: 2
+    });
+  }
+
+  passport.authenticate('other-signup', (err) => {
+    if (err) {
+      console.log(err);
+      if (err.name === 'MongoError' && err.code === 11000) {
+        // the 11000 Mongo code is for a duplication email error
+        // the 409 HTTP status code is for conflict error
+        return res.status(400).json({
+          success: false,
+          error: 'MONGO ERROR.',
+          code : 6
+        });
+      }
+      if (err.code === 4 || err.code === 5) {
+        // the 11000 Mongo code is for a duplication email error
+        // the 409 HTTP status code is for conflict error
+        return res.status(400).json({
+          success: false,
+          error: err.name,
+          code : err.code
+        });
+      }
+
+      return res.status(400).json({
+        success: false,
+        error: 'Could not process the form.',
+        code: 7,
+      });
+    }
+
+    return res.json({
+      success: true,
+    });
+  })(req, res, next);
+
+});
 /*
     ACCOUNT SIGNIN: POST /api/account/signin
     BODY SAMPLE: { "username": "test", "password": "test" }
@@ -85,8 +144,8 @@ router.post('/signin', (req, res, next) => {
     //user has authenticated correctly thus we create a JWT token
     return res.json({
       token : token,
+      email: data.email,
       username: data.username,
-      nickname : data.nickname
     });
 
   })(req, res, next);
@@ -139,9 +198,36 @@ router.post('/signin', (req, res, next) => {
   */
 });
 
+router.get('/signinfacebook',
+  passport.authenticate('facebook-signin',{ scope: ['email']}));
+
+router.get('/facebook/callback' ,passport.authenticate('facebook-signin',{
+  failureRedirect:'/',
+  session: false,
+}),function(req, res) {
+
+  if(req.user.type == 'token'){
+    res.cookie('token', req.user.data, {
+      maxAge: 10000
+    });
+    res.redirect('/channel');
+  }
+  else if(req.user.type == 'email'){
+    res.cookie('email', req.user.data,{
+      maxAge: 10000
+    });
+    res.redirect('/otherauth');
+  }
+
+});
+
+
+
 /*
     GET CURRENT USER INFO GET /api/account/getInfo
 */
+
+
 router.get('/getinfo', (req, res) => {
   if (!req.headers.authorization) {
     return res.status(401).json({
@@ -159,7 +245,17 @@ router.get('/getinfo', (req, res) => {
         code: 2
       });
     }
-    return res.json({ info: decoded });
+
+    accounts.findOne({email: decoded.email},{id: 1},function(err,user){
+      if(err) {
+        return res.status(401).json({
+          error: 'MONGO ERROR',
+          code: 2
+        });
+      }
+
+      return res.json({info: user});
+    });
   });
 });
 

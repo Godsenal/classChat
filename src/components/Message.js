@@ -1,6 +1,6 @@
 import React,{Component, PropTypes} from 'react';
 import ReactDOM from 'react-dom';
-import {Popup, Button, Image, Icon,  Segment, Divider, Modal } from 'semantic-ui-react';
+import {Popup, Button, Image, Icon,  Segment, Divider, Modal, Embed } from 'semantic-ui-react';
 import moment from 'moment';
 import styles from '../Style.css';
 
@@ -30,6 +30,7 @@ class Message extends Component {
     if(this.props.messageJumpID !== nextProps.messageJumpID){
       if(nextProps.messageJumpID === this.props.id){
         if(this.message){
+          this.message.className=styles.fadeInAnimation;
           var jumpNode = ReactDOM.findDOMNode(this.message);
           this.props.scrollIntoJump(jumpNode);
         }
@@ -60,12 +61,18 @@ class Message extends Component {
   }
 
   render () {
+    //const urlRE= new RegExp("([a-zA-Z0-9]+://)?([a-zA-Z0-9_]+:[a-zA-Z0-9_]+@)?([a-zA-Z0-9.-]+\\.[A-Za-z]{2,4})(:[0-9]+)?([^ ])+");
+    //const urlContents = this.props.contents.match(urlRE);
     const myMessage = (this.props.currentUser === this.props.userName)?
       <div>HI {this.props.currentUser}</div>
       :<Button onClick={ () => this.handleAddGroup(this.props.userName)}>1:1 채팅하기</Button>;
     const waitingStyle =  !this.props.isWaiting?styles.flexMessage:styles.flexMessageWaiting;
     const contents = this.props.types === 'message'?
-                    <p style={{'wordWrap':'break-word','whiteSpace':'pre-wrap'}}>{this.props.contents}</p>
+                  <div>
+                    <p style={{'wordWrap':'break-word','whiteSpace':'pre-wrap'}}>
+                      {this.props.contents}
+                    </p>
+                  </div>
                     :this.props.types === 'application'?<a href={`/api/download/${this.props.types}/${this.props.url}/${this.props.contents}`} download>
                       <p style={{'wordWrap':'break-word','whiteSpace':'pre-wrap'}}><Icon name='file'/>{this.props.contents}</p></a>
                       :<Segment basic compact>

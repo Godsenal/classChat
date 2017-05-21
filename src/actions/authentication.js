@@ -18,14 +18,13 @@ import moment from 'moment';
 /* dispatch안에는 action 객체가 들어가고 state 는 redux에서 알아서 관리
    err말고 error을 쓰는 이유는, 기본 err과 겹치는 것을  피하기 위해 */
 
-export function signinRequest(username, password) {
+export function signinRequest(email, password) {
   return (dispatch) => {
     dispatch({type: AUTH_SIGNIN});
-
-    return axios.post('/api/account/signin', { username, password })
+    return axios.post('/api/account/signin', { email, password })
             .then((res) => {
               localStorage.setItem('token', res.data.token);
-              dispatch({type: AUTH_SIGNIN_SUCCESS, username, nickname: res.data.nickname, isAdmin: res.data.isAdmin, token:res.data.token });
+              dispatch({type: AUTH_SIGNIN_SUCCESS, email, username: res.data.username, nickname: res.data.nickname, isAdmin: res.data.isAdmin, token:res.data.token });
             }).catch((err) => {
               localStorage.removeItem('token');
               dispatch({type: AUTH_SIGNIN_FAILURE, err: err.response.data.error, code: err.response.data.code});
@@ -33,12 +32,24 @@ export function signinRequest(username, password) {
   };
 }
 
-
-/* REGISTER */
-export function signupRequest(username, password, nickname) {
+/* REGISTER THIRD PARTY AUTH */
+export function otherAuthRequest(email,username,password = '1'){ // need to change
   return (dispatch) => {
     dispatch({type: AUTH_SIGNUP});
-    return axios.post('/api/account/signup', { username, password, nickname })
+    return axios.post('/api/account/signup/otherauth', { email, username, password })
+            .then((res) => {
+              dispatch({type: AUTH_SIGNUP_SUCCESS});
+            }).catch((err) => {
+              dispatch({type: AUTH_SIGNUP_FAILURE, err: err.response.data.error, code: err.response.data.code});
+            });
+  };
+}
+
+/* REGISTER */
+export function signupRequest(email, username, password) {
+  return (dispatch) => {
+    dispatch({type: AUTH_SIGNUP});
+    return axios.post('/api/account/signup', { email, username, password })
             .then((res) => {
               dispatch({type: AUTH_SIGNUP_SUCCESS});
             }).catch((err) => {
@@ -55,8 +66,10 @@ export function getStatusRequest(token) {
     dispatch({type: AUTH_GET_STATUS});
     return axios.get('/api/account/getinfo',{ headers: { 'Authorization': AuthStr } })
             .then((res) => {
-              dispatch({type: AUTH_GET_STATUS_SUCCESS, username: res.data.info.username, nickname: res.data.info.nickname, isAdmin: res.data.info.isAdmin});
+              localStorage.setItem('token', token);
+              dispatch({type: AUTH_GET_STATUS_SUCCESS, username: res.data.info.id, token});
             }).catch((err) => {
+              localStorage.removeItem('token');
               dispatch({type: AUTH_GET_STATUS_FAILURE, err: err.response.data.error});
             });
   };

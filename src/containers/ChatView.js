@@ -56,6 +56,13 @@ class ChatView extends Component{
         });
     }
   }
+  componentDidUpdate(prevProps, prevState){ // 같은 targetID로 이동할 때 messageList에서 update를 못하게 했으므로 다시 빈칸으로 바꿔줌.
+    if(/\S/.test(this.state.targetID)){
+      this.setState({
+        targetID: '',
+      });
+    }
+  }
   // div 바로 다음. <ChannelList channels={this.props.channels} changeActiveChannel={this.changeActiveChannel} />
   render(){
     const {isSearch} = this.state;

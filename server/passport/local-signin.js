@@ -8,17 +8,17 @@ import config  from '../config.js';
  * Return the Passport Local Strategy object.
  */
 module.exports = new PassportLocalStrategy({
-  usernameField: 'username',
+  usernameField: 'email',
   passwordField: 'password',
   session: false,
   passReqToCallback: true
-}, (req, username, password, done) => {
+}, (req, email, password, done) => {
   const userData = {
-    username: username.trim(),
+    email: email.trim(),
     password: password.trim(),
   };
   // find a user by email address
-  accounts.findOne({ id: userData.username }, (err, user) => {
+  accounts.findOne({ email: userData.email }, (err, user) => {
     if (err) { return done(err); }
 
     if (!user) {
@@ -38,13 +38,15 @@ module.exports = new PassportLocalStrategy({
       return done(error);
     }
     const payload = {
-      username: user.id,
-      nickname: user.nickname,
+      email: user.email,
+      //username: user.id,
+      //nickname: user.nickname,
       isSignedIn : true,
     };
       // create a token string
     const token = jwt.sign(payload, config.jwtSecret);
     const data = {
+      email: user.email,
       username: user.id,
     };
     return done(null, token, data);

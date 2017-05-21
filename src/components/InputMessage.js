@@ -67,8 +67,12 @@ class InputMessage extends React.Component {
     });
   }
   handleKeyPress = (e) => {
+
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
+      if(!/\S/.test(this.state.input)){
+        return;
+      }
       if(this.state.selectedMention.length !== 0){
         this.props.handleMention(this.state.selectedMention);
       }

@@ -12,6 +12,20 @@
   font-family: 'NanumGothic';
   src: url(/assets/fonts/NanumGothic.ttf);
 }
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.fadeInAnimation {
+  animation-duration: 2s;
+  animation-name: fadeIn;
+}
+
 .logo{
   font-family: 'NanumBrush','NanumGothicExtraBold', cursive;
   font-size: 1.5em;

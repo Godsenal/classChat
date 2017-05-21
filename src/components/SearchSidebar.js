@@ -19,12 +19,11 @@ class SearchSidebar extends Component {
       selectOption : [],
       searchFilter: 'message',
       searchWord: '',
-      isSearch: false,
     };
   }
   componentWillReceiveProps(nextProps){
     if(this.props.activeChannel !== nextProps.activeChannel)
-      this.setState({isInitial : true, isSearch : false});
+      this.setState({isInitial : true});
 
     if(this.state.selectOption!== nextProps.activeChannel.participants){
       this.setState({
@@ -32,6 +31,13 @@ class SearchSidebar extends Component {
           var option = {key : index, value : participant, text : participant};
           return option;
         }),
+      });
+    }
+
+    if(this.props.isSearch !== nextProps.isSearch){
+      this.setState({
+        searchFilter: 'message',
+        searchWord: '',
       });
     }
   }
@@ -42,7 +48,7 @@ class SearchSidebar extends Component {
     });
   }
   handleSearchKeyDown = (e) => {
-    if(this.state.searchWord === 0 || !this.state.searchWord.trim()){
+    if(!/\S/.test(this.state.searchWord)){
       return;
     }
     if (e.key === 'Enter' && !e.shiftKey) {

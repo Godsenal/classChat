@@ -1,25 +1,23 @@
 import React,{Component, PropTypes} from 'react';
 import {connect} from 'react-redux';
-import {Header, Icon,Segment, Menu, Modal, Form, Button, Image, Divider} from 'semantic-ui-react';
-import {Link, browserHistory} from 'react-router';
+import {Icon,Segment, Menu, Button, Image, Divider} from 'semantic-ui-react';
 import NotificationSystem from 'react-notification-system';
 
-import {signinRequest, getStatusRequest} from '../actions/authentication';
+import {Signup, Signin} from '../components';
+import {signinRequest, getStatusRequest, signupRequest} from '../actions/authentication';
+import {joinChannel, listChannel} from '../actions/channel';
 import styles from '../Style.css';
+
 class Home extends Component{
   constructor(){
     super();
     this.state = {
       success : false,
       activeItem : '',
-      modalOpen : false,
-      username : '',
-      password: '',
+      signinOpen : false,
+      signupOpen : false,
     };
     this.addNotification = this.addNotification.bind(this);
-  }
-  componentDidMount() {
-
   }
   addNotification(message, level, position) {
     this.notificationSystem.addNotification({
@@ -30,88 +28,47 @@ class Home extends Component{
     });
   }
   handleChange = (e) => {
-    if(e.target.name === 'username')
-      this.setState({username: e.target.value});
+    if(e.target.name === 'email')
+      this.setState({email: e.target.value});
     else if(e.target.name ==='password')
       this.setState({password: e.target.value});
   }
-  handleOpen = () => {
+  handleSigninOpen = () => {
     this.setState({
-      modalOpen: true,
+      signinOpen: true,
     });
   }
-  handleClose = () => {
+  handleSignupOpen = () => {
     this.setState({
-      modalOpen: false,
+      signupOpen: true,
     });
   }
-  handleKeyPress = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      this.handleSignin();
-    }
+  handleSigninClose = () => {
+    this.setState({
+      signinOpen: false,
+    });
   }
-  handleSignin = (e) => {
-    if(e){
-      e.preventDefault();
-    }
-    if(this.state.username == ''){
-      this.addNotification('아이디를 입력해주세요.','warning','bc');
-      return;
-    }
-    if(this.state.password == ''){
-      this.addNotification('비밀번호를 입력해주세요.','warning','bc');
-      return;
-    }
-    this.props.signinRequest(this.state.username,this.state.password)
-      .then(() => {
-        if(this.props.signin.status === 'SUCCESS') {
-          /*
-          let signinData = {
-            isSignedIn: true,
-            id: this.state.id,
-            nickname: this.props.nickname,
-            isAdmin: false,
-          };
-          document.cookie = 'key=' + btoa(JSON.stringify(signinData));*/
-          this.handleClose();
-          browserHistory.push('/channel');
-          return true;
-        }
-        else{
-          this.addNotification('아이디나 비밀번호가 잘못되었습니다.','warning','bc');
-          this.setState({password : ''});
-          return false;
-        }
-      });
-
+  handleSignupClose = () => {
+    this.setState({
+      signupOpen: false,
+    });
+  }
+  handleSigninFacebook = () => {
+    var url = 'http://' + window.location.host + '/api/account/signinfacebook';
+    window.location.href = url;
   }
   handleItemClick = (e, { name }) => this.setState({ activeItem: name })
   render () {
-    const {activeItem, modalOpen} = this.state;
-    const signinModal = <Modal className={styles.signinModal} open={modalOpen} onClose={this.handleClose} dimmer='blurring' size='small'>
-                          <Modal.Header style={{'textAlign':'center'}}>로그인</Modal.Header>
-                          <Modal.Content>
-                            <Form>
-                              <Form.Input name='username' label='아이디' placeholder='아이디' type='text' onChange={this.handleChange} onKeyPress={this.handleKeyPress}/>
-                              <Form.Input name='password' label='비밀번호' placeholder='비밀번호' type='password' onChange={this.handleChange} onKeyPress={this.handleKeyPress}/>
-                            </Form>
-                            <Modal.Description>
-                              <p>아직 아이디가 없으신가요?  &nbsp;<Link to='/signup'><b>여기</b></Link>서&nbsp; 회원가입 하세요.</p>
-                            </Modal.Description>
-                          </Modal.Content>
-                          <Modal.Actions>
-                            <Button primary basic type='submit' onClick={this.handleSignin}>로그인</Button>
-                          </Modal.Actions>
-                          <NotificationSystem ref={ref => this.notificationSystem = ref} />
-                        </Modal>;
+    const {signinOpen, signupOpen} = this.state;
+    //<NotificationSystem ref={ref => this.notificationSystem = ref} />
+
     return(
       <div>
         <Menu inverted style={{'borderRadius':0,'backgroundColor':'#1E1E20'}}  attached='top' borderless>
           <Menu.Item className={styles.logo}><a href='/'><Image size='mini' inline src='/assets/images/logo/favicon-96x96.png'/>클래스 챗</a></Menu.Item>
           <Menu.Menu position='right'>
-            <Menu.Item ><Button basic inverted color='olive' onClick={this.handleOpen}>로그인</Button></Menu.Item>
-            <Menu.Item ><Button basic inverted color='teal' onClick={this.handleOpen}>회원가입</Button></Menu.Item>
+            <Menu.Item ><Button basic inverted color='olive' onClick={this.handleSigninOpen}>로그인</Button></Menu.Item>
+            <Menu.Item ><Button basic inverted color='teal' onClick={this.handleSignupOpen}>회원가입</Button></Menu.Item>
           </Menu.Menu>
         </Menu>
         <div >
@@ -128,44 +85,89 @@ class Home extends Component{
 
           </Segment>
           <Segment style={{'borderRadius':0}} basic padded textAlign='center'>
-            <Button style={{'width':'20%'}} basic color='brown' onClick={this.handleOpen}>시작하기</Button>
-
+            <Button style={{'width':'15rem'}} basic color='brown' onClick={this.handleSigninOpen}>시작하기</Button>
+            <br/><br/>
+            <Button style={{'width':'15rem','borderRadius':0}} color='facebook' onClick={this.handleSigninFacebook}>
+              <Icon name='facebook' /> 페이스북으로 시작
+            </Button>
           </Segment>
           <Segment style={{'width':'100%','position':'absolute','bottom':0,'borderRadius':0, 'textAlign': 'right'}} basic padded>
             <span>Copyright © Taehee Lee. All Rights Reserved.</span>
           </Segment>
         </div>
-        {signinModal}
+        {signinOpen ? <Signin signinOpen={signinOpen}
+                              signin={this.props.signin}
+                              status={this.props.status}
+                              handleSigninOpen={this.handleSigninOpen}
+                              handleSigninClose={this.handleSigninClose}
+                              signinRequest={this.props.signinRequest}
+                              getStatusRequest={this.props.getStatusRequest}
+                              addNotification={this.addNotification}/>:null }
+        {signupOpen ? <Signup signupOpen={signupOpen}
+                              socket={this.props.socket}
+                              signup={this.props.signup}
+                              status={this.props.status}
+                              channelList={this.props.channelList}
+                              handleSignupOpen={this.handleSignupOpen}
+                              handleSignupClose={this.handleSignupClose}
+                              signupRequest={this.props.signupRequest}
+                              joinChannel={this.props.joinChannel}
+                              listChannel={this.props.listChannel}
+                              getStatusRequest={this.props.getStatusRequest}
+                              addNotification={this.addNotification}/>:null }
+        <NotificationSystem ref={ref => this.notificationSystem = ref} />
       </div>
     );
   }
 }
-
 Home.defaultProps = {
-  nickname: 'Guest',
+  signinRequest: () => {console.log('Home props error');},
+  getStatusRequest: () => {console.log('Home props error');},
+  signupRequest: () => {console.log('Home props error');},
+  listChannel: () => {console.log('Home props error');},
+  joinChannel: () => {console.log('Home props error');},
+  signin: {},
+  signup: {},
+  status: {},
+  channelList: {},
 };
 Home.propTypes = {
   signinRequest: PropTypes.func.isRequired,
   getStatusRequest : PropTypes.func.isRequired,
   signin : PropTypes.object.isRequired,
+  signupRequest : PropTypes.func.isRequired,
+  signup : PropTypes.object.isRequired,
   status: PropTypes.object.isRequired,
-  nickname: PropTypes.string.isRequired,
+  channelList : PropTypes.object.isRequired,
+  listChannel : PropTypes.func.isRequired,
+  joinChannel : PropTypes.func.isRequired,
 };
 const mapStateToProps = (state) => {
   return {
     signin: state.authentication.signin,
+    signup: state.authentication.signup,
     status: state.authentication.status,
+    channelList: state.channel.list,
   };
 };
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    signinRequest: (username, password) => {
-      return dispatch(signinRequest(username,password));
+    signinRequest: (email, password) => {
+      return dispatch(signinRequest(email,password));
     },
     getStatusRequest: () => {
       return dispatch(getStatusRequest());
-    }
+    },
+    signupRequest: (email, username, password) => {
+      return dispatch(signupRequest(email, username, password));
+    },
+    joinChannel: (channels, userName) => {
+      return dispatch(joinChannel(channels, userName));
+    },
+    listChannel: (userName, listType) => {
+      return dispatch(listChannel(userName, listType));
+    },
   };
 };
 

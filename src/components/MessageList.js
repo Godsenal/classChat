@@ -220,6 +220,7 @@ class MessageList extends Component {
 MessageList.defaultProps = {
   messages: [],
   lastDateID: '',
+  messageJumpID: '',
 };
 MessageList.propTypes = {
   isMobile : PropTypes.bool.isRequired,
@@ -236,5 +237,6 @@ MessageList.propTypes = {
   listMessage : PropTypes.func.isRequired,
   activeChannel: PropTypes.object.isRequired,
   addGroup : PropTypes.func.isRequired,
+  messageJumpID : PropTypes.string.isRequired,
 };
 export default MessageList;
