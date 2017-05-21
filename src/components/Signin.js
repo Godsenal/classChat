@@ -52,7 +52,7 @@ class Signin extends Component{
           return true;
         }
         else{
-          this.addNotification('이메일 혹은 비밀번호가 잘못되었습니다.','warning','bc');
+          this.props.addNotification('이메일 혹은 비밀번호가 잘못되었습니다.','warning','bc');
           this.setState({password : ''});
           return false;
         }

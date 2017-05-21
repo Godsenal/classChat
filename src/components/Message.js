@@ -30,7 +30,10 @@ class Message extends Component {
     if(this.props.messageJumpID !== nextProps.messageJumpID){
       if(nextProps.messageJumpID === this.props.id){
         if(this.message){
-          this.message.className=styles.fadeInAnimation;
+          this.message.classList.remove(styles.fadeInAnimation);
+          void this.message.offsetWidth;
+          this.message.classList.add(styles.fadeInAnimation); //reset animation
+
           var jumpNode = ReactDOM.findDOMNode(this.message);
           this.props.scrollIntoJump(jumpNode);
         }

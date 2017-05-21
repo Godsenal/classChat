@@ -132,7 +132,6 @@ router.get('/filter/:channelID/:messageID/:types/:searchWord', function(req, res
         });
       break;
     default:
-      console.log(req.params.types);
       messages.find({$and: [{channelID: req.params.channelID},{types: req.params.types},{contents: {$regex: searchReg, $options : 'i' }},{id : {$gt: req.params.messageID}}]})
         .sort({id: -1})
         .limit(15)
@@ -296,7 +295,6 @@ router.post('/new_message', function(req, res) {
 });
 
 router.post('/new_message/:types', upload.single('files') , function(req, res) {
-  console.log(req.body.contents);
   let message = {
     ...req.body,
     url: `${new Date()}-${req.file.originalname}`,

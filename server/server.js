@@ -58,11 +58,13 @@ passport.use('other-signup', otherSignupStrategy);
 
 app.use( bodyParser.urlencoded({ extended: true }) );
 app.use(bodyParser.json());
+/*
 app.use(session({
   secret: config.sessionSecret,
   resave: true,
   saveUninitialized: false
 }));
+*/
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(cookieParser());
