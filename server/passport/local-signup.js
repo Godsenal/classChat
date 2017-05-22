@@ -1,4 +1,5 @@
 import accounts from '../models/accounts';
+import bcrypt from 'bcrypt';
 const PassportLocalStrategy = require('passport-local').Strategy;
 
 
@@ -31,6 +32,8 @@ module.exports = new PassportLocalStrategy({
         return done(error);
       }
     }else{
+      let hash = bcrypt.hashSync(userData.password, 10);
+      userData.password = hash;
       const newAccount = new accounts(userData);
       newAccount.save((err) => {
         if (err) {

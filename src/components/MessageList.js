@@ -126,7 +126,7 @@ class MessageList extends Component {
       this.scrollToBottom();
     }
   }
-  componentDidUpdate(prevProps) {//다른 채널 들어갈 때 && 들어왔던 채널에 들어올때 // 여기서 바꾸는 내용은 render다시 안함.
+  componentDidUpdate(prevProps, prevState) {//다른 채널 들어갈 때 && 들어왔던 채널에 들어올때 // 여기서 바꾸는 내용은 render다시 안함.
     const messagesContainer = this.messagesContainer;
     if(messagesContainer){
       if(prevProps.messages !== this.props.messages){
@@ -145,7 +145,7 @@ class MessageList extends Component {
       }
       if(prevProps.activeChannel.id !== this.props.activeChannel.id){ //채널이 바뀔 때 이건 INIT해줘야함. 이렇게함으로써 메시지 add할 때 scrollbottom 가능.
         //scroll이 안읽은메시로 이동 후 cdu가 실행됨. 그러므로 여기서 삭제를 해줌.
-        if(this.isReceived !== 'DONE' && this.isLastDate !== 'DONE' && this.isJumped !== 'DONE'){
+        if(!this.scrolled){
           this.scrollToBottom();
         }
       }

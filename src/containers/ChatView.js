@@ -34,14 +34,14 @@ class ChatView extends Component{
     });
   }
   //왜인지 모르겠지만 e.target.name을 받아올때도 있고 못받아올때도 있음.
-  handleFilterApp = (e) => {
+  handleFilterApp = () => {
     this.props.filterMessage(this.props.activeChannel.id, 'application');
   }
-  handleFilterImg = (e) => {
+  handleFilterImg = () => {
     this.props.filterMessage(this.props.activeChannel.id, 'image');
   }
   handleJump = (targetID) => {
-    var topMessageID = this.props.list[this.props.activeChannel.id].messages[0].messages[0].id;
+    var topMessageID = this.props.messageList[this.props.activeChannel.id].messages[0].messages[0].id;
     if(topMessageID <= targetID){
       this.setState({
         targetID
@@ -74,7 +74,7 @@ class ChatView extends Component{
                 <Loader indeterminate >Preparing Messages</Loader>
               </Dimmer>
             </Segment>;
-    const chatView = this.props.activeChannel.id in this.props.list?
+    const chatView = this.props.activeChannel.id in this.props.messageList?
             <div className={styles.chatBody} style={{'height':mobileHeight+'px'}}>
               <ChatHeader {...this.props.activeChannel}
                           isSearch={this.state.isSearch}
@@ -89,20 +89,22 @@ class ChatView extends Component{
                              deleteReceiveMessage={this.props.deleteReceiveMessage}
                              deleteLastDateID={this.props.deleteLastDateID}
                              activeChannel={this.props.activeChannel}
-                             messages={this.props.list[this.props.activeChannel.id].messages}
+                             messages={this.props.messageList[this.props.activeChannel.id].messages}
                              messageAddStatus={this.props.messageAddStatus}
                              messageReceive={this.props.messageReceive}
                              messageListStatus={this.props.messageListStatus}
-                             isLast={this.props.list[this.props.activeChannel.id].isLast}
-                             lastDateID={this.props.list[this.props.activeChannel.id].lastDateID}
+                             isLast={this.props.messageList[this.props.activeChannel.id].isLast}
+                             lastDateID={this.props.messageList[this.props.activeChannel.id].lastDateID}
                              currentUser={this.props.currentUser}
                              setInitial={this.setInitial}
                              addGroup={this.props.addGroup}/>
               </div>
               <div className={styles.inputBody}>
                 <InputMessage addMessage={this.props.addMessage}
+                              channels={this.props.channelList.channels}
                               toggleSearch={this.toggleSearch}
                               handleMention={this.props.handleMention}
+                              inviteChannel={this.props.inviteChannel}
                               addGroup={this.props.addGroup}
                               activeChannel={this.props.activeChannel}
                               currentUser={this.props.currentUser}/>
@@ -147,6 +149,7 @@ ChatView.defaultProps = {
 };
 ChatView.propTypes = {
   isMobile : PropTypes.bool.isRequired,
+  screenHeight : PropTypes.number.isRequired,
   currentUser : PropTypes.string.isRequired,
   activeChannel : PropTypes.object.isRequired,
   changeChannel : PropTypes.func.isRequired,
@@ -155,7 +158,13 @@ ChatView.propTypes = {
   messages : PropTypes.array.isRequired,
   messageReceive : PropTypes.object.isRequired,
   messageAddStatus : PropTypes.string.isRequired,
+  messageList : PropTypes.object.isRequired,
   messageListStatus : PropTypes.string.isRequired,
+  deleteReceiveMessage : PropTypes.func.isRequired,
+  deleteLastDateID : PropTypes.func.isRequired,
+  channelList : PropTypes.object.isRequired,
+  handleMention : PropTypes.func.isRequired,
+  inviteChannel : PropTypes.func.isRequired,
   isLast : PropTypes.bool.isRequired,
   listMessage : PropTypes.func.isRequired,
   addMessage : PropTypes.func.isRequired,

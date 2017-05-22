@@ -42,7 +42,7 @@ class Sidebar extends React.Component {
         </Dropdown>
         <Dropdown className={styles.balooFont} item text='Channel'>
           <Dropdown.Menu color='violet'>
-            {this.props.channels.map((channel)=>{
+            {this.props.channelList.channels.map((channel)=>{
               if(channel.type === 'CHANNEL')
                 return(<Dropdown.Item name={channel.name}
                                       active={activeChannel.id === channel.id}
@@ -54,7 +54,7 @@ class Sidebar extends React.Component {
         </Dropdown>
         <Dropdown className={styles.balooFont} item text='Group'>
           <Dropdown.Menu color='red'>
-            {this.props.channels.map((channel)=>{
+            {this.props.channelList.channels.map((channel)=>{
               if(channel.type === 'GROUP')
                 return(<Dropdown.Item color='red'
                                       name={channel.name}
@@ -67,7 +67,7 @@ class Sidebar extends React.Component {
         </Dropdown>
         <Dropdown className={styles.balooFont} item text='1:1'>
           <Dropdown.Menu color='blue'>
-            {this.props.channels.map((channel)=>{
+            {this.props.channelList.channels.map((channel)=>{
               var splitName = channel.name.split('+');
               var filterName = splitName.filter((name) => {
                 return name !== this.props.status.currentUser;
@@ -103,7 +103,7 @@ class Sidebar extends React.Component {
         </Dropdown>
       </Menu.Header>
       <Menu.Item header className={styles.balooFont}>CHANNELS</Menu.Item>
-        {this.props.channels.map((channel)=>{
+        {this.props.channelList.channels.map((channel)=>{
           const label = channel.id in messageReceive && messageReceive[channel.id].length !== 0?
                         <Label color='teal'>{messageReceive[channel.id].length}</Label>:null;
           if(channel.type === 'CHANNEL'){
@@ -116,7 +116,7 @@ class Sidebar extends React.Component {
                               <Icon name='hashtag'/>{channel.name}</Menu.Item>);}
         })}
       <Menu.Item header className={styles.balooFont}>GROUPS</Menu.Item>
-        {this.props.channels.map((channel)=>{
+        {this.props.channelList.channels.map((channel)=>{
           const label = channel.id in messageReceive && messageReceive[channel.id].length !== 0?
                         <Label color='teal'>{messageReceive[channel.id].length}</Label>:null;
           if(channel.type === 'GROUP'){
@@ -129,7 +129,7 @@ class Sidebar extends React.Component {
                               <Icon name='group'/>{channel.name}</Menu.Item>);}
         })}
       <Menu.Item header className={styles.balooFont}>1:1</Menu.Item>
-        {this.props.channels.map((channel)=>{
+        {this.props.channelList.channels.map((channel)=>{
           var splitName = channel.name.split('+');
           var filterName = splitName.filter((name) => {
             return name !== this.props.status.currentUser;
@@ -185,6 +185,8 @@ Sidebar.propTypes = {
   changeActiveChannel : PropTypes.func.isRequired,
   isMute: PropTypes.bool.isRequired,
   toggleSound : PropTypes.func.isRequired,
+  messageReceive : PropTypes.object.isRequired,
+  channelList :PropTypes.object.isRequired,
 };
 
 

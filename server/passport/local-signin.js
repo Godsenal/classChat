@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 import accounts from '../models/accounts';
+import bcrypt from 'bcrypt';
 const PassportLocalStrategy = require('passport-local').Strategy;
 import config  from '../config.js';
 
@@ -29,8 +30,18 @@ module.exports = new PassportLocalStrategy({
       return done(error);
     }
 
-    // check if a hashed user's password is equal to a value saved in the database
+
+    /*/ check if a hashed user's password is equal to a value saved in the database
     if(userData.password !== user.password) {
+      let error = {};
+      error.name = 'IncorrectCredentialsError';
+      error.code = 3;
+
+      return done(error);
+    }*/
+    let hash = bcrypt.hashSync(userData.password, 10);
+
+    if(!bcrypt.compareSync(password, hash)) {
       let error = {};
       error.name = 'IncorrectCredentialsError';
       error.code = 3;

@@ -1,6 +1,7 @@
 import React, {Component, PropTypes} from 'react';
 import {Modal, Form, Button, Image, Icon} from 'semantic-ui-react';
 import {browserHistory} from 'react-router';
+import NotificationSystem from 'react-notification-system';
 
 import styles from '../Style.css';
 
@@ -13,6 +14,15 @@ class Signin extends Component{
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleSignin = this.handleSignin.bind(this);
+    this.addNotification = this.addNotification.bind(this);
+  }
+  addNotification(message, level, position) {
+    this.notificationSystem.addNotification({
+      message,
+      level,
+      position,
+      autoDismiss: 2,
+    });
   }
   handleChange(e){
     this.setState({[`${e.target.name}`]: e.target.value});
@@ -29,11 +39,11 @@ class Signin extends Component{
       e.preventDefault();
     }
     if(this.state.email == ''){
-      this.props.addNotification('아이디를 입력해주세요.','warning','bc');
+      this.addNotification('아이디를 입력해주세요.','warning','bc');
       return;
     }
     if(this.state.password == ''){
-      this.props.addNotification('비밀번호를 입력해주세요.','warning','bc');
+      this.addNotification('비밀번호를 입력해주세요.','warning','bc');
       return;
     }
     this.props.signinRequest(this.state.email,this.state.password)
@@ -52,7 +62,7 @@ class Signin extends Component{
           return true;
         }
         else{
-          this.props.addNotification('이메일 혹은 비밀번호가 잘못되었습니다.','warning','bc');
+          this.addNotification('이메일 혹은 비밀번호가 잘못되었습니다.','error','bc');
           this.setState({password : ''});
           return false;
         }
@@ -81,6 +91,7 @@ class Signin extends Component{
         <Button style={{'borderRadius':0}} color='facebook' fluid onClick={this.handleSigninFacebook}>
           <Icon name='facebook' /> 페이스북으로 로그인
         </Button>
+        <NotificationSystem ref={ref => this.notificationSystem = ref} />
       </Modal>
     );
   }
@@ -95,7 +106,6 @@ Signin.propTypes = {
   status: PropTypes.object.isRequired,
   signin: PropTypes.object.isRequired,
   nickname: PropTypes.string.isRequired,
-  addNotification: PropTypes.func.isRequired,
 };
 
 export default Signin;

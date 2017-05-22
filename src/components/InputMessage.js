@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react';
-import {Button, Select, Input, Modal, Dropdown, Grid, Icon} from 'semantic-ui-react';
+import {Button, Modal, Dropdown, Image, Form} from 'semantic-ui-react';
 import NotificationSystem from 'react-notification-system';
 import { MentionsInput, Mention } from 'react-mentions';
 import mentionStyle from './mentionStyle';
@@ -11,16 +11,13 @@ class InputMessage extends React.Component {
     super(props);
     this.state= {
       type : 'input', // filter로 자신을 걸러주고 object로 mapping
-      selectOption : this.props.activeChannel.participants.filter((participant) => {
-        if(participant !== this.props.currentUser){
-          return participant;
-        }
-      }).map((participant, index) => {
-        var option = {id: participant, display: participant, key : index, value : participant, text : participant};
-        return option;
-      }),
+      selectOption : [],
+      channelSelectOption: [],
+      inviteSelectOption: [],
       selected:[],
       selectedMention:[],
+      selectedChannel: '',
+      selectedInvite: [],
       input:'',
       groupName: '',
     };
@@ -28,19 +25,30 @@ class InputMessage extends React.Component {
     this.handleMentionChange = this.handleMentionChange.bind(this);
     this.addNotification = this.addNotification.bind(this);
   }
-
-  componentWillReceiveProps(nextProps){ // participant가 새로 추가되었을 때 바로 변경. +1은 자기자신 제외한거 다시 더한거.
-    if(this.state.selectOption.length+1 !== nextProps.activeChannel.participants.length){
-      this.setState({selectOption : nextProps.activeChannel.participants.filter((participant) => {
-        if(participant !== this.props.currentUser){
-          return participant;
+  componentDidUpdate(prevProps, prevState) {
+    if(this.state.selectedChannel !== '' && prevState.selectedChannel !== this.state.selectedChannel){
+      let init =[];
+      for(var i=0; i<this.props.channels.length; i++){
+        if(this.props.channels[i].id === this.state.selectedChannel){
+          init = this.props.channels[i].participants;
+          break;
         }
-      }).map((participant, index) => {
-        var option = {key : index, value : participant, text : participant};
-        return option;
-      }),});
-    }
+      }
+      var participants = [];
 
+      init.forEach(function(key) {
+        if (-1 === this.props.activeChannel.participants.indexOf(key)) {
+          participants.push(key);
+        }
+      }, this); // 현재 채널에 없는 participants 만.
+
+      this.setState({
+        inviteSelectOption: participants.map((participant, index) => {
+          var option = {id: participant, display: participant, key : index, value : participant, text : participant};
+          return option;
+        }),
+      });
+    }
   }
   addNotification(message, level, position) {
     this.notificationSystem.addNotification({
@@ -91,7 +99,17 @@ class InputMessage extends React.Component {
     }
   }
   handleGroupClick = () => {
-    this.setState({type : 'group'});
+    this.setState({
+      type : 'group',
+      selectOption: this.props.activeChannel.participants.filter((participant) => {
+        if(participant !== this.props.currentUser){
+          return participant;
+        }
+      }).map((participant, index) => {
+        var option = {id: participant, display: participant, key : index, value : participant, text : participant};
+        return option;
+      }),
+    });
   }
   handleImageClick = () => {
     this.setState({type : 'image'});
@@ -99,11 +117,43 @@ class InputMessage extends React.Component {
   handleFileClick = () => {
     this.file.click();
   }
+  handleInviteClick = () => {
+    this.setState({
+      type : 'invite',
+      channelSelectOption: this.props.channels.filter((channel) => {
+        if(channel.type === 'CHANNEL'){
+          return channel;
+        }
+      }).map((channel, index) => {
+        var option = {id: channel.id, display: channel.name, key : index, value : channel.id, text : channel.name};
+        return option;
+      }),
+    });
+  }
   handleInit = () => {
-    this.setState({type : 'input'});
+    this.setState({
+      type : 'input',
+      inviteSelectOption: [],
+      selected:[],
+      selectedMention:[],
+      selectedChannel: '',
+      selectedInvite: [],
+      input:'',
+      groupName: '',
+    });
   }
   handleDirectClick = () => {
-    this.setState({type : 'direct'});
+    this.setState({
+      type : 'direct',
+      selectOption: this.props.activeChannel.participants.filter((participant) => {
+        if(participant !== this.props.currentUser){
+          return participant;
+        }
+      }).map((participant, index) => {
+        var option = {id: participant, display: participant, key : index, value : participant, text : participant};
+        return option;
+      }),
+    });
   }
   handleFile = (e) => {
     e.preventDefault();
@@ -113,6 +163,16 @@ class InputMessage extends React.Component {
   selectedItem = (e, data) =>{
     this.setState({
       selected : data.value,
+    });
+  }
+  selectedInvite = (e, data) =>{
+    this.setState({
+      selectedInvite: data.value,
+    });
+  }
+  selectedChannel = (e, data) =>{
+    this.setState({
+      selectedChannel : data.value,
     });
   }
   handleAddDirect = () => {
@@ -151,15 +211,31 @@ class InputMessage extends React.Component {
       });
     }
   }
+  handleInvite = () => {
+    if(this.state.selectedInvite.length < 1){
+      this.addNotification('초대할 사람을 선택해주세요.','warning','bc');
+    }
+    else{
+      this.props.inviteChannel(this.props.activeChannel.id,this.state.selectedInvite);
+      this.setState({
+        selectedChannel: '',
+        selectedInvite: [],
+        type : 'input',
+      });
+    }
+
+  }
   //<Select multiple selection search placeholder='그룹에 초대할 사람' options={participantsOptions} onChange={this.selectedItem}/>
   render () {
-    const {type, selectOption, groupName, input, searchFilter} = this.state;
+    const {type, selectOption, channelSelectOption, inviteSelectOption, groupName, input} = this.state;
+    const {activeChannel} = this.props;
     const inputView =
       <div>
         <Dropdown style={{'position': 'absolute', 'zIndex': 100, 'height':40}} icon='plus' upward button className='icon'>
           <Dropdown.Menu>
-            <Dropdown.Item onClick={this.handleDirectClick}>1:1채팅</Dropdown.Item>
-            <Dropdown.Item onClick={this.handleGroupClick}>그룹채팅</Dropdown.Item>
+            {activeChannel.type==='CHANNEL'?<Dropdown.Item onClick={this.handleGroupClick}>그룹 만들기</Dropdown.Item>: null}
+            {activeChannel.type==='CHANNEL'|| activeChannel.type==='GROUP'?<Dropdown.Item onClick={this.handleDirectClick}>1:1 채팅하기</Dropdown.Item>:null}
+            {activeChannel.type==='GROUP'?<Dropdown.Item onClick={this.handleInviteClick}>초대하기</Dropdown.Item>:null}
             <Dropdown.Item onClick={this.handleFileClick}>이미지/파일 전송</Dropdown.Item>
 
           </Dropdown.Menu>
@@ -187,28 +263,57 @@ class InputMessage extends React.Component {
 
     const groupModal =
     <Modal open={type === 'group'} size='small' onClose={this.handleInit}>
-      <Modal.Header>그룹 추가</Modal.Header>
-      <Modal.Content>
-        <Input label='그룹명' fluid name='groupName' value={groupName} onChange={this.handleChange}/>
-        <Modal.Description>
-          <Select multiple selection fluid search placeholder='그룹에 초대할 사람' options={selectOption} onChange={this.selectedItem}/>
-        </Modal.Description>
-      </Modal.Content>
-      <Modal.Actions>
-        <Button primary onClick={this.handleAddGroup}>그룹 만들기</Button>
-      </Modal.Actions>
+      <Modal.Header style={{'backgroundColor':'#2C3E50','color':'#ECF0F1'}}>
+        <span className={styles.logo}>
+          <Image size='mini' inline src='/assets/images/logo/favicon-96x96.png'/>클래스 챗
+          <span style={{'float':'right','color':'#E74C3C'}}>그룹 만들기</span>
+        </span>
+      </Modal.Header>
+        <Modal.Content style={{'backgroundColor':'#ECF0F1'}}>
+          <Form className='attached fluid segment' style={{'textAlign':'left'}}>
+            <Form.Input label='그룹명' fluid name='groupName' value={groupName} onChange={this.handleChange}/>
+            <Form.Dropdown label='그룹에 초대할 사람' multiple selection fluid search placeholder='선택해주세요.' options={selectOption} onChange={this.selectedItem}/>
+          </Form>
+        </Modal.Content>
+        <Modal.Actions style={{'backgroundColor':'#ECF0F1'}}>
+          <Button primary basic type='submit' onClick={this.handleAddGroup}>그룹 생성</Button>
+        </Modal.Actions>
       <NotificationSystem ref={ref => this.notificationSystem = ref} />
     </Modal>;
     const directModal =
     <Modal open={type === 'direct'} size='small' onClose={this.handleInit}>
-      <Modal.Header>1:1채팅 추가</Modal.Header>
-      <Modal.Content>
-        <Modal.Description>
-          <Select selection fluid search placeholder='1:1채팅 상대' options={selectOption} onChange={this.selectedItem}/>
-        </Modal.Description>
+      <Modal.Header style={{'backgroundColor':'#2C3E50','color':'#ECF0F1'}}>
+        <span className={styles.logo}>
+          <Image size='mini' inline src='/assets/images/logo/favicon-96x96.png'/>클래스 챗
+          <span style={{'float':'right','color':'#E74C3C'}}>1:1 채팅</span>
+        </span>
+      </Modal.Header>
+      <Modal.Content style={{'backgroundColor':'#ECF0F1'}}>
+        <Form className='attached fluid segment' style={{'textAlign':'left'}}>
+          <Form.Dropdown label='1:1 채팅' multiple selection fluid search placeholder='상대를 선택해주세요.' options={selectOption} onChange={this.selectedItem}/>
+        </Form>
       </Modal.Content>
-      <Modal.Actions>
-        <Button primary onClick={this.handleAddDirect}>1:1채팅 만들기</Button>
+      <Modal.Actions style={{'backgroundColor':'#ECF0F1'}}>
+        <Button primary basic type='submit' onClick={this.handleAddDirect}>1:1 채팅 시작</Button>
+      </Modal.Actions>
+      <NotificationSystem ref={ref => this.notificationSystem = ref} />
+    </Modal>;
+    const inviteModal =
+    <Modal open={type === 'invite'} size='small' onClose={this.handleInit}>
+      <Modal.Header style={{'backgroundColor':'#2C3E50','color':'#ECF0F1'}}>
+        <span className={styles.logo}>
+          <Image size='mini' inline src='/assets/images/logo/favicon-96x96.png'/>클래스 챗
+          <span style={{'float':'right','color':'#E74C3C'}}>그룹에 초대하기</span>
+        </span>
+      </Modal.Header>
+      <Modal.Content style={{'backgroundColor':'#ECF0F1'}}>
+        <Form className='attached fluid segment' style={{'textAlign':'left'}}>
+          <Form.Dropdown label='채널 선택' placeholder='대상이 있는 채널을 선택해 주세요' fluid search selection options={channelSelectOption} onChange={this.selectedChannel}/>
+          <Form.Dropdown label='대상 선택' placeholder='초대 대상을 선택해주세요' multiple fluid search selection options={inviteSelectOption} onChange={this.selectedInvite}/>
+        </Form>
+      </Modal.Content>
+      <Modal.Actions style={{'backgroundColor':'#ECF0F1'}}>
+        <Button primary basic type='submit' onClick={this.handleInvite}>초대</Button>
       </Modal.Actions>
       <NotificationSystem ref={ref => this.notificationSystem = ref} />
     </Modal>;
@@ -233,6 +338,7 @@ class InputMessage extends React.Component {
         {groupModal}
         {directModal}
         {fileModal}
+        {inviteModal}
       </div>
     );
   }
@@ -254,6 +360,8 @@ InputMessage.propTypes ={
   currentUser : PropTypes.string.isRequired,
   isSearch : PropTypes.bool.isRequired,
   toggleSearch : PropTypes.func.isRequired,
+  channels : PropTypes.array.isRequired,
+  inviteChannel: PropTypes.func.isRequired,
 };
 
 export default InputMessage;

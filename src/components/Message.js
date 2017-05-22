@@ -1,6 +1,6 @@
 import React,{Component, PropTypes} from 'react';
 import ReactDOM from 'react-dom';
-import {Popup, Button, Image, Icon,  Segment, Divider, Modal, Embed } from 'semantic-ui-react';
+import {Popup, Button, Image, Icon,  Segment, Divider, Modal } from 'semantic-ui-react';
 import moment from 'moment';
 import styles from '../Style.css';
 
@@ -148,6 +148,7 @@ Message.propTypes = {
   isReceived : PropTypes.bool.isRequired,
   scrollIntoReceive : PropTypes.func.isRequired,
   scrollIntoDate :PropTypes.func.isRequired,
+  scrollIntoJump: PropTypes.func.isRequired,
   lastDateID : PropTypes.string.isRequired,
   messageJumpID : PropTypes.string.isRequired,
 };

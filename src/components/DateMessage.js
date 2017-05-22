@@ -7,7 +7,7 @@ class DateMessage extends React.Component {
   constructor(){
     super();
   }
-  shouldComponentUpdate(nextProps,nextState){
+  shouldComponentUpdate(nextProps){
     if(this.props.messages !== nextProps.messages){
       return true;
     }
@@ -55,6 +55,7 @@ DateMessage.propTypes = {
   scrollIntoDate : PropTypes.func.isRequired,
   lastDateID : PropTypes.string.isRequired,
   messageJumpID : PropTypes.string.isRequired,
+  scrollIntoJump :PropTypes.func.isRequired,
 };
 
 DateMessage.defaultProps = {
@@ -65,6 +66,7 @@ DateMessage.defaultProps = {
   addGroup : () => {console.log('props Error');},
   scrollIntoReceive : () => {console.log('props Error(DateMessage)');},
   scrollIntoDate : () => {console.log('props Error(DateMessage)');},
+  scrollIntoJump : () => {console.log('props Error(DateMessage)');},
   lastDateID : '',
   messageJumpID : '',
 };

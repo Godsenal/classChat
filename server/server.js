@@ -5,12 +5,10 @@ import api from './api';
 import path from 'path';
 import bodyParser from 'body-parser';
 import express from 'express';
-import session from 'express-session';
 import cookieParser from 'cookie-parser';
 import socketEvents from './socketEvents';
 
 const passport = require('passport');
-const MongoStore = require('connect-mongo')(session);
 
 
 var db = mongoose.connection;

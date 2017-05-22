@@ -22,8 +22,8 @@ exports = module.exports = function (io) {
       console.log('user disconnected');
     });
     /* USER LEAVE ROOM */
-    socket.on('leave channel', function(channelID, participant, isLeave = false) { // 소켓만 나갈 때
-      if(isLeave){
+    socket.on('leave channel', function(channelID, participant, isLeave = false) {
+      if(isLeave){ //isLeave가 true면 완전히 나가는 것.
         socket.broadcast.to(channelID).emit('receive new participant', channelID, participant, isLeave);
 
         socket.leave(channelID);
@@ -36,6 +36,22 @@ exports = module.exports = function (io) {
         socket.join(channelID); // 이미 들어왔다면 무시됨.
         if(io.nsps['/'].adapter.rooms[channelID] !== 'undefined')
           socket.broadcast.to(channelID).emit('receive new participant', channelID, participant, false);
+      });
+    });
+    socket.on('join channel invite', function(channelID) { // 배열로 받은 channel에 한번에 join
+      socket.join(channelID);
+    });
+    /* EXIST PARTICIPANTS WHEN INVITE OCCUR */
+    socket.on('invite participant', function(channel, participants){ // user name = sender name
+      participants.forEach(function(participant){
+        socket.broadcast.to(clients[participant]).emit('receive invite participant',channel);
+      });
+      socket.emit('receive invite participant', channel);
+    });
+    /* USER INVITED ROOM */
+    socket.on('invite channel', function(channel, usernames){ // invite 받은 user가 channel을 바로 받을 수 있도록 함.
+      usernames.forEach(function(username){
+        socket.broadcast.to(clients[username]).emit('receive invite',channel);
       });
     });
     /* NEW MESSAGE */

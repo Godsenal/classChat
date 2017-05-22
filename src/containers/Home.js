@@ -141,6 +141,7 @@ Home.propTypes = {
   channelList : PropTypes.object.isRequired,
   listChannel : PropTypes.func.isRequired,
   joinChannel : PropTypes.func.isRequired,
+  socket: PropTypes.object.isRequired,
 };
 const mapStateToProps = (state) => {
   return {

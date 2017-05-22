@@ -22,7 +22,6 @@ class App extends Component{
       activeItem: 'home',
       getChannel: false,
     };
-    this.handleSignout = this.handleSignout.bind(this);
     this.addNotification = this.addNotification.bind(this);
   }
   addNotification(notification) {
@@ -81,20 +80,6 @@ class App extends Component{
     });
   }
 
-  handleSignout(){
-    this.props.signoutRequest().then(
-      () => {
-        Materialize.toast('Good Bye!', 2000);
-        let signinData = {
-          isSignedIn: false,
-          id: '',
-          nickname: '',
-          isAdmin: false,
-        };
-        document.cookie = 'key=' + btoa(JSON.stringify(signinData));
-      }
-    );
-  }
   handleItemClick = (e, { name }) => this.setState({ activeItem: name })
   render(){
     //const re = /(signin|signup)/;

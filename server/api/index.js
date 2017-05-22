@@ -1,8 +1,6 @@
 import express from 'express';
 
 import account from './account';
-import post from './post';
-import comment from './comment';
 import channel from './channel';
 import message from './message';
 import download from './download';
@@ -22,8 +20,6 @@ router.use('/*', (req, res, next) => {
 
 
 router.use('/account', account);
-router.use('/post', post);
-router.use('/comment', comment);
 router.use('/channel', channel);
 router.use('/message', message);
 router.use('/download',download);

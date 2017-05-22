@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react';
-import {Icon, Divider, Dropdown, Modal, Button, Input} from 'semantic-ui-react';
+import {Icon, Divider, Dropdown, Modal, Button} from 'semantic-ui-react';
 import styles from '../Style.css';
 
 class ChatHeader extends React.Component {
@@ -13,7 +13,7 @@ class ChatHeader extends React.Component {
   closeModal = () => this.setState({ open: false });
   render () {
     const {open} = this.state;
-    const {name, participants, id, type, leaveChannel, currentUser} = this.props;
+    const {name, participants, type, leaveChannel, currentUser} = this.props;
     const searchModal = <Modal open={open} basic size ='small' onClose={this.closeModal}>
                           <Modal.Header>
                             Search Message

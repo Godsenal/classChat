@@ -11,6 +11,9 @@ import {
     CHANNEL_LEAVE,
     CHANNEL_LEAVE_SUCCESS,
     CHANNEL_LEAVE_FAILURE,
+    CHANNEL_INVITE,
+    CHANNEL_INVITE_SUCCESS,
+    CHANNEL_INVITE_FAILURE,
     CHANNEL_CHANGE,
     CHANNEL_SEARCH,
     CHANNEL_SEARCH_SUCCESS,
@@ -71,6 +74,19 @@ export  function joinChannel(channels, userName){ // channel ID의 Array
               dispatch({type: CHANNEL_JOIN_SUCCESS});
             }).catch((err)=> {
               dispatch({type: CHANNEL_JOIN_FAILURE, err: err.response.data.error});
+            });
+  };
+}
+
+/* INVITE CHANNEL */
+export function inviteChannel(channelID, usernames){ // username의 Array
+  return (dispatch) => {
+    dispatch({type: CHANNEL_INVITE});
+    return axios.put('/api/channel/invite',{channelID,usernames})
+            .then((res)=>{
+              dispatch({type: CHANNEL_INVITE_SUCCESS, channel: res.data.channel});
+            }).catch((err)=> {
+              dispatch({type: CHANNEL_INVITE_FAILURE, err: err.response.data.error});
             });
   };
 }

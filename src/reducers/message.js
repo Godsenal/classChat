@@ -433,6 +433,11 @@ export default function message(state, action) {
         errCode: { $set: action.code}
       }
     });
+  case types.MESSAGE_DELETE:
+    if(action.channelID in state.list){
+      delete state.list[action.channelID];
+    }
+    return state;
   case types.RESET_MESSAGE_FILTER:
     return update(state, {
       filter: {

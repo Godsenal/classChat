@@ -1,7 +1,8 @@
 import React, {Component, PropTypes} from 'react';
 import { Button, Form, Modal, Image} from 'semantic-ui-react';
+import NotificationSystem from 'react-notification-system';
 
-import styles from '../Style.css'
+import styles from '../Style.css';
 
 
 class Signup extends Component{
@@ -18,6 +19,7 @@ class Signup extends Component{
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleSignup = this.handleSignup.bind(this);
+    this.addNotification = this.addNotification.bind(this);
   }
   componentDidMount() {
 
@@ -31,6 +33,14 @@ class Signup extends Component{
           channelLoading: false,
         });
       });
+  }
+  addNotification(message, level, position) {
+    this.notificationSystem.addNotification({
+      message,
+      level,
+      position,
+      autoDismiss: 2,
+    });
   }
   //[`${e.target.name}`]: e.target.value
   handleValid = () =>{
@@ -65,6 +75,7 @@ class Signup extends Component{
         password: '',
         passwordCheck: '',
       });
+      this.addNotification('비밀번호가 같지 않습니다.','error','bc');
     }
     let email = this.state.email;
     let username = this.state.username;
@@ -83,18 +94,23 @@ class Signup extends Component{
         else{
           if(this.props.signup.errCode == 1){
             this.setState({email:''}); // BAD EMAIL
+            this.addNotification('잘못된 이메일 형식입니다.','error','bc');
           }
           else if(this.props.signup.errCode == 3){
             this.setState({username:''}); // BAD USERNAME
+            this.addNotification('잘못된 유저 이름 형식입니다.','error','bc');
           }
           else if(this.props.signup.errCode == 4){
             this.setState({email:''}); // EMAIL EXIST
+            this.addNotification('이미 사용중인 이메일 입니다.','error','bc');
           }
           else if(this.props.signup.errCode == 5){
             this.setState({username:''}); // USERNAME EXIST
+            this.addNotification('이미 사용중인 유저 이름 입니다.','error','bc');
           }
           else{
             this.setState({username:''}); // NETWORK ERROR
+            this.addNotification('네트워크 에러.','error','bc');
           }
           this.setState({
             password:'',
@@ -130,6 +146,7 @@ class Signup extends Component{
           <Modal.Actions style={{'backgroundColor':'#ECF0F1'}}>
             <Button primary basic type='submit' onClick={this.handleSignup}>가입</Button>
           </Modal.Actions>
+          <NotificationSystem ref={ref => this.notificationSystem = ref} />
         </Modal>
     );
   }
@@ -143,5 +160,6 @@ Signup.propTypes = {
   listChannel : PropTypes.func.isRequired,
   joinChannel : PropTypes.func.isRequired,
   status: PropTypes.object.isRequired,
+  socket: PropTypes.object.isRequired,
 };
 export default Signup;

@@ -5,13 +5,14 @@ import {Segment, Dimmer, Loader} from 'semantic-ui-react';
 import uuid from 'node-uuid';
 import moment from 'moment';
 
-import {receiveRawMessage, addMessage, listMessage, filterMessage, jumpMessage, deleteReceiveMessage, deleteLastDateID, resetFilter} from '../actions/message';
+import {receiveRawMessage, addMessage, listMessage, filterMessage, jumpMessage, deleteReceiveMessage, deleteLastDateID, resetFilter, deleteMessage} from '../actions/message';
 import {addChannel,
         changeChannel,
         listChannel,
         searchChannel,
         joinChannel,
         leaveChannel,
+        inviteChannel,
         receiveRawChannel,
         receiveRawParticipant,
         receiveRawSignupParticipant} from '../actions/channel';
@@ -39,6 +40,7 @@ class Chat extends React.Component {
     this.handleSearchClose = this.handleSearchClose.bind(this);
     this.handleJoinChannel = this.handleJoinChannel.bind(this);
     this.handleLeaveChannel = this.handleLeaveChannel.bind(this);
+    this.handleInviteChannel = this.handleInviteChannel.bind(this);
     this.handleAddChannel = this.handleAddChannel.bind(this);
     this.handleAddGroup = this.handleAddGroup.bind(this);
   }
@@ -61,7 +63,7 @@ class Chat extends React.Component {
   }
   checkNotification = () => {
     if (!('Notification' in window)) {
-      alert("This browser does not support desktop notification");
+      alert('This browser does not support desktop notification');
     }
 
     // Let's check whether notification permissions have already been granted
@@ -97,9 +99,9 @@ class Chat extends React.Component {
     window.removeEventListener('beforeunload', this.onUnload);
   }
   getCookie(name) {
-    var value = "; " + document.cookie;
-    var parts = value.split("; " + name + "=");
-    if (parts.length == 2) return parts.pop().split(";").shift();
+    var value = '; ' + document.cookie; //"; " + document.cookie;
+    var parts = value.split('; ' + name + '=');
+    if (parts.length == 2) return parts.pop().split(';').shift();
   }
   deleteCookie(name) {
   // If the cookie exists
@@ -147,18 +149,18 @@ class Chat extends React.Component {
         this.checkNotification();
         this.props.listChannel(this.props.status.currentUser)
           .then(()=>{
-            var findChannel = this.props.channels.filter((channel) => {return channel.id === '1';});
+            var findChannel = this.props.channelList.channels.filter((channel) => {return channel.id === '1';});
             var publicChannel = findChannel[0];
             this.props.changeChannel(publicChannel);
             document.title = this.props.activeChannel.name + ' | Class Chat'; // 브라우저 탭 타이틀 설정.
             this.props.listMessage(this.props.activeChannel.id,true,lastAccess).then(()=>{
               this.props.socket.emit('chat mounted');
               this.props.socket.emit('storeClientInfo',this.props.status);
-              this.props.socket.emit('join channel',this.props.channels, this.props.status.currentUser, this.props.activeChannel.participants);
+              this.props.socket.emit('join channel',this.props.channelList.channels, this.props.status.currentUser, this.props.activeChannel.participants);
               this.props.socket.on('receive signup participant', (channels, userName) => {
                 this.props.receiveRawSignupParticipant(channels, userName);
               });
-              this.props.socket.on('receive new participant', (channelID, participant, isLeave) =>
+              this.props.socket.on('receive new participant', (channelID, participant, isLeave) => // Leave는 채팅방을 나갈 떄.
                 this.props.receiveRawParticipant(channelID, participant, isLeave)
               );
               this.props.socket.on('new bc message', (message) =>{
@@ -167,6 +169,7 @@ class Chat extends React.Component {
                   isActive = true;
                 }
                 this.props.receiveRawMessage(message, isActive);
+                console.log('raw');
               });
               this.props.socket.on('receive mention', (channel, username) => {
                 let title = channel + '채널\n';
@@ -175,9 +178,7 @@ class Chat extends React.Component {
               });
               this.props.socket.on('receive private channel', (channel) =>{
                 var exist = false;
-                console.log(channel);
-                this.props.channels.forEach((myChannel)=>{
-                  console.log(channel.id, myChannel.id);
+                this.props.channelList.channels.forEach((myChannel)=>{
                   if(channel.id === myChannel.id){
                     exist = true;
                   }
@@ -197,6 +198,16 @@ class Chat extends React.Component {
                   }
                 }
               });
+              this.props.socket.on('receive invite participant', (channel) => {
+                this.props.receiveRawChannel(channel);
+              });
+
+              this.props.socket.on('receive invite', (channel) => {
+                this.props.receiveRawChannel(channel);
+                this.props.socket.emit('join channel invite', channel.id);
+                this.spawnNotification('classChat','새로운 그룹에 초대되었습니다!');
+              });
+
               this.props.socket.on('receive socket', socketID =>
                 this.props.receiveSocket(socketID)
               );
@@ -207,13 +218,17 @@ class Chat extends React.Component {
     });
 
   }
+  componentDidUpdate(prevProps,prevState) {
+    if(prevProps.activeChannel.name !== this.props.activeChannel.name){
+      document.title = this.props.activeChannel.name + ' | Class Chat';
+    }
+  }
   changeActiveChannel(channel) { // leave가 true라면 this.props.socket전송할 participants를 보내줌.
     this.props.socket.emit('join channel',[channel], this.props.status.currentUser);
     this.props.changeChannel(channel);
-    document.title = this.props.activeChannel.name + ' | Class Chat';
     this.props.deleteLastDateID(this.props.activeChannel.id); // 마지막 접속 날짜 표시를 위한 데이터를 비움.
     this.props.deleteReceiveMessage(this.props.activeChannel.id); // 마지막 읽은 메시지 표시를 위한 데이터를 비움.
-    var result = channel.id in this.props.list; //현재 세션에서 들어갔던 채널인지 아닌지.(state에 저장되어있는지 아닌지)
+    var result = channel.id in this.props.messageList; //현재 세션에서 들어갔던 채널인지 아닌지.(state에 저장되어있는지 아닌지)
 
     if(!result){
       let lastAccess = localStorage.getItem('lastAccess')|| '-1'; // get last Accessed time
@@ -273,7 +288,7 @@ class Chat extends React.Component {
         }
         else if(this.props.channelAdd.status === 'FAILURE'){
           if(this.props.channelAdd.errCode === 2){ // 이미 있는 다이렉트메시지 채널을 만들때.
-            var existChannel = this.props.channels.find((channel) => {
+            var existChannel = this.props.channelList.channels.find((channel) => {
               return channel.name === group.name;
             });
             this.props.socket.emit('new private channel', existChannel.participants, existChannel);
@@ -297,11 +312,23 @@ class Chat extends React.Component {
   handleLeaveChannel(){
     var activeChannel = this.props.activeChannel; // ui를 위해 먼저 채널을 이동.
     this.props.socket.emit('leave channel', this.props.activeChannel.id, this.props.status.currentUser, true);
-    this.changeActiveChannel(this.props.channels[0], true);
+    this.changeActiveChannel(this.props.channelList.channels[0], true);
     this.props.leaveChannel(activeChannel.id, this.props.status.currentUser)
       .then(()=>{
         if(this.props.channelLeave.status === 'SUCCESS'){
            //hard coding- need to fix!
+          this.props.deleteMessage(activeChannel.id);
+        }
+      });
+  }
+  handleInviteChannel(channelID, usernames){
+    let participants = this.props.activeChannel.participants;
+    this.props.inviteChannel(channelID, usernames)
+      .then(()=>{
+        if(this.props.channelInvite.status === 'SUCCESS'){
+
+          this.props.socket.emit('invite channel', this.props.channelInvite.channel, usernames); // 새로 들어오는 사람들에게
+          this.props.socket.emit('invite participant', this.props.channelInvite.channel, participants); // 이미 있던 사람들에게
         }
       });
   }
@@ -311,14 +338,6 @@ class Chat extends React.Component {
     this.props.signoutRequest();
     this.props.socket.emit('leave channel', this.props.activeChannel.id, status.currentUser);
     this.props.socket.emit('disconnected',this.props.status);
-    Materialize.toast('Good Bye!', 2000);
-    let signinData = {
-      isSignedIn: false,
-      id: '',
-      nickname: '',
-      isAdmin: false,
-    };
-    //document.cookie = 'key=' + btoa(JSON.stringify(signinData));
 
   }
   handleSearchClick(){
@@ -350,12 +369,12 @@ class Chat extends React.Component {
       <div style={{'height':screenHeight+'px', 'width':screenWidth+'px', 'overflowX':'hidden', 'overflowY':'hidden'}}>
       {status.valid?<div className={layoutStyle} style={{'height':screenHeight+'px', 'width':screenWidth+'px', 'overflowX':'hidden', 'overflowY':'hidden'}}>
         <SearchModal isOpen={this.state.searchModal}
-                     results={this.props.search.results}
+                     results={this.props.channelSearch.results}
                      handleJoinChannel = {this.handleJoinChannel}
                      changeActiveChannel={this.changeActiveChannel}
                      handleSearchClose={this.handleSearchClose}/>
         <div className={sidebarStyle}>
-          <Sidebar channels={this.props.channels}
+          <Sidebar channelList={this.props.channelList}
                    toggleSound={this.toggleSound}
                    isMute={this.state.isMute}
                    changeActiveChannel={this.changeActiveChannel}
@@ -371,6 +390,7 @@ class Chat extends React.Component {
         <div className={chatViewStyle} >
             <ChatView isMobile={isMobile}
                       screenHeight={screenHeight}
+                      channelList={this.props.channelList}
                       activeChannel={this.props.activeChannel}
                       messageListStatus={this.props.messageListStatus}
                       messageAddStatus={this.props.messageAddStatus}
@@ -381,14 +401,14 @@ class Chat extends React.Component {
                       filterMessage={this.handleFilterMessage}
                       jumpMessage={this.props.jumpMessage}
                       resetFilter={this.props.resetFilter}
-                      messages={this.props.messages}
+                      inviteChannel={this.handleInviteChannel}
+                      messageList={this.props.messageList}
                       messageFilter={this.props.messageFilter}
                       isLast={this.props.isLast}
                       addMessage={this.addMessage}
                       addGroup={this.handleAddGroup}
                       handleMention={this.handleMention}
                       leaveChannel={this.handleLeaveChannel}
-                      list={this.props.list}
                       currentUser={this.props.status.currentUser}/>
                   </div>
       </div>:isLoading}
@@ -397,24 +417,66 @@ class Chat extends React.Component {
   }
 }
 
+Chat.propTypes = {
+  activeChannel: PropTypes.object.isRequired,
+  channelAdd : PropTypes.object.isRequired,
+  channelList: PropTypes.object.isRequired,
+  channelListStatus: PropTypes.string.isRequired,
+  channelLeave : PropTypes.object.isRequired,
+  channelInvite : PropTypes.object.isRequired,
+  channelSearch : PropTypes.object.isRequired,
+  channelJoin : PropTypes.object.isRequired,
+  messageList : PropTypes.object.isRequired,
+  messageListStatus: PropTypes.string.isRequired,
+  messageAddMessage : PropTypes.object.isRequired,
+  messageAddStatus : PropTypes.string.isRequired,
+  messageReceive: PropTypes.object.isRequired,
+  messageFilter : PropTypes.object.isRequired,
+  isLast: PropTypes.bool.isRequired,
+  status: PropTypes.object.isRequired,
+  environment: PropTypes.object.isRequired,
+  socket: PropTypes.object.isRequired,
 
+  receiveSocket: PropTypes.func.isRequired,
+  getStatusRequest: PropTypes.func.isRequired,
+  receiveRawMessage: PropTypes.func.isRequired,
+  receiveRawChannel: PropTypes.func.isRequired,
+  receiveRawParticipant: PropTypes.func.isRequired,
+  addMessage: PropTypes.func.isRequired,
+  listMessage: PropTypes.func.isRequired,
+  filterMessage: PropTypes.func.isRequired,
+  jumpMessage: PropTypes.func.isRequired,
+  deleteReceiveMessage: PropTypes.func.isRequired,
+  deleteLastDateID: PropTypes.func.isRequired,
+  changeChannel: PropTypes.func.isRequired,
+  addChannel: PropTypes.func.isRequired,
+  listChannel: PropTypes.func.isRequired,
+  joinChannel: PropTypes.func.isRequired,
+  leaveChannel: PropTypes.func.isRequired,
+  inviteChannel: PropTypes.func.isRequired,
+  searchChannel: PropTypes.func.isRequired,
+  signoutRequest: PropTypes.func.isRequired,
+  addNotification: PropTypes.func.isRequired,
+  receiveRawSignupParticipant: PropTypes.func.isRequired,
+  resetFilter: PropTypes.func.isRequired,
+  deleteMessage: PropTypes.func.isRequired,
+};
 const mapStateToProps = (state) => {
   return {
     activeChannel: state.channel.activeChannel,
     channelAdd : state.channel.add,
-    channels: state.channel.list.channels,
+    channelList: state.channel.list,
     channelListStatus: state.channel.list.status,
     channelLeave : state.channel.leave,
-    messages: state.message.list.messages,
-    list: state.message.list,
+    channelInvite : state.channel.invite,
+    channelSearch : state.channel.search,
+    channelJoin : state.channel.join,
     isLast: state.message.list.isLast,
     status: state.authentication.status,
-    isAdmin : state.authentication.status.isAdmin,
-    search : state.channel.search,
-    join : state.channel.join,
+    messageList : state.message.list,
+    messageListStatus: state.message.list.status,
     messageAddMessage : state.message.add.message,
     messageAddStatus : state.message.add.status,
-    messageListStatus: state.message.list.status,
     messageReceive: state.message.receive,
     messageFilter : state.message.filter,
     environment: state.environment,
@@ -471,6 +533,9 @@ const mapDispatchToProps = (dispatch) => {
     leaveChannel: (channelID, userName) => {
       return dispatch(leaveChannel(channelID, userName));
     },
+    inviteChannel: (channelID, usernames) => {
+      return dispatch(inviteChannel(channelID, usernames));
+    },
     searchChannel: (channelName) => {
       return dispatch(searchChannel(channelName));
     },
@@ -485,6 +550,9 @@ const mapDispatchToProps = (dispatch) => {
     },
     resetFilter: () => {
       return dispatch(resetFilter());
+    },
+    deleteMessage: (channelID) => {
+      return dispatch(deleteMessage(channelID));
     }
   };
 };

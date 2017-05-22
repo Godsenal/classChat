@@ -35,6 +35,12 @@ const initialState = {
     err: 'ERROR',
     errCode: -1,
   },
+  invite: {
+    status: 'INIT',
+    channel: {},
+    err: 'ERROR',
+    errCode: -1,
+  },
   search: {
     status: 'INIT',
     results: [],
@@ -53,7 +59,22 @@ export default function channel(state, action) {
   case types.ROW_CHANNEL_RECEIVE:
     var channelIndex = state.list.channels.findIndex((channel)=> channel.id === action.channel.id);
     if(channelIndex >=0){ //이미 존재할 경우
-      return state;
+      if(action.channel.id === state.activeChannel.id){ // 그때, 현재 접속중인 채널인 경우.
+        state = update(state, {
+          activeChannel: {
+            participants: {$set: action.channel.participants}
+          }
+        });
+      }
+      return update(state, {
+        list: {
+          channels:{
+            [channelIndex]: {
+              participants: {$set: action.channel.participants}
+            }
+          }
+        }
+      });
     }
     return update(state, {
       receive: {
@@ -274,6 +295,28 @@ export default function channel(state, action) {
       }
     });
 
+    /* CHANNEL INVITE */
+  case types.CHANNEL_INVITE:
+    return update(state, {
+      invite: {
+        status: { $set: 'WAITING' },
+      }
+    });
+  case types.CHANNEL_INVITE_SUCCESS:
+    return update(state, {
+      invite: {
+        status: { $set: 'SUCCESS' },
+        channel: { $set: action.channel },
+      }
+    });
+  case types.CHANNEL_INVITE_FAILURE:
+    return update(state, {
+      invite: {
+        status: { $set: 'FAILURE' },
+        err: { $set: action.err },
+        errCode: { $set: action.code}
+      }
+    });
         /* CHAGNE CHANNEL */
   case types.CHANNEL_CHANGE:
     return update(state, {

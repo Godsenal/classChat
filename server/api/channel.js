@@ -112,6 +112,16 @@ router.put('/leave/:userName', function(req,res){ // 총 한명일때 나가면 
     }
   });
 });
+/* INVITE USER */
+router.put('/invite', function(req,res){
+  channels.findOneAndUpdate({id: req.body.channelID},{$push: {participants: {$each: req.body.usernames}}},{new: true}, (err, channel) => {
+    if(err) {
+      console.log(err);
+      res.status(500).json({error: 'internal server error', code: 1});
+    }
+    return res.json({channel});
+  });
+});
   //post a user to channel TODO: find whether user is already exist or not.
 router.put('/join/:userName', function(req,res){
   //multi Id to array

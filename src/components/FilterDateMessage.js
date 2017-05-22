@@ -1,4 +1,4 @@
-import React, { PropTypes } from 'react'
+import React, { PropTypes } from 'react';
 import {Divider, List} from 'semantic-ui-react';
 import {FilterMessage} from './';
 import moment from 'moment';
@@ -16,5 +16,10 @@ class FilterDateMessage extends React.Component {
     );
   }
 }
-
+FilterDateMessage.propTypes = {
+  date: PropTypes.number.isRequired,
+  messages: PropTypes.array.isRequired,
+  currentUser: PropTypes.string.isRequired,
+  jumpMessage: PropTypes.func.isRequired,
+};
 export default FilterDateMessage;
