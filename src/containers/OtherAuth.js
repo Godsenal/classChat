@@ -1,11 +1,13 @@
 import React,{Component, PropTypes} from 'react';
 import {connect} from 'react-redux';
 import {browserHistory} from 'react-router';
-import {Form, Button, Modal, Image} from 'semantic-ui-react';
+import {Form, Button, Modal, Image, Card} from 'semantic-ui-react';
 
 import {otherAuthRequest} from '../actions/authentication';
 import {joinChannel, listChannel} from '../actions/channel';
 import styles from '../Style.css';
+
+const imgPath = '/assets/images/users/basic/';
 
 class OtherAuth extends Component{
   constructor(){
@@ -16,6 +18,7 @@ class OtherAuth extends Component{
       channelOptions: [],
       selected:[],
       channelLoading : true,
+      profileImg : 'profile1',
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleSignup = this.handleSignup.bind(this);
@@ -100,9 +103,14 @@ class OtherAuth extends Component{
       selected: data.value
     });
   }
+  changeImg =(e) =>{
+    this.setState({
+      profileImg: 'profile'+e.target.value,
+    });
+  }
   render () {
 
-    const {channelOptions ,username} = this.state;
+    const {channelOptions ,username, profileImg} = this.state;
     return(
       <Modal className={styles.signinModal} open={true} dimmer='blurring' size='small'>
         <Modal.Header style={{'backgroundColor':'#2C3E50','color':'#ECF0F1'}}>
@@ -112,6 +120,25 @@ class OtherAuth extends Component{
           </span>
         </Modal.Header>
         <Modal.Content style={{'backgroundColor':'#ECF0F1'}}>
+          <Card centered>
+            <Card.Content>
+              <Card.Header>
+                <span className={styles.logo}>
+                  프로필 이미지
+                </span>
+              </Card.Header>
+            </Card.Content>
+            <Image ref={img => this.img=img} centered width={100} src={`${imgPath}${profileImg}.png`} onError={()=>this.img.src = imgPath+'profile1.png'}/>
+            <Card.Content style={{'textAlign':'center'}}>
+              <Button.Group basic size='small'>
+                <Button value ='1' onClick={this.changeImg}>1</Button>
+                <Button value ='2' onClick={this.changeImg}>2</Button>
+                <Button value ='3' onClick={this.changeImg}>3</Button>
+                <Button value ='4' onClick={this.changeImg}>4</Button>
+                <Button value ='5' onClick={this.changeImg}>5</Button>
+              </Button.Group>
+            </Card.Content>
+          </Card>
           <Form className='attached fluid segment' style={{'textAlign':'left'}}>
             <Form.Input name='username' value={username} label='이름' placeholder='이름' type='text' onChange={this.handleChange}/>
             <Form.Select multiple selection search label='채널' placeholder='채널 선택' loading={this.state.channelLoading} options={channelOptions} onChange={this.selectedItem}/>
@@ -145,8 +172,8 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    otherAuthRequest: (email,username) => {
-      return dispatch(otherAuthRequest(email,username));
+    otherAuthRequest: (email,username, image) => {
+      return dispatch(otherAuthRequest(email,username, image));
     },
     joinChannel: (channels, userName) => {
       return dispatch(joinChannel(channels, userName));

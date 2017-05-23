@@ -1,10 +1,10 @@
 import React, {Component, PropTypes} from 'react';
-import { Button, Form, Modal, Image} from 'semantic-ui-react';
+import { Button, Form, Modal, Card, Image} from 'semantic-ui-react';
 import NotificationSystem from 'react-notification-system';
 
 import styles from '../Style.css';
 
-
+const imgPath = '/assets/images/users/basic/';
 class Signup extends Component{
   constructor(){
     super();
@@ -16,6 +16,7 @@ class Signup extends Component{
       channelOptions: [],
       selected:[],
       channelLoading : true,
+      profileImg : 'profile1',
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleSignup = this.handleSignup.bind(this);
@@ -80,15 +81,16 @@ class Signup extends Component{
     let email = this.state.email;
     let username = this.state.username;
     let password = this.state.password;
+    let profileImg = this.state.profileImg;
     var selected = this.state.selected;
-    this.props.signupRequest(email, username, password)
+    this.props.signupRequest(email, username, password, profileImg)
       .then(() =>{
 
         if(this.props.signup.status === 'SUCCESS'){
           this.props.joinChannel(selected, username)
             .then(() => {
               this.props.socket.emit('signup participant', selected, username);
-              this.props.handleSignupClose();
+              this.props.handleSignupClose(true);
             });
         }
         else{
@@ -124,17 +126,43 @@ class Signup extends Component{
       selected: data.value
     });
   }
+  changeImg =(e) =>{
+    this.setState({
+      profileImg: 'profile'+e.target.value,
+    });
+  }
   render(){
-    const {channelOptions ,email, username, password, passwordCheck} = this.state;
+    const {channelOptions ,email, username, password, passwordCheck,profileImg} = this.state;
+
     return(
         <Modal className={styles.signinModal} open={this.props.signupOpen} onClose={this.props.handleSignupClose} dimmer='blurring' size='small'>
+
           <Modal.Header style={{'backgroundColor':'#2C3E50','color':'#ECF0F1'}}>
             <span className={styles.logo}>
-              <Image size='mini' inline src='/assets/images/logo/favicon-96x96.png'/>클래스 챗
+              <Image size='mini' inline src={'/assets/images/logo/favicon-96x96.png'}/>클래스 챗
               <span style={{'float':'right','color':'#E74C3C'}}>회원가입</span>
             </span>
           </Modal.Header>
           <Modal.Content style={{'backgroundColor':'#ECF0F1'}}>
+            <Card centered>
+              <Card.Content>
+                <Card.Header>
+                  <span className={styles.logo}>
+                    프로필 이미지
+                  </span>
+                </Card.Header>
+              </Card.Content>
+              <Image ref={img => this.img=img} centered width={100} src={`${imgPath}${profileImg}.png`} onError={()=>this.img.src = imgPath+'profile1.png'}/>
+              <Card.Content style={{'textAlign':'center'}}>
+                <Button.Group basic size='small'>
+                  <Button value ='1' onClick={this.changeImg}>1</Button>
+                  <Button value ='2' onClick={this.changeImg}>2</Button>
+                  <Button value ='3' onClick={this.changeImg}>3</Button>
+                  <Button value ='4' onClick={this.changeImg}>4</Button>
+                  <Button value ='5' onClick={this.changeImg}>5</Button>
+                </Button.Group>
+              </Card.Content>
+            </Card>
             <Form className='attached fluid segment' style={{'textAlign':'left'}}>
               <Form.Input name='email' value={email} label='이메일' placeholder='이메일' type='email' onChange={this.handleChange}/>
               <Form.Input name='username' value={username} label='이름' placeholder='이름' type='text' onChange={this.handleChange}/>

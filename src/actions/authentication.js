@@ -33,10 +33,10 @@ export function signinRequest(email, password) {
 }
 
 /* REGISTER THIRD PARTY AUTH */
-export function otherAuthRequest(email,username,password = '1'){ // need to change
+export function otherAuthRequest(email,username,password = '1', image){ // need to change
   return (dispatch) => {
     dispatch({type: AUTH_SIGNUP});
-    return axios.post('/api/account/signup/otherauth', { email, username, password })
+    return axios.post('/api/account/signup/otherauth', { email, username, password, image })
             .then((res) => {
               dispatch({type: AUTH_SIGNUP_SUCCESS});
             }).catch((err) => {
@@ -46,10 +46,10 @@ export function otherAuthRequest(email,username,password = '1'){ // need to chan
 }
 
 /* REGISTER */
-export function signupRequest(email, username, password) {
+export function signupRequest(email, username, password, image) {
   return (dispatch) => {
     dispatch({type: AUTH_SIGNUP});
-    return axios.post('/api/account/signup', { email, username, password })
+    return axios.post('/api/account/signup', { email, username, password, image})
             .then((res) => {
               dispatch({type: AUTH_SIGNUP_SUCCESS});
             }).catch((err) => {

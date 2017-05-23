@@ -39,6 +39,7 @@ class Home extends Component{
     });
   }
   handleSignupOpen = () => {
+
     this.setState({
       signupOpen: true,
     });
@@ -48,7 +49,10 @@ class Home extends Component{
       signinOpen: false,
     });
   }
-  handleSignupClose = () => {
+  handleSignupClose = (status) => {
+    if(status=='SUCCESS'){
+      this.addNotification('가입이 완료되었습니다. 로그인 해 주세요!','success','tc');
+    }
     this.setState({
       signupOpen: false,
     });
@@ -85,7 +89,7 @@ class Home extends Component{
 
           </Segment>
           <Segment style={{'borderRadius':0}} basic padded textAlign='center'>
-            <Button style={{'width':'15rem'}} basic color='brown' onClick={this.handleSigninOpen}>시작하기</Button>
+            <Button style={{'width':'15rem', 'borderRadius':0}} basic color='brown' onClick={this.handleSigninOpen}>시작하기</Button>
             <br/><br/>
             <Button style={{'width':'15rem','borderRadius':0}} color='facebook' onClick={this.handleSigninFacebook}>
               <Icon name='facebook' /> 페이스북으로 시작
@@ -160,8 +164,8 @@ const mapDispatchToProps = (dispatch) => {
     getStatusRequest: () => {
       return dispatch(getStatusRequest());
     },
-    signupRequest: (email, username, password) => {
-      return dispatch(signupRequest(email, username, password));
+    signupRequest: (email, username, password, image) => {
+      return dispatch(signupRequest(email, username, password, image));
     },
     joinChannel: (channels, userName) => {
       return dispatch(joinChannel(channels, userName));

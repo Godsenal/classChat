@@ -5,11 +5,12 @@ import moment from 'moment';
 import styles from '../Style.css';
 
 class Message extends Component {
-  constructor(){
-    super();
+  constructor(props){
+    super(props);
     this.state = {
       imageStatus : 'loading',
       hiddenImage : true,
+
     };
   }
   componentDidMount() {
@@ -62,7 +63,6 @@ class Message extends Component {
     };
     this.props.addGroup(group);
   }
-
   render () {
     //const urlRE= new RegExp("([a-zA-Z0-9]+://)?([a-zA-Z0-9_]+:[a-zA-Z0-9_]+@)?([a-zA-Z0-9.-]+\\.[A-Za-z]{2,4})(:[0-9]+)?([^ ])+");
     //const urlContents = this.props.contents.match(urlRE);
@@ -103,7 +103,10 @@ class Message extends Component {
         </div>
         <div className={waitingStyle}>
           <div className={styles.messageImg}>
-            <img className={styles.messageImg} src='https://semantic-ui.com/images/avatar/small/matt.jpg'/>
+            <img className={styles.messageImg}
+              ref={img => this.img = img}
+              src={`/assets/images/users/${this.props.userName}.png`}
+              onError={ () => this.img.src = '/assets/images/users/basic/profile1.png'}/>
           </div>
           <div className={styles.messageContents}>
             <Popup

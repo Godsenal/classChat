@@ -1,7 +1,6 @@
 import channels from '../models/channel';
 import messages from '../models/message';
 import express from 'express';
-
 const router = express.Router();
 
 

@@ -87,10 +87,13 @@ class Signin extends Component{
             <Form.Input name='password' label='비밀번호' placeholder='비밀번호' type='password' onChange={this.handleChange} onKeyPress={this.handleKeyPress}/>
           </Form>
         </Modal.Content>
-        <Button style={{'borderRadius':0}} primary type='submit' fluid onClick={this.handleSignin}>로그인</Button>
-        <Button style={{'borderRadius':0}} color='facebook' fluid onClick={this.handleSigninFacebook}>
-          <Icon name='facebook' /> 페이스북으로 로그인
-        </Button>
+        <Modal.Content>
+          <Button style={{'borderRadius':0}} floated='right' primary type='submit' onClick={this.handleSignin}>로그인</Button>
+          <Button style={{'borderRadius':0}} color='facebook' onClick={this.handleSigninFacebook}>
+            <Icon name='facebook' /> 페이스북으로 로그인
+          </Button>
+        </Modal.Content>
+
         <NotificationSystem ref={ref => this.notificationSystem = ref} />
       </Modal>
     );

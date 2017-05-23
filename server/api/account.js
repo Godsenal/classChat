@@ -2,9 +2,12 @@ import accounts from '../models/accounts';
 import express from 'express';
 import config from '../config.js';
 import jwt from 'jsonwebtoken';
+import fs from 'fs';
+import path from 'path';
 const router = express.Router();
 import passport from 'passport';
 
+const imgPath = path.resolve(__dirname,'../../public/assets/images/users/');
 router.post('/signup', (req, res, next) => {
     // CHECK USERNAME FORMAT
 
@@ -59,6 +62,27 @@ router.post('/signup', (req, res, next) => {
       });
     }
 
+    //fs.createReadStream(imgPath+'/basic/profile.png').pipe(fs.createWriteStream(imgPath+'/'+req.body.username+'.png'));
+    //프로필 이미지 지정
+    var cbCalled = false;
+    var basicPath = imgPath+'/basic/'+req.body.image+'.png';
+    var userPath = imgPath+'/'+req.body.username+'.png';
+    var rd = fs.createReadStream(basicPath);
+    rd.on('error', done);
+
+    var wr = fs.createWriteStream(userPath);
+    wr.on('error', done);
+    wr.on('close', function() {
+      done();
+    });
+    rd.pipe(wr);
+
+    function done() {
+      if (!cbCalled) {
+        cbCalled = true;
+      }
+    }
+
     return res.json({
       success: true,
     });
@@ -107,7 +131,24 @@ router.post('/signup/otherauth', (req, res, next) => {
         code: 7,
       });
     }
+    var cbCalled = false;
+    var basicPath = imgPath+'/basic/'+req.body.image+'.png';
+    var userPath = imgPath+'/'+req.body.username+'.png';
+    var rd = fs.createReadStream(basicPath);
+    rd.on('error', done);
 
+    var wr = fs.createWriteStream(userPath);
+    wr.on('error', done);
+    wr.on('close', function() {
+      done();
+    });
+    rd.pipe(wr);
+
+    function done() {
+      if (!cbCalled) {
+        cbCalled = true;
+      }
+    }
     return res.json({
       success: true,
     });
