@@ -2,9 +2,10 @@ import React,{Component, PropTypes} from 'react';
 import {connect} from 'react-redux';
 import {browserHistory} from 'react-router';
 import {Form, Button, Modal, Image, Card} from 'semantic-ui-react';
+import NotificationSystem from 'react-notification-system';
 
 import {otherAuthRequest} from '../actions/authentication';
-import {joinChannel, listChannel} from '../actions/channel';
+import {joinChannel, searchChannel} from '../actions/channel';
 import styles from '../Style.css';
 
 const imgPath = '/assets/images/users/basic/';
@@ -22,9 +23,10 @@ class OtherAuth extends Component{
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleSignup = this.handleSignup.bind(this);
+    this.addNotification = this.addNotification.bind(this);
   }
   getCookie(name) {
-    var regexp = new RegExp("(?:^" + name + "|;\s*"+ name + ")=(.*?)(?:;|$)", "g");
+    var regexp = new RegExp('(?:^' + name + '|;\s*'+ name + ')=(.*?)(?:;|$)', 'g');
     var result = regexp.exec(document.cookie);
     return (result === null) ? null : result[1];
   }
@@ -39,16 +41,22 @@ class OtherAuth extends Component{
     if(!email){
       browserHistory.push('/');
     }
+    this.addNotification('인증이 완료되었습니다. 프로필을 입력해주세요.','success','tc');
     this.setState({
       email
     });
-    this.props.listChannel('*','CHANNEL')
+    this.props.searchChannel('*','CHANNEL')
       .then(()=>{
+        var channelOptions = this.props.channelSearch.channels.map((channel, index) => {
+          var option = {key : index, value : channel.id, text : channel.name};
+          return option;
+        });
+        for(var i=0; i<channelOptions.length; i++){
+          channelOptions.splice(i,1);
+          break;
+        }
         this.setState({
-          channelOptions: this.props.channelList.channels.map((channel, index) => {
-            var option = {key : index, value : channel.id, text : channel.name};
-            return option;
-          }),
+          channelOptions,
           channelLoading: false,
         });
       });
@@ -69,7 +77,6 @@ class OtherAuth extends Component{
     this.props.otherAuthRequest(email, username)
       .then(() =>{
         if(this.props.signup.status === 'SUCCESS'){
-          console.log(this.props.signup);
           this.props.joinChannel(selected, username)
             .then(() => {
               this.props.socket.emit('signup participant', selected, username);
@@ -80,12 +87,14 @@ class OtherAuth extends Component{
         else{
           if(this.props.signup.errCode == 2){
             this.setState({username:''}); // BAD USERNAME
+            this.addNotification('잘못된 유저 이름 입니다.','error','bc');
           }
           else if(this.props.signup.errCode == 4){
             browserHistory.push('/'); // 수정 필요. 이메일이 중복 되었을 때,
           }
           else if(this.props.signup.errCode == 5){
             this.setState({username:''}); // USERNAME EXIST
+            this.addNotification('이미 사용중인 유저 이름 입니다.','error','bc');
           }
           else{
             this.setState({username:''}); // NETWORK ERROR
@@ -147,26 +156,29 @@ class OtherAuth extends Component{
         <Modal.Actions style={{'backgroundColor':'#ECF0F1'}}>
           <Button primary basic type='submit' onClick={this.handleSignup}>가입</Button>
         </Modal.Actions>
+        <NotificationSystem ref={ref => this.notificationSystem = ref} />
       </Modal>
     );
   }
 }
 OtherAuth.defaultProps = {
-  listChannel: () => {console.log('Home props error');},
+  searchChannel: () => {console.log('Home props error');},
   joinChannel: () => {console.log('Home props error');},
   signup: {},
-  channelList: {},
+  channelSearch: {},
 };
 OtherAuth.propTypes = {
   signup : PropTypes.object.isRequired,
-  channelList : PropTypes.object.isRequired,
-  listChannel : PropTypes.func.isRequired,
+  channelSearch : PropTypes.object.isRequired,
+  searchChannel : PropTypes.func.isRequired,
   joinChannel : PropTypes.func.isRequired,
+  otherAuthRequest: PropTypes.func.isRequired,
+  socket:PropTypes.object.isRequired,
 };
 const mapStateToProps = (state) => {
   return {
     signup: state.authentication.signup,
-    channelList: state.channel.list,
+    channelSearch: state.channel.search,
   };
 };
 
@@ -178,8 +190,8 @@ const mapDispatchToProps = (dispatch) => {
     joinChannel: (channels, userName) => {
       return dispatch(joinChannel(channels, userName));
     },
-    listChannel: (userName, listType) => {
-      return dispatch(listChannel(userName, listType));
+    searchChannel: (searchWord,type) => {
+      return dispatch(searchChannel(searchWord,type));
     },
   };
 };
