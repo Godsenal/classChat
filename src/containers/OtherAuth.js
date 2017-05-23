@@ -16,6 +16,7 @@ class OtherAuth extends Component{
     this.state = {
       email: '',
       username: '',
+      password: '1',
       channelOptions: [],
       selected:[],
       channelLoading : true,
@@ -73,9 +74,10 @@ class OtherAuth extends Component{
     e.preventDefault();
     let email = this.state.email;
     let username = this.state.username;
+    let password = this.state.password;
     let profileImg = this.state.profileImg;
     var selected = this.state.selected;
-    this.props.otherAuthRequest(email, username, profileImg)
+    this.props.otherAuthRequest(email, username,password, profileImg) // password 필요가 없어서 임의 지정. 어떻게 할지 생각.
       .then(() =>{
         if(this.props.signup.status === 'SUCCESS'){
           selected.push('1');
@@ -186,8 +188,8 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    otherAuthRequest: (email,username, image) => {
-      return dispatch(otherAuthRequest(email,username, image));
+    otherAuthRequest: (email,username, password, image) => {
+      return dispatch(otherAuthRequest(email,username, password, image));
     },
     joinChannel: (channels, userName) => {
       return dispatch(joinChannel(channels, userName));
