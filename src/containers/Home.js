@@ -84,7 +84,7 @@ class Home extends Component{
             </Divider>
 
           </Segment>
-          <Segment style={{'borderRadius':0, 'marginTop':'100'}} basic padded textAlign='center'>
+          <Segment style={{'borderRadius':0, 'marginTop':100}} basic padded textAlign='center'>
             <Button style={{'width':'15rem', 'borderRadius':0}} basic color='brown' onClick={this.handleSigninOpen}>시작하기</Button>
             <br/><br/>
             <Button style={{'width':'15rem','borderRadius':0}} color='facebook' onClick={this.handleSigninFacebook}>
