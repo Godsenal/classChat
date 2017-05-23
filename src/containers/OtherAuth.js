@@ -73,8 +73,9 @@ class OtherAuth extends Component{
     e.preventDefault();
     let email = this.state.email;
     let username = this.state.username;
+    let profileImg = this.state.profileImg;
     var selected = this.state.selected;
-    this.props.otherAuthRequest(email, username)
+    this.props.otherAuthRequest(email, username, profileImg)
       .then(() =>{
         if(this.props.signup.status === 'SUCCESS'){
           selected.push('1');
