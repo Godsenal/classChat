@@ -149,8 +149,8 @@ class Chat extends React.Component {
         this.checkNotification();
         this.props.listChannel(this.props.status.currentUser)
           .then(()=>{
-            var findChannel = this.props.channelList.channels.filter((channel) => {return channel.id === '1';});
-            var publicChannel = findChannel[0];
+            //var findChannel = this.props.channelList.channels[.filter((channel) => {return channel.id === '1';});]
+            var publicChannel = this.props.channelList.channels[0];
             this.props.changeChannel(publicChannel);
             document.title = this.props.activeChannel.name + ' | Class Chat'; // 브라우저 탭 타이틀 설정.
             this.props.listMessage(this.props.activeChannel.id,true,lastAccess).then(()=>{
@@ -169,7 +169,6 @@ class Chat extends React.Component {
                   isActive = true;
                 }
                 this.props.receiveRawMessage(message, isActive);
-                console.log('raw');
               });
               this.props.socket.on('receive mention', (channel, username) => {
                 let title = channel + '채널\n';

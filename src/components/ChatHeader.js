@@ -46,14 +46,14 @@ class ChatHeader extends React.Component {
           <span className={styles.chatHeaderName} size='massive'><Icon name='comments outline'/>#{directName}</span>
           {this.props.isSearch?<Button icon='close' onClick={this.props.toggleSearch}/>:
             <div>
-              <Dropdown compact pointing text={participants.length.toString()+'명'} button icon='group' labeled className='icon' >
+              <Dropdown style={{'backgroundColor': '#263248','borderRadius': 0,'color':'#FFFFFF'}} compact pointing text={participants.length.toString()+'명'} button icon='group' labeled className='icon' >
                 <Dropdown.Menu>
                   {this.props.participants.map((participant) => {
                     return(<Dropdown.Item key={participant} text={participant} />);
                   })}
                 </Dropdown.Menu>
-              </Dropdown>
-              <Button compact icon color='black' onClick={this.props.toggleSearch}>
+              </Dropdown >
+              <Button style={{'backgroundColor': '#263248','borderRadius': 0,'color':'#FFFFFF'}} compact icon onClick={this.props.toggleSearch}>
                 <Icon name='search' />
               </Button>
               {outBtn}

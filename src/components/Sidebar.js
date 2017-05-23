@@ -88,7 +88,7 @@ class Sidebar extends React.Component {
         </Menu.Item>
       </Menu>
         :
-    <Menu style = {{'height':'100vh'}} vertical attached inverted>
+    <Menu style = {{'height':'100vh','backgroundColor': '#263248','borderRadius': 0}} vertical inverted>
       <Menu.Item icon>
         알림 {!this.props.isMute?
           <Icon name='alarm outline' link onClick={this.props.toggleSound}/>

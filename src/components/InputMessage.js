@@ -25,6 +25,32 @@ class InputMessage extends React.Component {
     this.handleMentionChange = this.handleMentionChange.bind(this);
     this.addNotification = this.addNotification.bind(this);
   }
+  componentDidMount(){
+    this.setState({
+      selectOption: this.props.activeChannel.participants.filter((participant) => {
+        if(participant !== this.props.currentUser){
+          return participant;
+        }
+      }).map((participant, index) => {
+        var option = {id: participant, display: participant, key : index, value : participant, text : participant};
+        return option;
+      }),
+    });
+  }
+  componentWillReceiveProps(nextProps) {
+    if(this.props.activeChannel !== nextProps.activeChannel){ //participants 달라지면 옵션 업데이트.
+      this.setState({
+        selectOption: nextProps.activeChannel.participants.filter((participant) => {
+          if(participant !== this.props.currentUser){
+            return participant;
+          }
+        }).map((participant, index) => {
+          var option = {id: participant, display: participant, key : index, value : participant, text : participant};
+          return option;
+        }),
+      });
+    }
+  }
   componentDidUpdate(prevProps, prevState) {
     if(this.state.selectedChannel !== '' && prevState.selectedChannel !== this.state.selectedChannel){
       let init =[];
@@ -101,14 +127,6 @@ class InputMessage extends React.Component {
   handleGroupClick = () => {
     this.setState({
       type : 'group',
-      selectOption: this.props.activeChannel.participants.filter((participant) => {
-        if(participant !== this.props.currentUser){
-          return participant;
-        }
-      }).map((participant, index) => {
-        var option = {id: participant, display: participant, key : index, value : participant, text : participant};
-        return option;
-      }),
     });
   }
   handleImageClick = () => {
@@ -145,14 +163,6 @@ class InputMessage extends React.Component {
   handleDirectClick = () => {
     this.setState({
       type : 'direct',
-      selectOption: this.props.activeChannel.participants.filter((participant) => {
-        if(participant !== this.props.currentUser){
-          return participant;
-        }
-      }).map((participant, index) => {
-        var option = {id: participant, display: participant, key : index, value : participant, text : participant};
-        return option;
-      }),
     });
   }
   handleFile = (e) => {
@@ -231,12 +241,12 @@ class InputMessage extends React.Component {
     const {activeChannel} = this.props;
     const inputView =
       <div>
-        <Dropdown style={{'position': 'absolute', 'zIndex': 100, 'height':40}} icon='plus' upward button className='icon'>
-          <Dropdown.Menu>
-            {activeChannel.type==='CHANNEL'?<Dropdown.Item onClick={this.handleGroupClick}>그룹 만들기</Dropdown.Item>: null}
-            {activeChannel.type==='CHANNEL'|| activeChannel.type==='GROUP'?<Dropdown.Item onClick={this.handleDirectClick}>1:1 채팅하기</Dropdown.Item>:null}
-            {activeChannel.type==='GROUP'?<Dropdown.Item onClick={this.handleInviteClick}>초대하기</Dropdown.Item>:null}
-            <Dropdown.Item onClick={this.handleFileClick}>이미지/파일 전송</Dropdown.Item>
+        <Dropdown color='black' style={{'position': 'absolute', 'zIndex': 100, 'height':40}} icon='plus' upward button className='icon'>
+          <Dropdown.Menu >
+            {activeChannel.type==='CHANNEL'?<Dropdown.Item icon='discussions' text='그룹만들기'onClick={this.handleGroupClick}/>: null}
+            {activeChannel.type==='CHANNEL'|| activeChannel.type==='GROUP'?<Dropdown.Item icon='chat' text='1:1 채팅하기' onClick={this.handleDirectClick}/>:null}
+            {activeChannel.type==='GROUP'?<Dropdown.Item icon='add user' text='초대하기' onClick={this.handleInviteClick}/>:null}
+            <Dropdown.Item icon='file' text='이미지/파일 전송' onClick={this.handleFileClick}/>
 
           </Dropdown.Menu>
         </Dropdown>

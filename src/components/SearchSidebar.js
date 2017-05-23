@@ -88,7 +88,7 @@ class SearchSidebar extends Component {
               return <FilterDateMessage key={message.id} {...message} currentUser={this.props.currentUser} jumpMessage={this.props.jumpMessage}/>;}):null;
 
     return(
-      <Sidebar as={Segment} style={{'background':'#EFECCA'}} compact animation='overlay' direction='right' width='very wide' visible={this.props.isSearch} icon='labeled'>
+      <Sidebar as={Segment} style={{'background':'#263248'}} inverted compact animation='overlay' direction='right' width='very wide' visible={this.props.isSearch} icon='labeled'>
         <Menu attached='top' style={{'height':'10%'}}>
           <Menu.Item name='닫기' onClick={this.props.toggleSearch}/>
           <Menu.Item>

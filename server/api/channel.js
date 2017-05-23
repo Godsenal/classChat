@@ -133,10 +133,10 @@ router.put('/join/:userName', function(req,res){
   });
 });
 
-router.get('/search/:channelName', function(req, res){
+router.get('/search/:searchWord/:type', function(req, res){
   //Do i need this?
-  if(req.params.channelName === '*'){
-    channels.find({},function(err,channels){
+  if(req.params.searchWord === '*'){
+    channels.find({type: req.params.type},function(err,channels){
       if(err){
         return res.status(400).json({error:'internal server error', code: 1});
       }
@@ -144,7 +144,7 @@ router.get('/search/:channelName', function(req, res){
     });
   }
   else{
-    channels.find({name:{$regex : req.params.channelName, $options: 'i'}}, null, {sort: {name: 1}},function(err,channels){
+    channels.find({$and:[{name:{$regex : req.params.searchWord, $options: 'i'}},{type:req.params.type}]},function(err,channels){
       if(err){
         return res.status(400).json({error:'internal server error', code: 1});
       }

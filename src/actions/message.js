@@ -44,7 +44,7 @@ export function resetFilter(){
     type: RESET_MESSAGE_FILTER,
   };
 }
-export function deleteMessage(channelID) {
+export function deleteMessage(channelID) { // 특정 채널에 대한 메시지를 지움.
   return {
     type: MESSAGE_DELETE,
     channelID,

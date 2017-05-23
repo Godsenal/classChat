@@ -43,7 +43,7 @@ const initialState = {
   },
   search: {
     status: 'INIT',
-    results: [],
+    channels: [],
     err: 'ERROR',
     errCode: -1,
   },
@@ -333,14 +333,14 @@ export default function channel(state, action) {
     return update(state, {
       search: {
         status: {$set: 'SUCCESS'},
-        results: {$set: action.channels},
+        channels: {$set: action.channels},
       }
     });
   case types.CHANNEL_SEARCH_FAILURE:
     return update(state, {
       search: {
         status: {$set: 'FAILURE'},
-        results: {$set: []}
+        channels: {$set: []}
       },
     });
   default:

@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react';
-import {List, Button} from 'semantic-ui-react';
+import {List, Button, Icon} from 'semantic-ui-react';
 import moment from 'moment';
 class FilterMessage extends React.Component {
 
@@ -11,11 +11,11 @@ class FilterMessage extends React.Component {
     const icon = types =='application'?'file':types =='image'?'image':'comment';
     const header = types =='application'|| types=='image' ?
       <List.Header as='a' href={`/api/download/${types}/${url}/${contents}`} download>{contents}</List.Header>
-      :<List.Header>{contents}</List.Header>;
+      :<List.Header >{contents}</List.Header>;
     return(
       <List.Item>
         <List.Content floated='right'>
-          <Button onClick={this.handleJump}>이동</Button>
+          <Button icon inverted onClick={this.handleJump}><Icon name='arrow right'/></Button>
         </List.Content>
         <List.Icon name={icon} size='small' verticalAlign='middle' />
         <List.Content>

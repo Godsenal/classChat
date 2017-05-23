@@ -5,7 +5,7 @@ import NotificationSystem from 'react-notification-system';
 
 import {Signup, Signin} from '../components';
 import {signinRequest, getStatusRequest, signupRequest} from '../actions/authentication';
-import {joinChannel, listChannel} from '../actions/channel';
+import {joinChannel, searchChannel} from '../actions/channel';
 import styles from '../Style.css';
 
 class Home extends Component{
@@ -68,7 +68,7 @@ class Home extends Component{
 
     return(
       <div>
-        <Menu inverted style={{'borderRadius':0,'backgroundColor':'#1E1E20'}}  attached='top' borderless>
+        <Menu inverted style={{'borderRadius':0,'backgroundColor':'#263248'}}  attached='top' borderless>
           <Menu.Item className={styles.logo}><a href='/'><Image size='mini' inline src='/assets/images/logo/favicon-96x96.png'/>클래스 챗</a></Menu.Item>
           <Menu.Menu position='right'>
             <Menu.Item ><Button basic inverted color='olive' onClick={this.handleSigninOpen}>로그인</Button></Menu.Item>
@@ -76,19 +76,15 @@ class Home extends Component{
           </Menu.Menu>
         </Menu>
         <div >
-          <Segment style={{'borderRadius':0,'backgroundColor':'#1E1E20'}} padded inverted textAlign='center'>
+          <Segment style={{'borderRadius':0,'backgroundColor':'#263248'}} padded inverted textAlign='center'>
             <span className={styles.homeHeader}>클래스&nbsp;챗</span>
             <br/><br/><br/>
             <Divider horizontal inverted>
               <span className={styles.homeMain}>대학생을 위한 메신저 웹</span>
             </Divider>
-            <br/><br/>
-            <span className={styles.homeMain}><Icon name='comment'/><Icon name='search'/><Icon name='group'/></span>
-            <br/><br/>
-            <span className={styles.homeMain}>모든 것을 여기서</span>
 
           </Segment>
-          <Segment style={{'borderRadius':0}} basic padded textAlign='center'>
+          <Segment style={{'borderRadius':0, 'marginTop':'100'}} basic padded textAlign='center'>
             <Button style={{'width':'15rem', 'borderRadius':0}} basic color='brown' onClick={this.handleSigninOpen}>시작하기</Button>
             <br/><br/>
             <Button style={{'width':'15rem','borderRadius':0}} color='facebook' onClick={this.handleSigninFacebook}>
@@ -111,12 +107,12 @@ class Home extends Component{
                               socket={this.props.socket}
                               signup={this.props.signup}
                               status={this.props.status}
-                              channelList={this.props.channelList}
+                              channelSearch={this.props.channelSearch}
                               handleSignupOpen={this.handleSignupOpen}
                               handleSignupClose={this.handleSignupClose}
                               signupRequest={this.props.signupRequest}
                               joinChannel={this.props.joinChannel}
-                              listChannel={this.props.listChannel}
+                              searchChannel={this.props.searchChannel}
                               getStatusRequest={this.props.getStatusRequest}
                               addNotification={this.addNotification}/>:null }
         <NotificationSystem ref={ref => this.notificationSystem = ref} />
@@ -128,12 +124,12 @@ Home.defaultProps = {
   signinRequest: () => {console.log('Home props error');},
   getStatusRequest: () => {console.log('Home props error');},
   signupRequest: () => {console.log('Home props error');},
-  listChannel: () => {console.log('Home props error');},
+  searchChannel: () => {console.log('Home props error');},
   joinChannel: () => {console.log('Home props error');},
   signin: {},
   signup: {},
   status: {},
-  channelList: {},
+  channelSearch: {},
 };
 Home.propTypes = {
   signinRequest: PropTypes.func.isRequired,
@@ -142,8 +138,8 @@ Home.propTypes = {
   signupRequest : PropTypes.func.isRequired,
   signup : PropTypes.object.isRequired,
   status: PropTypes.object.isRequired,
-  channelList : PropTypes.object.isRequired,
-  listChannel : PropTypes.func.isRequired,
+  searchChannel : PropTypes.func.isRequired,
+  channelSearch : PropTypes.object.isRequired,
   joinChannel : PropTypes.func.isRequired,
   socket: PropTypes.object.isRequired,
 };
@@ -152,7 +148,7 @@ const mapStateToProps = (state) => {
     signin: state.authentication.signin,
     signup: state.authentication.signup,
     status: state.authentication.status,
-    channelList: state.channel.list,
+    channelSearch: state.channel.search,
   };
 };
 
@@ -170,8 +166,8 @@ const mapDispatchToProps = (dispatch) => {
     joinChannel: (channels, userName) => {
       return dispatch(joinChannel(channels, userName));
     },
-    listChannel: (userName, listType) => {
-      return dispatch(listChannel(userName, listType));
+    searchChannel: (searchWord,type) => {
+      return dispatch(searchChannel(searchWord,type));
     },
   };
 };

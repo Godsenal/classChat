@@ -23,14 +23,18 @@ class Signup extends Component{
     this.addNotification = this.addNotification.bind(this);
   }
   componentDidMount() {
-
-    this.props.listChannel('*','CHANNEL')
+    this.props.searchChannel('*','CHANNEL')
       .then(()=>{
+        var channelOptions = this.props.channelSearch.channels.map((channel, index) => {
+          var option = {key : index, value : channel.id, text : channel.name};
+          return option;
+        });
+        for(var i=0; i<channelOptions.length; i++){
+          channelOptions.splice(i,1);
+          break;
+        }
         this.setState({
-          channelOptions: this.props.channelList.channels.map((channel, index) => {
-            var option = {key : index, value : channel.id, text : channel.name};
-            return option;
-          }),
+          channelOptions,
           channelLoading: false,
         });
       });
@@ -87,10 +91,11 @@ class Signup extends Component{
       .then(() =>{
 
         if(this.props.signup.status === 'SUCCESS'){
+          selected.push('1');
           this.props.joinChannel(selected, username)
             .then(() => {
               this.props.socket.emit('signup participant', selected, username);
-              this.props.handleSignupClose(true);
+              this.props.handleSignupClose('SUCCESS');
             });
         }
         else{
@@ -184,8 +189,8 @@ Signup.propTypes = {
   handleSignupClose: PropTypes.func.isRequired,
   signupRequest : PropTypes.func.isRequired,
   signup : PropTypes.object.isRequired,
-  channelList : PropTypes.object.isRequired,
-  listChannel : PropTypes.func.isRequired,
+  channelSearch : PropTypes.object.isRequired,
+  searchChannel : PropTypes.func.isRequired,
   joinChannel : PropTypes.func.isRequired,
   status: PropTypes.object.isRequired,
   socket: PropTypes.object.isRequired,

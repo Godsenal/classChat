@@ -134,10 +134,10 @@ export function changeChannel(channel){
 
 /* SEARCH CHANNEL */
 
-export function searchChannel(channelName){
+export function searchChannel(searchWord,type){
   return (dispatch) => {
     dispatch({type: CHANNEL_SEARCH});
-    return axios.get(`api/channel/search/${channelName}`)
+    return axios.get(`api/channel/search/${searchWord}/${type}`)
             .then((res)=>{
               dispatch({type: CHANNEL_SEARCH_SUCCESS, channels: res.data.channels});
             }).catch((err) => {
