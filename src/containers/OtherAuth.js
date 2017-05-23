@@ -77,6 +77,7 @@ class OtherAuth extends Component{
     this.props.otherAuthRequest(email, username)
       .then(() =>{
         if(this.props.signup.status === 'SUCCESS'){
+          selected.push('1');
           this.props.joinChannel(selected, username)
             .then(() => {
               this.props.socket.emit('signup participant', selected, username);
