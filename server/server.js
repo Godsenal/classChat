@@ -14,7 +14,13 @@ const passport = require('passport');
 var db = mongoose.connection;
 db.on('error', console.error);
 db.once('open', function(){
-  console.log('Connected to mongod server');
+  if(config.dbUrl == 'local'){
+    console.log('Connected to mongod server');
+  }
+  else{
+    console.log('Connected to mongolab server');
+  }
+
 });
 
 mongoose.Promise = require('bluebird');

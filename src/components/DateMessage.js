@@ -7,7 +7,7 @@ class DateMessage extends React.Component {
   constructor(){
     super();
   }
-  shouldComponentUpdate(nextProps){
+  shouldComponentUpdate(nextProps){ // 필요한가? 
     if(this.props.messages !== nextProps.messages){
       return true;
     }

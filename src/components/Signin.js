@@ -78,7 +78,7 @@ class Signin extends Component{
         <Modal.Header style={{'backgroundColor':'#2C3E50','color':'#ECF0F1'}}>
           <span className={styles.logo}>
             <Image size='mini' inline src='/assets/images/logo/favicon-96x96.png'/>클래스 챗
-            <span style={{'float':'right','color':'#E74C3C'}}>로그인</span>
+            <span className={styles.signinHeader}>로그인</span>
           </span>
         </Modal.Header>
         <Modal.Content style={{'backgroundColor':'#ECF0F1'}}>
@@ -86,6 +86,7 @@ class Signin extends Component{
             <Form.Input name='email' label='이메일' placeholder='이메일' type='text' onChange={this.handleChange} onKeyPress={this.handleKeyPress}/>
             <Form.Input name='password' label='비밀번호' placeholder='비밀번호' type='password' onChange={this.handleChange} onKeyPress={this.handleKeyPress}/>
           </Form>
+          <span style={{'float':'right'}}>아직 아이디가 없으신가요? 지금 <span onClick={this.props.handleSignupOpen} style={{'color':'blue','fondWeight':'bold','cursor':'pointer'}}>회원가입</span> 하세요.</span>
         </Modal.Content>
         <Modal.Content>
           <Button style={{'borderRadius':0}} floated='right' primary type='submit' onClick={this.handleSignin}>로그인</Button>
@@ -104,6 +105,7 @@ Signin.defaultProps = {
 };
 Signin.propTypes = {
   signinOpen: PropTypes.bool.isRequired,
+  handleSignupOpen: PropTypes.func.isRequired,
   handleSigninClose: PropTypes.func.isRequired,
   signinRequest: PropTypes.func.isRequired,
   status: PropTypes.object.isRequired,

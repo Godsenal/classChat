@@ -35,12 +35,13 @@ class Home extends Component{
   }
   handleSigninOpen = () => {
     this.setState({
+      signupOpen: false,
       signinOpen: true,
     });
   }
   handleSignupOpen = () => {
-
     this.setState({
+      signinOpen: false,
       signupOpen: true,
     });
   }
@@ -99,6 +100,7 @@ class Home extends Component{
                               signin={this.props.signin}
                               status={this.props.status}
                               handleSigninOpen={this.handleSigninOpen}
+                              handleSignupOpen={this.handleSignupOpen}
                               handleSigninClose={this.handleSigninClose}
                               signinRequest={this.props.signinRequest}
                               getStatusRequest={this.props.getStatusRequest}

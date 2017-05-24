@@ -28,22 +28,16 @@ class Message extends Component {
     }
   }
   componentWillReceiveProps(nextProps) { // messageJumpID 는 무조건 이미 render된 메시지 안에서 하므로
-    if(this.props.messageJumpID !== nextProps.messageJumpID){
-      if(nextProps.messageJumpID === this.props.id){
-        if(this.message){
-          this.message.classList.remove(styles.fadeInAnimation);
-          void this.message.offsetWidth;
-          this.message.classList.add(styles.fadeInAnimation); //reset animation
+    if(nextProps.messageJumpID === this.props.id){
+      if(this.message){
+        this.message.classList.remove(styles.fadeInAnimation);
+        void this.message.offsetWidth;
+        this.message.classList.add(styles.fadeInAnimation); //reset animation
 
-          var jumpNode = ReactDOM.findDOMNode(this.message);
-          this.props.scrollIntoJump(jumpNode);
-        }
+        var jumpNode = ReactDOM.findDOMNode(this.message);
+        this.props.scrollIntoJump(jumpNode);
       }
     }
-  }
-  handleImageLoad = () => {
-    this.setState({ imageStatus: 'loaded' }); // onload
-
   }
   handleToggleImage = () => {
     this.setState({ hiddenImage : !this.handleToggleImage});
@@ -80,7 +74,7 @@ class Message extends Component {
                       <p style={{'wordWrap':'break-word','whiteSpace':'pre-wrap'}}><Icon name='file'/>{this.props.contents}</p></a>
                       :<Segment basic compact>
                       <Modal basic trigger={
-                          <Image inline size ='medium'
+                          <Image inline height={100} size ='medium'
                              bordered
                              src={`/files/${this.props.url}`}/>
                          }>

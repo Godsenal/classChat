@@ -145,7 +145,7 @@ class Signup extends Component{
           <Modal.Header style={{'backgroundColor':'#2C3E50','color':'#ECF0F1'}}>
             <span className={styles.logo}>
               <Image size='mini' inline src={'/assets/images/logo/favicon-96x96.png'}/>클래스 챗
-              <span style={{'float':'right','color':'#E74C3C'}}>회원가입</span>
+              <span className={styles.signinHeader}>회원가입</span>
             </span>
           </Modal.Header>
           <Modal.Content style={{'backgroundColor':'#ECF0F1'}}>

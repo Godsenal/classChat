@@ -45,14 +45,13 @@ class MessageList extends Component {
           </div>
           <div className={styles.messageContents}>
             <span style={{'fontWeight':'bold'}}>{this.props.messageReceive.message.userName}</span>
-            <span className='grey-text' style={{'fontStyle':'italic','fontSize':10}}> ..{moment(this.props.messageReceive.message.created).format('MMMM Do YYYY, h:mm:ss a')}</span>
             <p style={{'wordWrap':'break-word','whiteSpace':'pre-wrap'}}>{this.props.messageReceive.message.contents}</p>
           </div>
+          <Button icon='arrow down' circular color='red' onClick={this.scrollToBottom}/>
         </div>
       ),
       level: 'info',
       position: 'bl',
-      onClick: this.scrollToBottom,
     });
   }
   scrollToBottom = () => {
@@ -67,10 +66,14 @@ class MessageList extends Component {
       // 맨 밑인지 보는 함수.
       //if(messagesContainer.scrollTop + messagesContainer.offsetHeight == messagesContainer.scrollHeight)
       if(messagesContainer.scrollHeight - messagesContainer.scrollTop > messagesContainer.offsetHeight * 2){
-        this.setState({isBottom: false});
+        if(this.state.isBottom){
+          this.setState({isBottom: false});
+        }
       }
       else{
-        this.setState({isBottom: true});
+        if(!this.state.isBottom){
+          this.setState({isBottom: true});
+        }
       }
       if((!this.props.isLast)&&(messagesContainer.scrollTop == 0) && (!this.isLoading)){
         this.isLoading = true;
@@ -135,7 +138,6 @@ class MessageList extends Component {
         }else if(!this.isLoading && !this.scrolled ){//이 flag가 true면 안읽은 곳으로 이동한 상태이므로 밑으로 가면 안됨. 밑에서 false로 변경해줌.
           this.scrollToBottom();
         }
-
         if(prevProps.messageAddStatus !== this.props.messageAddStatus){
           this.props.deleteLastDateID(this.props.activeChannel.id);
           this.props.deleteReceiveMessage(this.props.activeChannel.id);

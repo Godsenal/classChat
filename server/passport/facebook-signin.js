@@ -6,7 +6,7 @@ import config  from '../config.js';
 module.exports = new FacebookStrategy({
   clientID: '102212780353117',
   clientSecret: 'b4af484c90070f8e6d01f2b69aa868d6',
-  callbackURL: `http://${config.host}:${config.port}/api/account/facebook/callback`,
+  callbackURL: `http://${config.domain}:${config.port}/api/account/facebook/callback`,
   passReqToCallback: true,
   profileFields: ['id', 'emails', 'name']
 },function(req, accessToken, refreshToken, profile, cb) {

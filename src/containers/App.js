@@ -57,6 +57,7 @@ class App extends Component{
     */
     /* INIT ENVIRONMENT */
     this.handleWindowSizeChange();
+    window.onpopstate = this.onBackButtonEvent;
     window.addEventListener('resize', this.handleWindowSizeChange);
     /* CHECK TOKEN VALID */
     let token = localStorage.getItem('token') || null;
@@ -74,6 +75,17 @@ class App extends Component{
   handleWindowSizeChange = () => {
     this.props.initEnvironment();
   };
+  onBackButtonEvent = (e) =>{ //뒤로가기 했을 때 막기.
+    e.preventDefault();
+    let token = localStorage.getItem('token') || null;
+    if(token !== null){
+      this.props.getStatusRequest(token).then(()=>{
+        if(this.props.status.valid){ // if session is valid. go to channel
+          browserHistory.push('/channel');
+        }
+      });
+    }
+  }
   toggleSide = () => {
     this.setState({
       side : !this.state.side,

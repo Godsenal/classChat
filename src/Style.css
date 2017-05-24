@@ -47,6 +47,11 @@
   font-family: 'NanumGothic','NanumBrush', cursive;
   font-size: 2em;
 }
+.signinHeader{
+  font-family: 'NanumGothic','NanumBrush', cursive;
+  float: right;
+  color: #FFFFFF;
+}
 .flexLayout{
   display: -webkit-box;      /* OLD - iOS 6-, Safari 3.1-6 */
   display: -moz-box;         /* OLD - Firefox 19- (buggy but mostly works) */
@@ -98,7 +103,7 @@
   width: 100%;
 }
 .chatView{
-  font-family: 'Baloo Bhaina', cursive;
+  font-family: 'Baloo Bhaina','NanumGothic', cursive;
   -webkit-box-flex: 0 1 auto;      /* OLD - iOS 6-, Safari 3.1-6 */
   -moz-box-flex: 0 1 auto;          /* OLD - Firefox 19- */             /* For old syntax, otherwise collapses. */
   -webkit-flex: 0 1 auto;            /* Chrome */
@@ -361,6 +366,7 @@
 .emptyChat{
   text-align: center;
   position: relative;
+  margin-top: 10rem;
 }
 .messageLoader{
   height: 100vh;

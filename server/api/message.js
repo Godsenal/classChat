@@ -1,10 +1,13 @@
 import messages from '../models/message';
 import express from 'express';
 import multer from 'multer';
+import path from 'path';
 const router = express.Router();
 
+const uploadPath = path.resolve(__dirname,'../../public/files');
+
 const storage = multer.diskStorage({
-  destination: './public/files',
+  destination: uploadPath,
   filename(req, file, cb) {
     cb(null, `${new Date()}-${file.originalname}`);
   },
