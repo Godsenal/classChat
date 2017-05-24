@@ -14,7 +14,7 @@ const passport = require('passport');
 var db = mongoose.connection;
 db.on('error', console.error);
 db.once('open', function(){
-  if(config.dbUrl == 'local'){
+  if(config.NODE_ENV !== 'development'){
     console.log('Connected to mongod server');
   }
   else{
