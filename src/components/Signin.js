@@ -27,7 +27,6 @@ class Signin extends Component{
   handleChange(e){
     this.setState({[`${e.target.name}`]: e.target.value});
   }
-
   handleKeyPress = (e) => {
     if (e && e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
@@ -86,7 +85,7 @@ class Signin extends Component{
             <Form.Input name='email' label='이메일' placeholder='이메일' type='text' onChange={this.handleChange} onKeyPress={this.handleKeyPress}/>
             <Form.Input name='password' label='비밀번호' placeholder='비밀번호' type='password' onChange={this.handleChange} onKeyPress={this.handleKeyPress}/>
           </Form>
-          <span style={{'float':'right'}}>아직 아이디가 없으신가요? 지금 <span onClick={this.props.handleSignupOpen} style={{'color':'blue','fondWeight':'bold','cursor':'pointer'}}>회원가입</span> 하세요.</span>
+          <span style={{'float':'right'}}>아직 아이디가 없으신가요? 지금 <span onClick={this.props.handleSignupOpen} style={{'color':'blue','fontWeight':'bold','cursor':'pointer'}}>회원가입</span> 하세요.</span>
         </Modal.Content>
         <Modal.Content>
           <Button style={{'borderRadius':0}} floated='right' primary type='submit' onClick={this.handleSignin}>로그인</Button>

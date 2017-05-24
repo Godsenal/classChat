@@ -83,7 +83,13 @@ class App extends Component{
         if(this.props.status.valid){ // if session is valid. go to channel
           browserHistory.push('/channel');
         }
+        else{
+          browserHistory.push('/');
+        }
       });
+    }
+    else{
+      browserHistory.push('/');
     }
   }
   toggleSide = () => {

@@ -82,7 +82,7 @@ export function signoutRequest() {
     localStorage.setItem('lastAccess',moment().format());
     var url = window.location.origin;
     window.location.replace(url);
-    dispatch({type: AUTH_SIGNOUT});
+    dispatch({type: AUTH_SIGNOUT}); //* Reset All State. Check reducer's index
     /*
     return axios.post('/api/account/signout')
             .then((res) => {
@@ -95,6 +95,8 @@ export function signoutRequest() {
   };*/
   };
 }
+
+
 export function receiveSocket(socketID) {
   return {
     type: AUTH_SOCKET_RECEIVE,

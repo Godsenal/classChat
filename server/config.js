@@ -11,6 +11,7 @@ export default {
   get serverUrl() {
     return `https://${this.host}:${this.port}`;
   },
+  nodeEnv,
   //dbUrl : 'mongodb://localhost:27017/chatDB',
   dbUrl : nodeEnv==='development'?cloudDB:localDB,
   jwtSecret: 'Godsenal!3737',
