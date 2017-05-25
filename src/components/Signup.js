@@ -140,7 +140,7 @@ class Signup extends Component{
     const {channelOptions ,email, username, password, passwordCheck,profileImg} = this.state;
 
     return(
-        <Modal className={styles.signinModal} open={this.props.signupOpen} onClose={this.props.handleSignupClose} dimmer='blurring' size='small'>
+        <Modal className={styles.signinModal} open={this.props.signupOpen} onClose={this.props.handleSignupClose} dimmer='blurring' size='small' closeIcon='close'>
 
           <Modal.Header style={{'backgroundColor':'#2C3E50','color':'#ECF0F1'}}>
             <span className={styles.logo}>

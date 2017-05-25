@@ -27,7 +27,7 @@ class Chat extends React.Component {
     super();
     this.state={
       searchModal: false,
-      isGranted: Notification.permission,
+      isGranted: 'granted',
       isMute : false,
     };
 
@@ -64,6 +64,7 @@ class Chat extends React.Component {
   checkNotification = () => {
     if (!('Notification' in window)) {
       alert('This browser does not support desktop notification');
+
     }
 
     // Let's check whether notification permissions have already been granted
@@ -80,6 +81,11 @@ class Chat extends React.Component {
         if (permission === 'granted') {
           let message = this.props.status.currentUser +'님 안녕하세요!';
           this.spawnNotification('classChat',message);
+        }
+        else{
+          this.setState({
+            isGranted: 'denied',
+          });
         }
       });
     }

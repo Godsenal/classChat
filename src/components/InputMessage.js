@@ -272,7 +272,7 @@ class InputMessage extends React.Component {
       </div>;
 
     const groupModal =
-    <Modal open={type === 'group'} size='small' onClose={this.handleInit}>
+    <Modal open={type === 'group'} size='small' onClose={this.handleInit} closeIcon='close'>
       <Modal.Header style={{'backgroundColor':'#2C3E50','color':'#ECF0F1'}}>
         <span className={styles.logo}>
           <Image size='mini' inline src='/assets/images/logo/favicon-96x96.png'/>클래스 챗
@@ -291,7 +291,7 @@ class InputMessage extends React.Component {
       <NotificationSystem ref={ref => this.notificationSystem = ref} />
     </Modal>;
     const directModal =
-    <Modal open={type === 'direct'} size='small' onClose={this.handleInit}>
+    <Modal open={type === 'direct'} size='small' onClose={this.handleInit} closeIcon='close'>
       <Modal.Header style={{'backgroundColor':'#2C3E50','color':'#ECF0F1'}}>
         <span className={styles.logo}>
           <Image size='mini' inline src='/assets/images/logo/favicon-96x96.png'/>클래스 챗
@@ -309,7 +309,7 @@ class InputMessage extends React.Component {
       <NotificationSystem ref={ref => this.notificationSystem = ref} />
     </Modal>;
     const inviteModal =
-    <Modal open={type === 'invite'} size='small' onClose={this.handleInit}>
+    <Modal open={type === 'invite'} size='small' onClose={this.handleInit} closeIcon='close'>
       <Modal.Header style={{'backgroundColor':'#2C3E50','color':'#ECF0F1'}}>
         <span className={styles.logo}>
           <Image size='mini' inline src='/assets/images/logo/favicon-96x96.png'/>클래스 챗
@@ -328,7 +328,7 @@ class InputMessage extends React.Component {
       <NotificationSystem ref={ref => this.notificationSystem = ref} />
     </Modal>;
     const fileModal =
-    <Modal open={type === 'file'} size='small' onClose={this.handleInit}>
+    <Modal open={type === 'file'} size='small' onClose={this.handleInit} closeIcon='close'>
       <Modal.Header>1:1채팅 추가</Modal.Header>
       <Modal.Content>
         <Modal.Description>

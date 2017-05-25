@@ -33,7 +33,7 @@ class Sidebar extends React.Component {
               </Dimmer>
             </Segment>;
     const responsiveView = (this.props.isMobile?
-      <Menu style = {{'backgroundColor': '#263248','borderRadius': 0,'height': '12vh'}} compact inverted fluid widths={5}>
+      <Menu style = {{'backgroundColor': '#263248','borderRadius': 0}} compact inverted fluid widths={5}>
         <Dropdown className={styles.balooFont} item text={this.props.status.currentUser}>
           <Dropdown.Menu>
             <Dropdown.Item>My Profile</Dropdown.Item>
@@ -94,7 +94,7 @@ class Sidebar extends React.Component {
           <Icon name='alarm outline' link onClick={this.props.toggleSound}/>
           :<Icon name='alarm mute outline' link onClick={this.props.toggleSound}/>}
       </Menu.Item>
-      <Menu.Header >
+      <Menu.Header>
         <Dropdown className={styles.balooFont} item text={this.props.status.currentUser}>
           <Dropdown.Menu>
             <Dropdown.Item>My Profile</Dropdown.Item>

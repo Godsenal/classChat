@@ -74,10 +74,7 @@ class Message extends Component {
                       <p style={{'wordWrap':'break-word','whiteSpace':'pre-wrap'}}><Icon name='file'/>{this.props.contents}</p></a>
                       :<Segment basic compact>
                       <Modal basic trigger={
-                          <Image inline height={100} size ='medium'
-                             bordered
-                             src={`/files/${this.props.url}`}/>
-                         }>
+                          <img src={`/files/${this.props.url}`} style={{'maxWidth':'100%','height':'auto'}}/>}>
                         <Modal.Content image>
                           <Image centered src={`/files/${this.props.url}`} />
                         </Modal.Content>

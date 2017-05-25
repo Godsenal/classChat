@@ -73,7 +73,7 @@ class Signin extends Component{
   }
   render(){
     return(
-      <Modal className={styles.signinModal} open={this.props.signinOpen} onClose={this.props.handleSigninClose} dimmer='blurring' size='small'>
+      <Modal className={styles.signinModal} open={this.props.signinOpen} onClose={this.props.handleSigninClose} dimmer='blurring' size='small' closeIcon='close'>
         <Modal.Header style={{'backgroundColor':'#2C3E50','color':'#ECF0F1'}}>
           <span className={styles.logo}>
             <Image size='mini' inline src='/assets/images/logo/favicon-96x96.png'/>클래스 챗

@@ -27,6 +27,7 @@ class Home extends Component{
       autoDismiss: 2,
     });
   }
+
   handleChange = (e) => {
     if(e.target.name === 'email')
       this.setState({email: e.target.value});
@@ -68,31 +69,24 @@ class Home extends Component{
     //<NotificationSystem ref={ref => this.notificationSystem = ref} />
 
     return(
-      <div>
-        <Menu inverted style={{'borderRadius':0,'backgroundColor':'#263248'}}  attached='top' borderless>
-          <Menu.Item className={styles.logo}><a href='/'><Image size='mini' inline src='/assets/images/logo/favicon-96x96.png'/>클래스 챗</a></Menu.Item>
-          <Menu.Menu position='right'>
-            <Menu.Item ><Button basic inverted color='olive' onClick={this.handleSigninOpen}>로그인</Button></Menu.Item>
-            <Menu.Item ><Button basic inverted color='teal' onClick={this.handleSignupOpen}>회원가입</Button></Menu.Item>
-          </Menu.Menu>
-        </Menu>
+      <div className={styles.homeContainer }>
+          <a href='/' className={styles.logo}><Image size='mini' inline src='/assets/images/logo/favicon-96x96.png'/>클래스 챗</a>
         <div >
-          <Segment style={{'borderRadius':0,'backgroundColor':'#263248'}} padded inverted textAlign='center'>
-            <span className={styles.homeHeader}>클래스&nbsp;챗</span>
-            <br/><br/><br/>
-            <Divider horizontal inverted>
-              <span className={styles.homeMain}>대학생을 위한 메신저 웹</span>
-            </Divider>
+          <div className={styles.homeBlackbox + ' ' + styles.fadeInAnimation}>
+          <div>
+            <div className={styles.homeHeader}>클래스&nbsp;챗</div>
+            <div className={styles.homeMain}>대학생을 위한 메신저 웹</div>
 
-          </Segment>
-          <Segment style={{'borderRadius':0, 'marginTop':100}} basic padded textAlign='center'>
-            <Button style={{'width':'15rem', 'borderRadius':0}} basic color='brown' onClick={this.handleSigninOpen}>시작하기</Button>
+          </div>
+          <div className={styles.homeButtonContainer} >
+            <Button style={{'width':'15rem', 'borderRadius':0}} color='brown' onClick={this.handleSigninOpen}>시작하기</Button>
             <br/><br/>
             <Button style={{'width':'15rem','borderRadius':0}} color='facebook' onClick={this.handleSigninFacebook}>
               <Icon name='facebook' /> 페이스북으로 시작
             </Button>
-          </Segment>
-          <Segment style={{'width':'100%','position':'absolute','bottom':0,'borderRadius':0, 'textAlign': 'right'}} basic padded>
+          </div>
+        </div>
+          <Segment style={{'width':'100%','color':'white', 'position':'absolute','bottom':0,'borderRadius':0, 'textAlign': 'right'}} basic padded>
             <span>Copyright © Taehee Lee. All Rights Reserved.</span>
           </Segment>
         </div>
