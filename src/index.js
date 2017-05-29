@@ -7,7 +7,7 @@ import { createStore, applyMiddleware } from 'redux';
 
 import thunk from 'redux-thunk';
 
-import {App, Home, ListView, PostView, Signin, Signup, SearchView, Chat, ImageView} from './containers';
+import {App, Home, Signin, Signup, Chat, ImageView, OtherAuth} from './containers';
 import reducers from './reducers';
 
 const store = createStore(reducers, applyMiddleware(thunk)); // thunk가 mapDispatchToProps 할 때, 인자를 전달 할 수 있게 도와줌.
@@ -51,16 +51,14 @@ ReactDOM.render(
   <Provider store={store}>
       <Router history={browserHistory}>
         <Route path="/" component={App} >
+          <Route path="signup" component={Signup} />
           <IndexRoute component={Home} />
           <Route path="signin" component={Signin} />
-          <Route path="signup" component={Signup} />
-          <Route path="search" component={SearchView} />
-          <Route path="notice" component={ListView} />
+          <Route path="otherauth" component={OtherAuth} />
           <Route path="channel" component={Chat}>
             <Route path=":channelName" component={Chat} />
           </Route>
           <Route path="image/:url/:name" component={ImageView} />
-          <Route path=":postId" component={PostView} />
         </Route>
       </Router>
   </Provider>

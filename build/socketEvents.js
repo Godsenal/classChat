@@ -26,24 +26,20 @@ exports = module.exports = function (io) {
     /* USER LEAVE ROOM */
     socket.on('leave channel', function (channelID, participant) {
       var isLeave = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-      var participants = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : [];
       // 소켓만 나갈 때
       if (isLeave) {
-        participants.map(function (element) {
-          if (participant !== element) {
-            socket.broadcast.to(clients[element]).emit('receive new participant', channelID, participant, isLeave);
-          }
-        });
+        socket.broadcast.to(channelID).emit('receive new participant', channelID, participant, isLeave);
+
+        socket.leave(channelID);
       }
-      socket.leave(channelID);
     });
     /* USER JOIN ROOM */
-    socket.on('join channel', function (channelID, participant, participants) {
-      socket.join(channelID);
-      participants.map(function (element) {
-        if (participant !== element) {
-          socket.broadcast.to(clients[element]).emit('receive new participant', channelID, participant, false);
-        }
+    socket.on('join channel', function (channels, participant) {
+      // 배열로 받은 channel에 한번에 join
+      channels.map(function (channel) {
+        var channelID = channel.id;
+        socket.join(channelID); // 이미 들어왔다면 무시됨.
+        if (io.nsps['/'].adapter.rooms[channelID] !== 'undefined') socket.broadcast.to(channelID).emit('receive new participant', channelID, participant, false);
       });
     });
     /* NEW MESSAGE */
@@ -53,6 +49,12 @@ exports = module.exports = function (io) {
     /* NEW CHANNEL */
     socket.on('new channel', function (channel) {
       socket.broadcast.emit('receive channel', channel);
+    });
+    /* NEW MENTION */
+    socket.on('new mention', function (channel, username, participants) {
+      participants.forEach(function (element) {
+        socket.broadcast.to(clients[element]).emit('receive mention', channel, username);
+      });
     });
     socket.on('typing', function (data) {
       socket.broadcast.to(data.channel).emit('typing bc', data.user);

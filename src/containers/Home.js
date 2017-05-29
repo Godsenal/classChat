@@ -1,28 +1,23 @@
 import React,{Component, PropTypes} from 'react';
 import {connect} from 'react-redux';
-import {Header, Icon, Menu, Modal, Form, Button} from 'semantic-ui-react';
-import {Link, browserHistory} from 'react-router';
+import {Icon,Segment, Menu, Button, Image, Divider} from 'semantic-ui-react';
 import NotificationSystem from 'react-notification-system';
 
-import {signinRequest, getStatusRequest} from '../actions/authentication';
+import {Signup, Signin} from '../components';
+import {signinRequest, getStatusRequest, signupRequest} from '../actions/authentication';
+import {joinChannel, searchChannel} from '../actions/channel';
 import styles from '../Style.css';
+
 class Home extends Component{
   constructor(){
     super();
     this.state = {
       success : false,
       activeItem : '',
-      modalOpen : false,
+      signinOpen : false,
+      signupOpen : false,
     };
     this.addNotification = this.addNotification.bind(this);
-  }
-  componentDidMount() {
-    this.props.getStatusRequest()
-      .then(()=>{
-        if(this.props.status.valid){
-          browserHistory.push('/channel');
-        }
-      });
   }
   addNotification(message, level, position) {
     this.notificationSystem.addNotification({
@@ -32,107 +27,144 @@ class Home extends Component{
       autoDismiss: 2,
     });
   }
-  handleChange = (e) => {
-    if(e.target.name === 'id')
-      this.setState({id: e.target.value});
-    else if(e.target.name ==='pw')
-      this.setState({pw: e.target.value});
-  }
-  handleOpen = () => {
-    this.setState({
-      modalOpen: true,
-    });
-  }
-  handleClose = () => {
-    this.setState({
-      modalOpen: false,
-    });
-  }
-  handleSignin = (e) => {
-    e.preventDefault();
-    this.props.signinRequest(this.state.id,this.state.pw)
-      .then(() => {
-        if(this.props.signin.status === 'SUCCESS') {
-          let signinData = {
-            isSignedIn: true,
-            id: this.state.id,
-            nickname: this.props.nickname,
-            isAdmin: false,
-          };
-          document.cookie = 'key=' + btoa(JSON.stringify(signinData));
-          this.handleClose();
-          browserHistory.push('/channel');
-          return true;
-        }
-        else{
-          this.addNotification('Incorrect username or password','warning','bc');
-          this.setState({pw : ''});
-          return false;
-        }
-      });
 
+  handleChange = (e) => {
+    if(e.target.name === 'email')
+      this.setState({email: e.target.value});
+    else if(e.target.name ==='password')
+      this.setState({password: e.target.value});
+  }
+  handleSigninOpen = () => {
+    this.setState({
+      signupOpen: false,
+      signinOpen: true,
+    });
+  }
+  handleSignupOpen = () => {
+    this.setState({
+      signinOpen: false,
+      signupOpen: true,
+    });
+  }
+  handleSigninClose = () => {
+    this.setState({
+      signinOpen: false,
+    });
+  }
+  handleSignupClose = (status) => {
+    if(status=='SUCCESS'){
+      this.addNotification('가입이 완료되었습니다. 로그인 해 주세요!','success','tc');
+    }
+    this.setState({
+      signupOpen: false,
+    });
+  }
+  handleSigninFacebook = () => {
+    var url = 'http://' + window.location.host + '/api/account/signinfacebook';
+    window.location.href = url;
   }
   handleItemClick = (e, { name }) => this.setState({ activeItem: name })
   render () {
-    const {activeItem, modalOpen} = this.state;
-    const signinModal = <Modal className={styles.signinModal} open={modalOpen} onClose={this.handleClose} dimmer='blurring' size='small'>
-                          <Modal.Header>Sign in</Modal.Header>
-                          <Modal.Content>
-                            <Form>
-                              <Form.Input name='id' label='ID' placeholder='id' type='text' onChange={this.handleChange}/>
-                              <Form.Input name='pw' label='Password' type='password' onChange={this.handleChange}/>
-                            </Form>
-                            <Modal.Description>
-                              <p>Don't have account yet?&nbsp;<Link to='/signup'>Sign up here</Link>&nbsp;instead.</p>
-                            </Modal.Description>
-                          </Modal.Content>
-                          <Modal.Actions>
-                            <Button primary type='submit' onClick={this.handleSignin}>Sign in</Button>
-                          </Modal.Actions>
-                          <NotificationSystem ref={ref => this.notificationSystem = ref} />
-                        </Modal>
+    const {signinOpen, signupOpen} = this.state;
+    //<NotificationSystem ref={ref => this.notificationSystem = ref} />
+
     return(
-      <div>
-        <Menu attached='top'>
-          <Menu.Item name='signin' position='right' active={activeItem === 'signin'} onClick={this.handleOpen} />
-        </Menu>
-        <Header as='h2' icon textAlign='center'>
-          <Icon name='users' circular />
-          <Header.Content>
-            Friends
-          </Header.Content>
-        </Header>
-        {signinModal}
+      <div className={styles.homeContainer }>
+          <a href='/' className={styles.logo}><Image size='mini' inline src='/assets/images/logo/favicon-96x96.png'/>클래스 챗</a>
+        <div >
+          <div className={styles.homeBlackbox + ' ' + styles.fadeInAnimation}>
+          <div>
+            <div className={styles.homeHeader}>클래스&nbsp;챗</div>
+            <div className={styles.homeMain}>대학생을 위한 메신저 웹</div>
+
+          </div>
+          <div className={styles.homeButtonContainer} >
+            <Button style={{'width':'15rem', 'borderRadius':0}} color='brown' onClick={this.handleSigninOpen}>시작하기</Button>
+            <br/><br/>
+            <Button style={{'width':'15rem','borderRadius':0}} color='facebook' onClick={this.handleSigninFacebook}>
+              <Icon name='facebook' /> 페이스북으로 시작
+            </Button>
+          </div>
+        </div>
+          <Segment style={{'width':'100%','color':'white', 'position':'absolute','bottom':0,'borderRadius':0, 'textAlign': 'right'}} basic padded>
+            <span>Copyright © Taehee Lee. All Rights Reserved.</span>
+          </Segment>
+        </div>
+        {signinOpen ? <Signin signinOpen={signinOpen}
+                              signin={this.props.signin}
+                              status={this.props.status}
+                              handleSigninOpen={this.handleSigninOpen}
+                              handleSignupOpen={this.handleSignupOpen}
+                              handleSigninClose={this.handleSigninClose}
+                              signinRequest={this.props.signinRequest}
+                              getStatusRequest={this.props.getStatusRequest}
+                              addNotification={this.addNotification}/>:null }
+        {signupOpen ? <Signup signupOpen={signupOpen}
+                              socket={this.props.socket}
+                              signup={this.props.signup}
+                              status={this.props.status}
+                              channelSearch={this.props.channelSearch}
+                              handleSignupOpen={this.handleSignupOpen}
+                              handleSignupClose={this.handleSignupClose}
+                              signupRequest={this.props.signupRequest}
+                              joinChannel={this.props.joinChannel}
+                              searchChannel={this.props.searchChannel}
+                              getStatusRequest={this.props.getStatusRequest}
+                              addNotification={this.addNotification}/>:null }
+        <NotificationSystem ref={ref => this.notificationSystem = ref} />
       </div>
     );
   }
 }
-
 Home.defaultProps = {
-  nickname: 'Guest',
+  signinRequest: () => {console.log('Home props error');},
+  getStatusRequest: () => {console.log('Home props error');},
+  signupRequest: () => {console.log('Home props error');},
+  searchChannel: () => {console.log('Home props error');},
+  joinChannel: () => {console.log('Home props error');},
+  signin: {},
+  signup: {},
+  status: {},
+  channelSearch: {},
 };
 Home.propTypes = {
   signinRequest: PropTypes.func.isRequired,
   getStatusRequest : PropTypes.func.isRequired,
   signin : PropTypes.object.isRequired,
+  signupRequest : PropTypes.func.isRequired,
+  signup : PropTypes.object.isRequired,
   status: PropTypes.object.isRequired,
-  nickname: PropTypes.string.isRequired,
+  searchChannel : PropTypes.func.isRequired,
+  channelSearch : PropTypes.object.isRequired,
+  joinChannel : PropTypes.func.isRequired,
+  socket: PropTypes.object.isRequired,
 };
 const mapStateToProps = (state) => {
   return {
     signin: state.authentication.signin,
+    signup: state.authentication.signup,
     status: state.authentication.status,
+    channelSearch: state.channel.search,
   };
 };
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    signinRequest: (id, pw) => {
-      return dispatch(signinRequest(id,pw));
+    signinRequest: (email, password) => {
+      return dispatch(signinRequest(email,password));
     },
     getStatusRequest: () => {
       return dispatch(getStatusRequest());
-    }
+    },
+    signupRequest: (email, username, password, image) => {
+      return dispatch(signupRequest(email, username, password, image));
+    },
+    joinChannel: (channels, userName) => {
+      return dispatch(joinChannel(channels, userName));
+    },
+    searchChannel: (searchWord,type) => {
+      return dispatch(searchChannel(searchWord,type));
+    },
   };
 };
 

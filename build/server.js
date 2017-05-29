@@ -34,9 +34,10 @@ var _socketEvents2 = _interopRequireDefault(_socketEvents);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var MongoStore = require('connect-mongo')(_expressSession2.default);
+var passport = require('passport');
 //import sassMiddleware from 'node-sass-middleware';
 
+var MongoStore = require('connect-mongo')(_expressSession2.default);
 
 var db = _mongoose2.default.connection;
 db.on('error', console.error);
@@ -49,15 +50,14 @@ _mongoose2.default.connect(_config2.default.dbUrl);
 
 var app = (0, _express2.default)();
 
-app.use(_bodyParser2.default.json());
-
-app.use((0, _expressSession2.default)({
+/* USING SESSION
+app.use(session({
   secret: 'Godsenal!3737',
   saveUninitialized: false,
   resave: false,
   store: new MongoStore({
-    url: _config2.default.dbUrl,
-    ttl: 60 * 60 // 1 days (default: 14days)
+    url: config.dbUrl,
+    ttl: 60*60  // 1 days (default: 14days)
   })
 }));
 /*
@@ -66,6 +66,15 @@ app.use(sassMiddleware({
   dest: path.join(__dirname, 'public'),
 }));
 */
+
+var localSignupStrategy = require('./passport/local-signup');
+var localSigninStrategy = require('./passport/local-signin');
+passport.use('local-signup', localSignupStrategy);
+passport.use('local-signin', localSigninStrategy);
+
+app.use(_bodyParser2.default.urlencoded({ extended: true }));
+app.use(_bodyParser2.default.json());
+app.use(passport.initialize());
 
 app.use('/', _express2.default.static(_path2.default.join(__dirname, './../public'))); // 정적인 페이지 로드
 
@@ -80,7 +89,7 @@ var server = app.listen(_config2.default.port, function () {
   console.info('Express listening on port', _config2.default.port);
 });
 
-var io = require('socket.io').listen(server);
+var io = require('socket.io')(server);
 (0, _socketEvents2.default)(io);
 
 //const io = require('socket.io')(server) ?

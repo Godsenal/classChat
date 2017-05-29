@@ -1,7 +1,6 @@
 import channels from '../models/channel';
 import messages from '../models/message';
 import express from 'express';
-
 const router = express.Router();
 
 
@@ -112,6 +111,16 @@ router.put('/leave/:userName', function(req,res){ // 총 한명일때 나가면 
     }
   });
 });
+/* INVITE USER */
+router.put('/invite', function(req,res){
+  channels.findOneAndUpdate({id: req.body.channelID},{$push: {participants: {$each: req.body.usernames}}},{new: true}, (err, channel) => {
+    if(err) {
+      console.log(err);
+      res.status(500).json({error: 'internal server error', code: 1});
+    }
+    return res.json({channel});
+  });
+});
   //post a user to channel TODO: find whether user is already exist or not.
 router.put('/join/:userName', function(req,res){
   //multi Id to array
@@ -124,10 +133,10 @@ router.put('/join/:userName', function(req,res){
   });
 });
 
-router.get('/search/:channelName', function(req, res){
+router.get('/search/:searchWord/:type', function(req, res){
   //Do i need this?
-  if(req.params.channelName === '*'){
-    channels.find({},function(err,channels){
+  if(req.params.searchWord === '*'){
+    channels.find({type: req.params.type},function(err,channels){
       if(err){
         return res.status(400).json({error:'internal server error', code: 1});
       }
@@ -135,7 +144,7 @@ router.get('/search/:channelName', function(req, res){
     });
   }
   else{
-    channels.find({name:{$regex : req.params.channelName, $options: 'i'}}, null, {sort: {name: 1}},function(err,channels){
+    channels.find({$and:[{name:{$regex : req.params.searchWord, $options: 'i'}},{type:req.params.type}]},function(err,channels){
       if(err){
         return res.status(400).json({error:'internal server error', code: 1});
       }

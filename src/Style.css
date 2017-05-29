@@ -1,152 +1,475 @@
 @import url(//fonts.googleapis.com/earlyaccess/jejugothic.css);
 @import url(http://fonts.googleapis.com/earlyaccess/nanumgothic.css);
-
-.flexLayout{
-  display: -webkit-box;      /* OLD - iOS 6-, Safari 3.1-6 */
-  display: -moz-box;         /* OLD - Firefox 19- (buggy but mostly works) */
-  display: -ms-flexbox;      /* TWEENER - IE 10 */
-  display: -webkit-flex;     /* NEW - Chrome */
-  display: flex;
+@font-face {
+  font-family: 'NanumGothicExtraBold';
+  src: url(/assets/fonts/NanumGothicExtraBold.ttf);
 }
-.flexLayoutMobile{
-  height: 100vh;
-  display: -webkit-box;      /* OLD - iOS 6-, Safari 3.1-6 */
-  display: -moz-box;         /* OLD - Firefox 19- (buggy but mostly works) */
-  display: -ms-flexbox;      /* TWEENER - IE 10 */
-  display: -webkit-flex;     /* NEW - Chrome */
+
+@font-face {
+  font-family: 'NanumBrush';
+  src: url(/assets/fonts/NanumBrush.ttf);
+}
+
+@font-face {
+  font-family: 'NanumGothic';
+  src: url(/assets/fonts/NanumGothic.ttf);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.fadeInAnimation {
+  animation-duration: 2s;
+  animation-name: fadeIn;
+}
+
+.homeContainer:before {
+  content: "";
+  position: fixed;
+  left: 0;
+  right: 0;
+  z-index: -1;
+  display: block;
+  width: 100%;
+  height: 100%;
+  background-image: url('/assets/images/background.jpg');
+  background-size: cover;
+  background-position: center;
+  -webkit-filter: blur(5px);
+  -moz-filter: blur(5px);
+  -o-filter: blur(5px);
+  -ms-filter: blur(5px);
+  filter: blur(5px);
+  overflow: hidden;
+}
+
+.homeContainer {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.homeTransparency {}
+
+.logo {
+  font-family: 'NanumBrush', 'NanumGothicExtraBold', cursive;
+  font-size: 1.5em;
+  font-weight: bold;
+  margin: 0;
+  padding: 0;
+}
+
+.homeHeader {
+  font-family: 'NanumGothicExtraBold', 'NanumBrush', cursive;
+  font-size: 4em;
+  font-weight: bold;
+  color: #DAEDE2;
+}
+
+.homeMain {
+  font-family: 'NanumGothicExtraBold', 'NanumBrush', cursive;
+  font-size: 2em;
+  text-align: center;
+  margin: auto;
+  margin-top: 5rem;
+  color: white;
+}
+
+.homeButtonContainer {
+  border-radius: 0;
+  text-align: center;
+  margin: auto;
+  margin-top: 5rem;
+}
+
+.homeBlackbox {
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 3rem;
+  margin: auto;
+  margin-top: 10%;
+  max-width: 100%;
+  width: 40rem;
+  text-align: center;
+}
+
+.signinModal {
+  font-family: 'NanumGothic', 'NanumBrush', cursive;
+  font-size: 2em;
+}
+
+.signinHeader {
+  font-family: 'NanumGothic', 'NanumBrush', cursive;
+  float: right;
+  color: #FFFFFF;
+}
+
+.flexLayout {
+  display: -webkit-box;
+  /* OLD - iOS 6-, Safari 3.1-6 */
+  display: -moz-box;
+  /* OLD - Firefox 19- (buggy but mostly works) */
+  display: -ms-flexbox;
+  /* TWEENER - IE 10 */
+  display: -webkit-flex;
+  /* NEW - Chrome */
   display: flex;
-  -webkit-box-flex-direction: column;      /* OLD - iOS 6-, Safari 3.1-6 */
+  overflow: hidden;
+}
+
+.flexLayoutMobile {
+  display: -webkit-box;
+  /* OLD - iOS 6-, Safari 3.1-6 */
+  display: -moz-box;
+  /* OLD - Firefox 19- (buggy but mostly works) */
+  display: -ms-flexbox;
+  /* TWEENER - IE 10 */
+  display: -webkit-flex;
+  /* NEW - Chrome */
+  display: flex;
+  -webkit-box-flex-direction: column;
+  /* OLD - iOS 6-, Safari 3.1-6 */
   -moz-box-flex-direction: column;
-  -webkit-flex-direction: column;     /* Chrome */
+  -webkit-flex-direction: column;
+  /* Chrome */
   -ms-flex-direction: column;
   flex-direction: column;
+  overflow: hidden;
 }
-.loadingView{
-  font-family: 'Baloo Bhaina', cursive;
+
+.loadingView {
+  font-family: 'Baloo Bhaina', 'NanumGothicExtraBold', cursive;
   height: 100vh;
-  display: -webkit-box;      /* OLD - iOS 6-, Safari 3.1-6 */
-  display: -moz-box;         /* OLD - Firefox 19- (buggy but mostly works) */
-  display: -ms-flexbox;      /* TWEENER - IE 10 */
-  display: -webkit-flex;     /* NEW - Chrome */
+  display: -webkit-box;
+  /* OLD - iOS 6-, Safari 3.1-6 */
+  display: -moz-box;
+  /* OLD - Firefox 19- (buggy but mostly works) */
+  display: -ms-flexbox;
+  /* TWEENER - IE 10 */
+  display: -webkit-flex;
+  /* NEW - Chrome */
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
-.chatSidebar{
-  font-family: 'Baloo Bhaina', cursive;
-  -webkit-box-flex: 0 1 auto;      /* OLD - iOS 6-, Safari 3.1-6 */
-  -moz-box-flex: 0 1 auto;         /* OLD - Firefox 19- */             /* For old syntax, otherwise collapses. */
-  -webkit-flex: 0 1 auto;          /* Chrome */
-  -ms-flex: 0 1 auto;              /* IE 10 */
-  flex: 0 1 auto;
-  min-width: 100px;
+
+.chatSidebar {
+  font-family: 'Baloo Bhaina', 'NanumGothicExtraBold', cursive;
+  -webkit-box-flex: 0 1 100px;
+  /* OLD - iOS 6-, Safari 3.1-6 */
+  -moz-box-flex: 0 1 100px;
+  /* OLD - Firefox 19- */
+  /* For old syntax, otherwise collapses. */
+  -webkit-flex: 0 100px;
+  /* Chrome */
+  -ms-flex: 0 1 100px;
+  /* IE 10 */
+  flex: 0 1 100px;
 }
-.chatSidebarMobile{
-  font-family: 'Roboto Slab', sans-serif;
-  -webkit-box-flex: 0 1 auto;      /* OLD - iOS 6-, Safari 3.1-6 */
-  -moz-box-flex: 0 1 auto;         /* OLD - Firefox 19- */             /* For old syntax, otherwise collapses. */
-  -webkit-flex: 0 1 auto;          /* Chrome */
-  -ms-flex: 0 1 auto;              /* IE 10 */
-  flex: 0 1 auto;
-  min-height: 2rem;
+
+.chatSidebarMobile {
+  font-family: 'Roboto Slab', 'NanumGothicExtraBold', sans-serif;
+  -webkit-box-flex: 0 1 60px;
+  /* OLD - iOS 6-, Safari 3.1-6 */
+  -moz-box-flex: 0 1 60px;
+  /* OLD - Firefox 19- */
+  /* For old syntax, otherwise collapses. */
+  -webkit-flex: 0 1 60px;
+  /* Chrome */
+  -ms-flex: 0 1 60px;
+  /* IE 10 */
+  flex: 0 1 60px;
   width: 100%;
 }
-.chatView{
-  font-family: 'Baloo Bhaina', cursive;
-  -webkit-box-flex: 1;      /* OLD - iOS 6-, Safari 3.1-6 */
-  -moz-box-flex: 1;         /* OLD - Firefox 19- */             /* For old syntax, otherwise collapses. */
-  -webkit-flex: 1;          /* Chrome */
-  -ms-flex: 1;              /* IE 10 */
-  flex: 1;
+
+.chatView {
+  font-family: 'Baloo Bhaina', 'NanumGothic', cursive;
+  -webkit-box-flex: 0 1 auto;
+  /* OLD - iOS 6-, Safari 3.1-6 */
+  -moz-box-flex: 0 1 auto;
+  /* OLD - Firefox 19- */
+  /* For old syntax, otherwise collapses. */
+  -webkit-flex: 0 1 auto;
+  /* Chrome */
+  -ms-flex: 0 1 auto;
+  /* IE 10 */
+  flex: 0 1 auto;
+  width: 100%;
+  overflow: hidden;
 }
-.flexMessage{
-  display: -webkit-box;      /* OLD - iOS 6-, Safari 3.1-6 */
-  display: -moz-box;         /* OLD - Firefox 19- (buggy but mostly works) */
-  display: -ms-flexbox;      /* TWEENER - IE 10 */
-  display: -webkit-flex;     /* NEW - Chrome */
+
+.chatViewMobile {
+  font-family: 'Baloo Bhaina', 'NanumGothicExtraBold', cursive;
+  -webkit-box-flex: 0 1 auto;
+  /* OLD - iOS 6-, Safari 3.1-6 */
+  -moz-box-flex: 0 1 auto;
+  /* OLD - Firefox 19- */
+  /* For old syntax, otherwise collapses. */
+  -webkit-flex: 0 1 auto;
+  /* Chrome */
+  -ms-flex: 0 1 auto;
+  /* IE 10 */
+  flex: 0 1 auto;
+  overflow: hidden;
+}
+
+.flexMessage {
+  display: -webkit-box;
+  /* OLD - iOS 6-, Safari 3.1-6 */
+  display: -moz-box;
+  /* OLD - Firefox 19- (buggy but mostly works) */
+  display: -ms-flexbox;
+  /* TWEENER - IE 10 */
+  display: -webkit-flex;
+  /* NEW - Chrome */
   display: flex;
-  margin : 2rem;
+  margin: 2rem;
   vertical-align: top;
 }
-.flexMessageWaiting{
-  display: -webkit-box;      /* OLD - iOS 6-, Safari 3.1-6 */
-  display: -moz-box;         /* OLD - Firefox 19- (buggy but mostly works) */
-  display: -ms-flexbox;      /* TWEENER - IE 10 */
-  display: -webkit-flex;     /* NEW - Chrome */
+
+.flexMessageWaiting {
+  display: -webkit-box;
+  /* OLD - iOS 6-, Safari 3.1-6 */
+  display: -moz-box;
+  /* OLD - Firefox 19- (buggy but mostly works) */
+  display: -ms-flexbox;
+  /* TWEENER - IE 10 */
+  display: -webkit-flex;
+  /* NEW - Chrome */
   display: flex;
-  margin : 2rem;
+  margin: 2rem;
   vertical-align: top;
   opacity: 0.3;
 }
-.flexMyMessage{
-  display: -webkit-box;      /* OLD - iOS 6-, Safari 3.1-6 */
-  display: -moz-box;         /* OLD - Firefox 19- (buggy but mostly works) */
-  display: -ms-flexbox;      /* TWEENER - IE 10 */
-  display: -webkit-flex;     /* NEW - Chrome */
+
+.flexMyMessage {
+  display: -webkit-box;
+  /* OLD - iOS 6-, Safari 3.1-6 */
+  display: -moz-box;
+  /* OLD - Firefox 19- (buggy but mostly works) */
+  display: -ms-flexbox;
+  /* TWEENER - IE 10 */
+  display: -webkit-flex;
+  /* NEW - Chrome */
   display: flex;
-  -webkit-box-flex-direction: row-reverse;      /* OLD - iOS 6-, Safari 3.1-6 */
+  -webkit-box-flex-direction: row-reverse;
+  /* OLD - iOS 6-, Safari 3.1-6 */
   -moz-box-flex-direction: row-reverse;
-  -webkit-flex-direction: row-reverse;     /* Chrome */
+  -webkit-flex-direction: row-reverse;
+  /* Chrome */
   -ms-flex-direction: row-reverse;
   flex-direction: row-reverse;
   margin-top: 20px;
   margin-left: 30px;
 }
-.messageImg{
-  -webkit-box-flex-basis: 2.25rem;      /* OLD - iOS 6-, Safari 3.1-6 */
+
+.messageImg {
+  -webkit-box-flex-basis: 2.25rem;
+  /* OLD - iOS 6-, Safari 3.1-6 */
   -moz-box-flex-basis: 2.25rem;
-  -webkit-flex-basis: 2.25rem;         /* Chrome */
+  -webkit-flex-basis: 2.25rem;
+  /* Chrome */
   -ms-flex-basis: 2.25rem;
   flex-basis: 2.25rem;
   width: 2.25rem;
   height: 2.25rem;
 }
-.messageContents{
-  font-family: 'Nanum Gothic', sans-serif;
+
+.messageContents {
+  font-family: 'Nanum Gothic', 'NanumGothicExtraBold', sans-serif;
   margin-left: 1rem;
-  -webkit-box-flex: 1;      /* OLD - iOS 6-, Safari 3.1-6 */
-  -moz-box-flex: 1;         /* OLD - Firefox 19- */             /* For old syntax, otherwise collapses. */
-  -webkit-flex: 1;          /* Chrome */
-  -ms-flex: 1;              /* IE 10 */
+  -webkit-box-flex: 1;
+  /* OLD - iOS 6-, Safari 3.1-6 */
+  -moz-box-flex: 1;
+  /* OLD - Firefox 19- */
+  /* For old syntax, otherwise collapses. */
+  -webkit-flex: 1;
+  /* Chrome */
+  -ms-flex: 1;
+  /* IE 10 */
   flex: 1;
 }
-.chatHeader{
-  display: -webkit-box;      /* OLD - iOS 6-, Safari 3.1-6 */
-  display: -moz-box;         /* OLD - Firefox 19- (buggy but mostly works) */
-  display: -ms-flexbox;      /* TWEENER - IE 10 */
-  display: -webkit-flex;     /* NEW - Chrome */
+
+.chatBody {
+  position: relative;
+  display: -webkit-box;
+  /* OLD - iOS 6-, Safari 3.1-6 */
+  display: -moz-box;
+  /* OLD - Firefox 19- (buggy but mostly works) */
+  display: -ms-flexbox;
+  /* TWEENER - IE 10 */
+  display: -webkit-flex;
+  /* NEW - Chrome */
+  display: flex;
+  -ms-flex-direction: column;
+  -moz-flex-direction: column;
+  -webkit-flex-direction: column;
+  flex-direction: column;
+  -webkit-box-flex: 1;
+  -webkit-flex-grow: 1;
+  -moz-flex-grow: 1;
+  -ms-flex-positive: 1;
+  flex-grow: 1;
+  min-width: 1px;
+}
+
+.chatBodyMobile {
+  position: relative;
+  -webkit-box-flex: 1;
+  -webkit-flex-grow: 1;
+  -moz-flex-grow: 1;
+  -ms-flex-positive: 1;
+  flex-grow: 1;
+  min-width: 1px;
+}
+
+.chatHeader {
+  -webkit-box-flex-basis: 5rem;
+  -webkit-flex-basis: 5rem;
+  -moz-flex-basis: 5rem;
+  -ms-flex-preferred-size: 5rem;
+  flex-basis: 5rem;
+  min-height: 5rem;
+  z-index: 201;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  display: -webkit-box;
+  /* OLD - iOS 6-, Safari 3.1-6 */
+  display: -moz-box;
+  /* OLD - Firefox 19- (buggy but mostly works) */
+  display: -ms-flexbox;
+  /* TWEENER - IE 10 */
+  display: -webkit-flex;
+  /* NEW - Chrome */
   display: flex;
   align-items: center;
-  margin-top: 10px;
-  font-size: 1rem;
+  font-size: 2em;
+  margin: 0;
+  background-color: #0F5385;
+  color: #FFFFFF;
 }
-.chatHeaderName{
-  font-family: 'Baloo Bhaina', cursive;
-  font-size: 2rem;
+
+.chatHeaderName {
+  font-family: 'Baloo Bhaina', 'Nanum Gothic', cursive;
   margin-left: 30px;
+  -webkit-flex: 2;
+  /* Safari 6.1+ */
+  -ms-flex: 2;
+  /* IE 10 */
   flex: 2;
 }
-.chatHeaderSetting{
-}
-.chatHeaderSearch{
+
+.chatHeaderSetting {}
+
+.chatHeaderSearch {
+  -webkit-flex: 2;
+  /* Safari 6.1+ */
+  -ms-flex: 2;
+  /* IE 10 */
   flex: 2;
   align-self: flex-end;
 }
-.messageListContainer{
-  height: 80vh;
-  overflow-y: auto;
-  overflow-x: hidden;
-}
-.messageListContainerMobile{
-  height: 70vh;
-  overflow-x: hidden;
-  overflow-y: auto;
-}
-.messageInputContainer{
+
+.messageBody {
+  margin-left: 0;
   position: relative;
+  display: -webkit-box;
+  /* OLD - iOS 6-, Safari 3.1-6 */
+  display: -moz-box;
+  /* OLD - Firefox 19- (buggy but mostly works) */
+  display: -ms-flexbox;
+  /* TWEENER - IE 10 */
+  display: -webkit-flex;
+  /* NEW - Chrome */
+  display: flex;
+  -webkit-box-flex: 0 1 auto;
+  /* OLD - iOS 6-, Safari 3.1-6 */
+  -moz-box-flex: 0 1 auto;
+  /* OLD - Firefox 19- */
+  /* For old syntax, otherwise collapses. */
+  -webkit-flex: 0 1 auto;
+  /* Chrome */
+  -ms-flex: 0 1 auto;
+  /* IE 10 */
+  flex: 0 1 auto;
+  -ms-flex-direction: column;
+  -moz-flex-direction: column;
+  -webkit-flex-direction: column;
+  flex-direction: column;
+  min-width: 1px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  font-size: 1em;
+}
+
+.messageListContainer {
+  -webkit-box-flex: 0 1 auto;
+  /* OLD - iOS 6-, Safari 3.1-6 */
+  -moz-box-flex: 0 1 auto;
+  /* OLD - Firefox 19- */
+  /* For old syntax, otherwise collapses. */
+  -webkit-flex: 0 1 auto;
+  /* Chrome */
+  -ms-flex: 0 1 auto;
+  /* IE 10 */
+  flex: 0 1 auto;
+  min-height: 1px;
+  position: relative;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.messageListContainerMobile {
+  -webkit-box-flex: 0 1 auto;
+  /* OLD - iOS 6-, Safari 3.1-6 */
+  -moz-box-flex: 0 1 auto;
+  /* OLD - Firefox 19- */
+  /* For old syntax, otherwise collapses. */
+  -webkit-flex: 0 1 auto;
+  /* Chrome */
+  -ms-flex: 0 1 auto;
+  /* IE 10 */
+  flex: 0 1 auto;
+  min-height: 1px;
+  position: relative;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.inputBody {
+  top: 2000px;
+  -webkit-box-flex: 0 1 auto;
+  /* OLD - iOS 6-, Safari 3.1-6 */
+  -moz-box-flex: 0 1 auto;
+  /* OLD - Firefox 19- */
+  /* For old syntax, otherwise collapses. */
+  -webkit-flex: 0 1 auto;
+  /* Chrome */
+  -ms-flex: 0 1 auto;
+  /* IE 10 */
+  flex: 0 1 auto;
+  position: -webkit-sticky;
+  position: -moz-sticky;
+  position: -ms-sticky;
+  position: -o-sticky;
+  position: sticky;
+  height: 10vh;
+  margin-bottom: 2rem;
+}
+
+.messageInputContainer {
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
   margin: 0 1.25rem;
   vertical-align: top;
 }
-.messageInputButton{
+
+.messageInputButton {
   position: absolute;
   min-height: 2.625rem;
   height: 40px;
@@ -156,85 +479,117 @@
   padding-left: 1.5rem;
   padding-bottom: .5625rem;
 }
-.messageInput{
-  overflow: hidden;
-    margin: 0;
-    width: 100%;
-    min-height: 2.625rem;
-    height: 40px;
-    max-height: 11.25rem;
-    padding-top: .625rem;
-    padding-right: 1.875rem;
-    padding-left: 1.875rem;
-    padding-bottom: .625rem;
-    border: 2px solid #E0E0E0;
-    border-radius: .375rem;
-    outline: 0;
-    background: #fff;
-    resize: none;
-    box-shadow: none;
-    color: #3D3C40;
-    font-family: 'Nanum Gothic', sans-serif;
-    font-size: 1.2rem;
-    line-height: 1.2rem;
-    -webkit-user-select: auto;
-    -moz-user-select: auto;
-    -ms-user-select: auto;
-    user-select: auto;
+
+.messageInput {
+  overflow-y: hidden;
+  overflow-x: visible;
+  margin: 0;
+  width: 100%;
+  min-height: 2.625rem;
+  height: 40px;
+  max-height: 11.25rem;
+  border: 2px solid #E0E0E0;
+  border-radius: .375rem;
+  outline: 0;
+  background: #fff;
+  resize: none;
+  box-shadow: none;
+  color: #3D3C40;
+  font-family: 'Nanum Gothic', sans-serif;
+  font-size: 1.2rem;
+  line-height: 1.2rem;
+  -webkit-user-select: auto;
+  -moz-user-select: auto;
+  -ms-user-select: auto;
+  user-select: auto;
 }
-.chatImg{
+
+.searchInput {
+  margin-left: 1.2rem;
+  min-height: 2.625rem;
+  height: 40px;
+  max-height: 11.25rem;
+  border: 2px solid #E0E0E0;
+  border-radius: .375rem;
+  outline: 0;
+  background: #fff;
+  resize: none;
+  box-shadow: none;
+  color: #3D3C40;
+  font-family: 'Nanum Gothic', sans-serif;
+  font-size: 1.2rem;
+  line-height: 1.2rem;
+  padding-top: .5625rem;
+  padding-right: 1rem;
+  padding-left: 1rem;
+  padding-bottom: .5625rem;
+  -webkit-user-select: auto;
+  -moz-user-select: auto;
+  -ms-user-select: auto;
+  user-select: auto;
+}
+
+.chatImg {
   width: 100%;
   height: auto;
 }
-.emptyChat{
+
+.emptyChat {
   text-align: center;
   position: relative;
-  top: 50%;
-  -webkit-transform: translateY(-50%);
-  -ms-transform: translateY(-50%);
-  transform: translateY(-50%);
+  margin-top: 10rem;
 }
-.messageLoader{
+
+.messageLoader {
   height: 100vh;
 }
-.messageLoaderMobile{
+
+.messageLoaderMobile {
   height: 90vh;
 }
-.channelLoader{
+
+.channelLoader {
   height: 100vh;
   width: 15rem;
 }
-.channelLoaderMobile{
-  font-family: 'Baloo Bhaina', cursive;
+
+.channelLoaderMobile {
+  font-family: 'Baloo Bhaina', 'NanumGothicExtraBold', cursive;
   height: 10vh;
 }
-.loadingImage{
-  max-width:100%;
-  max-height:100%;
+
+.loadingImage {
+  max-width: 100%;
+  max-height: 100%;
 }
-.mobileMenu{
+
+.mobileMenu {
   z-index: 100;
 }
-.balooFont{
+
+.balooFont {
   font-family: 'Baloo Bhaina', 'Nanum Gothic', sans-serif;
 }
 
-.signinModal{
+.signinModal {
   width: 30%;
 }
-.receiveOld{
+
+.receiveOld {
   height: 10rem;
   text-align: center;
-
 }
-.receiveOldText{
+
+.receiveOldText {
   vertical-align: bottom;
   font-size: 20px;
 }
-.messageInputHeight{
+
+.messageInputHeight {
   height: 40px;
 }
-.imageMessage{
-  width:200px;
-  height:200px;
+
+.imageMessage {
+  width: 200px;
+  height: 200px;
 }

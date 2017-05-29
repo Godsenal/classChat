@@ -19,7 +19,7 @@ const initialState = {
     isSignedIn: false,
     isAdmin: false,
     currentUser: '',
-    currentUserNickname: '',
+    token : '',
   },
 };
 
@@ -45,14 +45,19 @@ export default function authentication(state, action) {
       status: {
         isSignedIn: { $set: true },
         isAdmin: { $set: action.isAdmin},
-        currentUser: { $set: action.id },
-        currentUserNickname: { $set: action.nickname}
+        currentUser: { $set: action.username },
+        token: { $set: action.token},
+        valid: { $set:true},
       }
     });
   case types.AUTH_SIGNIN_FAILURE:
     return update(state, {
       signin: {
+        isSignedIn: { $set: false },
+        currentUser: { $set: '' },
+        token: { $set: ''},
         status: { $set: 'FAILURE' },
+        valid: { $set:false},
         err: { $set: action.err},
         errCode: { $set: action.code}
       }
@@ -91,18 +96,17 @@ export default function authentication(state, action) {
     return update(state, {
       status: {
         valid: { $set: true },
-        isAdmin: { $set: action.isAdmin},
-        currentUser: { $set: action.id },
-        currentUserNickname: { $set: action.nickname}
+        currentUser: { $set: action.username },
+        token: { $set: action.token },
       }
     });
   case types.AUTH_GET_STATUS_FAILURE:
     return update(state, {
       status: {
         valid: { $set: false },
-        isAdmin:{ $set: false},
         isSignedIn: { $set: false },
-        err: { $set: action.err}
+        err: { $set: action.err},
+        errCode: { $set: action.code}
       }
     });
 
@@ -110,10 +114,8 @@ export default function authentication(state, action) {
   case types.AUTH_SIGNOUT:
     return update(state, {
       status: {
-        isAdmin:{ $set: false},
         isSignedIn: { $set: false },
         currentUser: { $set: '' },
-        currentUserNickname: { $set: ''}
       }
     });
   case types.AUTH_SOCKET_RECEIVE:

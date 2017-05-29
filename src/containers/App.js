@@ -22,7 +22,6 @@ class App extends Component{
       activeItem: 'home',
       getChannel: false,
     };
-    this.handleSignout = this.handleSignout.bind(this);
     this.addNotification = this.addNotification.bind(this);
   }
   addNotification(notification) {
@@ -32,34 +31,73 @@ class App extends Component{
     if(this.props.notification !== nextProps.notification)
       this.addNotification(nextProps.notification);
   }
-  componentWillMount() {
+  componentDidMount() {
+    /*
+    function getCookie(name){
+      var value = '; '+ document.cookie;
+      var parts = value.split('; ' + name + '=');
+      if (parts.length == 2) return parts.pop().split(';').shift();
+    }
+    let signinData = getCookie('key');
 
 
-    this.props.initEnvironment();
-    //window.addEventListener('resize', this.handleWindowSizeChange);
+        // if loginData is undefined, do nothing
+    if(typeof signinData === 'undefined'){
+      return ;
+    }
+
+        // decode base64 & parse json
+    signinData = JSON.parse(atob(signinData));
+        // if not logged in, do nothing
+    if(signinData.isSignedIn){
+      browserHistory.push('/channel');
+    }else{
+      return ;
+    }
+    */
+    /* INIT ENVIRONMENT */
+    this.handleWindowSizeChange();
+    window.onpopstate = this.onBackButtonEvent;
+    window.addEventListener('resize', this.handleWindowSizeChange);
+    /* CHECK TOKEN VALID */
+    let token = localStorage.getItem('token') || null;
+    if(token !== null){
+      this.props.getStatusRequest(token).then(()=>{
+        if(this.props.status.valid){ // if session is valid. go to channel
+          browserHistory.push('/channel');
+        }
+      });
+    }
   }
-  /*handleWindowSizeChange = () => {
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.handleWindowSizeChange);
+  }
+  handleWindowSizeChange = () => {
     this.props.initEnvironment();
-  };*/
+  };
+  onBackButtonEvent = (e) =>{ //뒤로가기 했을 때 막기.
+    e.preventDefault();
+    let token = localStorage.getItem('token') || null;
+    if(token !== null){
+      this.props.getStatusRequest(token).then(()=>{
+        if(this.props.status.valid){ // if session is valid. go to channel
+          browserHistory.push('/channel');
+        }
+        else{
+          browserHistory.push('/');
+        }
+      });
+    }
+    else{
+      browserHistory.push('/');
+    }
+  }
   toggleSide = () => {
     this.setState({
       side : !this.state.side,
     });
   }
-  handleSignout(){
-    this.props.signoutRequest().then(
-      () => {
-        Materialize.toast('Good Bye!', 2000);
-        let signinData = {
-          isSignedIn: false,
-          id: '',
-          nickname: '',
-          isAdmin: false,
-        };
-        document.cookie = 'key=' + btoa(JSON.stringify(signinData));
-      }
-    );
-  }
+
   handleItemClick = (e, { name }) => this.setState({ activeItem: name })
   render(){
     //const re = /(signin|signup)/;
@@ -112,9 +150,10 @@ class App extends Component{
                               </nav>
                             </div>);*/
 
+    const {screenHeight, screenWidth} = this.props.environment;
 
     return(
-      <div>
+      <div style={{'height':{screenHeight}+'px', 'width':{screenWidth}+'px', 'overflowX':'hidden', 'overflowY':'hidden'}}>
         {this.props.children && React.cloneElement(this.props.children, {
           socket
         })}
@@ -150,8 +189,8 @@ const mapStateToProps = (state) => {
 };
 const mapDispatchToProps = (dispatch) => {
   return {
-    getStatusRequest: () => {
-      return dispatch(getStatusRequest());
+    getStatusRequest: (token) => {
+      return dispatch(getStatusRequest(token));
     },
     signoutRequest: () => {
       return dispatch(signoutRequest());

@@ -9,6 +9,10 @@ import {
     MESSAGE_FILTER_SUCCESS,
     MESSAGE_FILTER_FAILURE,
     ROW_MESSAGE_RECEIVE,
+    RECEIVE_MESSAGE_DELETE,
+    LASTDATEID_MESSAGE_DELETE,
+    RESET_MESSAGE_FILTER,
+    MESSAGE_DELETE,
 } from './ActionTypes';
 
 import axios from 'axios';
@@ -16,14 +20,36 @@ import axios from 'axios';
 /* NOT REQUIRED FETCH ACTION */
 
 
-export function receiveRawMessage(message) {
+export function receiveRawMessage(message, isActive = false) {
   return {
     type: ROW_MESSAGE_RECEIVE,
-    message
+    message,
+    isActive
   };
 }
-
-
+export function deleteReceiveMessage(channelID) {
+  return {
+    type: RECEIVE_MESSAGE_DELETE,
+    channelID
+  };
+}
+export function deleteLastDateID(channelID) {
+  return {
+    type: LASTDATEID_MESSAGE_DELETE,
+    channelID
+  };
+}
+export function resetFilter(){
+  return {
+    type: RESET_MESSAGE_FILTER,
+  };
+}
+export function deleteMessage(channelID) { // 특정 채널에 대한 메시지를 지움.
+  return {
+    type: MESSAGE_DELETE,
+    channelID,
+  };
+}
 /*
 export function typing(username) {
   return {
@@ -83,30 +109,47 @@ export function addMessage(message) {
 export function listMessage(channelID, isInitial, topMessageID = '-1') {
   return (dispatch) => {
     dispatch({type: MESSAGE_LIST});
-    var messageID = -1;
-    if(!isInitial)
-      messageID = topMessageID;
-    messageID = messageID.toString();
-    return axios.get(`api/message/list/${channelID}/${messageID}`)
-            .then((res) => {
-              dispatch({type: MESSAGE_LIST_SUCCESS, messages: res.data.messages, isInitial});
-            }).catch((err) => {
-              dispatch({type: MESSAGE_LIST_FAILURE, err: err.res.data.error});
-            });
-  };
-}//밑에처럼 바꾸기
+    if(!isInitial && (topMessageID === '-1')){
+      return dispatch({type: MESSAGE_LIST_SUCCESS, channelID, isInitial, topMessageID});
+    }
 
-/* FILTER MESSAGE */
-
-export function filterMessage(channelID, types, topMessageID = '-1') {
-  return (dispatch) => {
-    dispatch({type: MESSAGE_FILTER});
-    var messageID = topMessageID;
-    return axios.get(`api/message/filter/${channelID}/${messageID}/${types}`)
+    let url = `api/message/list/${channelID}/${topMessageID}`;
+    if(isInitial&&(topMessageID !== '-1')){ // 처음불러오는건데, topMessageID 가 -1이 아닐때.(Date로 불러올 때)
+      url = `api/message/listdate/${channelID}/${topMessageID}`;
+    }
+    return axios.get(url)
             .then((res) => {
-              dispatch({type: MESSAGE_FILTER_SUCCESS, messages: res.data.messages, topMessageID: topMessageID});
+              dispatch({type: MESSAGE_LIST_SUCCESS, messages: res.data.messages, channelID, isInitial, topMessageID, lastDateID: res.data.lastDateID});
             }).catch((err) => {
-              dispatch({type: MESSAGE_FILTER_FAILURE, err: err.res.data.error});
+              dispatch({type: MESSAGE_LIST_FAILURE, err: err.res.data.error, code: err.res.data.code});
             });
   };
 }
+
+/* FILTER MESSAGE */
+export function filterMessage(channelID, types = 'message', topMessageID = '-1', searchWord) {
+  return (dispatch) => {
+    dispatch({type: MESSAGE_FILTER});
+    var messageID = topMessageID;
+    return axios.get(`api/message/filter/${channelID}/${messageID}/${types}/${searchWord}`)
+            .then((res) => {
+              dispatch({type: MESSAGE_FILTER_SUCCESS, messages: res.data.messages, topMessageID: topMessageID, types, searchWord});
+            }).catch((err) => {
+              dispatch({type: MESSAGE_FILTER_FAILURE, err: err.res.data.error, code: err.res.data.code});
+            });
+  };
+}
+
+/* JUMP MESSAGE */
+export function jumpMessage(channelID, types ='id', topMessageID = '-1', targetID){
+  return (dispatch) => {
+    dispatch({type: MESSAGE_LIST});
+    return axios.get(`api/message/jump/${channelID}/${topMessageID}/${types}/${targetID}`)
+            .then((res) => {
+              dispatch({type: MESSAGE_LIST_SUCCESS, messages: res.data.messages, channelID, isInitial: false, topMessageID});
+            }).catch((err) => {
+              dispatch({type: MESSAGE_LIST_FAILURE, err: err.res.data.error, code: err.res.data.code});
+            });
+  };
+}
+/* SEARCH MESSAGE */

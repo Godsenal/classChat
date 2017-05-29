@@ -28,6 +28,10 @@ var _message = require('./message');
 
 var _message2 = _interopRequireDefault(_message);
 
+var _download = require('./download');
+
+var _download2 = _interopRequireDefault(_download);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var router = _express2.default.Router();
@@ -45,5 +49,6 @@ router.use('/post', _post2.default);
 router.use('/comment', _comment2.default);
 router.use('/channel', _channel2.default);
 router.use('/message', _message2.default);
+router.use('/download', _download2.default);
 
 exports.default = router;

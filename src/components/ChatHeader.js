@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react';
-import {Icon, Divider, Dropdown, Modal, Button, Input} from 'semantic-ui-react';
+import {Icon, Divider, Dropdown, Modal, Button} from 'semantic-ui-react';
 import styles from '../Style.css';
 
 class ChatHeader extends React.Component {
@@ -13,7 +13,7 @@ class ChatHeader extends React.Component {
   closeModal = () => this.setState({ open: false });
   render () {
     const {open} = this.state;
-    const {name, participants, id, type, leaveChannel, currentUser} = this.props;
+    const {name, participants, type, leaveChannel, currentUser} = this.props;
     const searchModal = <Modal open={open} basic size ='small' onClose={this.closeModal}>
                           <Modal.Header>
                             Search Message
@@ -29,7 +29,7 @@ class ChatHeader extends React.Component {
                             <Button positive icon='checkmark' labelPosition='right' content='Yes' />
                           </Modal.Actions>
                         </Modal>;
-    const outBtn = type !== 'CHANNEL' ?<Button icon primary onClick={leaveChannel}>
+    const outBtn = type !== 'CHANNEL' ?<Button icon primary compact onClick={leaveChannel}>
                                         <Icon name='sign out' />
                                       </Button>:null;
     var directName = name;
@@ -41,25 +41,23 @@ class ChatHeader extends React.Component {
       directName = filterName[0] + '님과의 채팅';
     }
     return(
-      <div>
+      <div className={styles.chatHeader}>
         {searchModal}
-        <div className={styles.chatHeader}>
           <span className={styles.chatHeaderName} size='massive'><Icon name='comments outline'/>#{directName}</span>
-          <Dropdown pointing text={participants.length.toString()+'명'} button icon='group' labeled className='icon' >
-            <Dropdown.Menu>
-              {this.props.participants.map((participant) => {
-                return(<Dropdown.Item key={participant} text={participant} />);
-              })}
-            </Dropdown.Menu>
-          </Dropdown>
-          <Button icon color='black' onClick={this.showModal}>
-            <Icon name='search' />
-          </Button>
-          {outBtn}
-          <Button icon onClick={this.props.toggleMenu}>
-            <Icon name='list layout' />
-          </Button>
-        </div>
+          {this.props.isSearch?<Button icon='close' onClick={this.props.toggleSearch}/>:
+            <div>
+              <Dropdown style={{'backgroundColor': '#263248','borderRadius': 0,'color':'#FFFFFF'}} compact pointing text={participants.length.toString()+'명'} button icon='group' labeled className='icon' >
+                <Dropdown.Menu>
+                  {this.props.participants.map((participant) => {
+                    return(<Dropdown.Item key={participant} text={participant} />);
+                  })}
+                </Dropdown.Menu>
+              </Dropdown >
+              <Button style={{'backgroundColor': '#263248','borderRadius': 0,'color':'#FFFFFF'}} compact icon onClick={this.props.toggleSearch}>
+                <Icon name='search' />
+              </Button>
+              {outBtn}
+            </div>}
         <Divider/>
       </div>
     );
@@ -72,13 +70,17 @@ ChatHeader.propTypes = {
   leaveChannel : PropTypes.func.isRequired,
   type : PropTypes.string.isRequired,
   currentUser : PropTypes.string.isRequired,
+  toggleSearch : PropTypes.func.isRequired,
+  isSearch : PropTypes.bool.isRequired,
 };
 ChatHeader.defaultProps = {
   name : '',
   participants : [],
   id : '',
-  leaveChannel : () => console.log('props error(leaveChannel)'),
+  leaveChannel : () => console.log('props error(ChatHeader)'),
   type : 'CHANNEL',
   currentUser : '',
+  toggleSearch : () => console.log('props error(ChatHeader)'),
+  isSearch: false,
 };
 export default ChatHeader;
