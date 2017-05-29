@@ -1,8 +1,8 @@
 # StudyReact
 
+
+Class Chatting Web Application building with Node.js,MongoDB,Socket.io and React
+
 TODO:
   EMOJI
-  CALANDER(SIDE BAR)
-  CLASS ROOM
-  MAP?
-  Mobile View(Header) Responsive
+  CALANDER(SIDE BAR
