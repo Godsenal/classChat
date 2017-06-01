@@ -21,6 +21,12 @@ const initialState = {
     currentUser: '',
     token : '',
   },
+  log: {
+    status: 'INIT',
+    err: 'ERROR',
+    errCode: -1,
+    channellogs: {},
+  }
 };
 
 
@@ -116,6 +122,50 @@ export default function authentication(state, action) {
       status: {
         isSignedIn: { $set: false },
         currentUser: { $set: '' },
+      }
+    });
+  case types.AUTH_GET_CHANNELLOG:
+    return update(state, {
+      log: {
+        status:{$set: 'WAITING'},
+      }
+    });
+  case types.AUTH_GET_CHANNELLOG_SUCCESS:
+    return update(state, {
+      log: {
+        status:{$set: 'SUCCESS'},
+        channellogs:{$set: action.channellogs}
+      }
+    });
+  case types.AUTH_GET_CHANNELLOG_FAILURE:
+    return update(state, {
+      log: {
+        status:{$set: 'FAILURE'},
+        err: { $set: action.err},
+        errCode: { $set: action.code}
+      }
+    });
+  case types.AUTH_POST_CHANNELLOG:
+    return update(state, {
+      log: {
+        status:{$set: 'WAITING'},
+      }
+    });
+  case types.AUTH_POST_CHANNELLOG_SUCCESS:
+    return update(state, {
+      log: {
+        status:{$set: 'SUCCESS'},
+        channellogs:{
+          [action.channelID]:{$set: action.lastAccess}
+        }
+      }
+    });
+  case types.AUTH_POST_CHANNELLOG_FAILURE:
+    return update(state, {
+      log: {
+        status:{$set: 'FAILURE'},
+        err: { $set: action.err},
+        errCode: { $set: action.code}
       }
     });
   case types.AUTH_SOCKET_RECEIVE:

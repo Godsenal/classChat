@@ -97,7 +97,8 @@ class ChatView extends Component{
                              lastDateID={this.props.messageList[this.props.activeChannel.id].lastDateID}
                              currentUser={this.props.currentUser}
                              setInitial={this.setInitial}
-                             addGroup={this.props.addGroup}/>
+                             addGroup={this.props.addGroup}
+                             log={this.props.log}/>
               </div>
               <div className={styles.inputBody}>
                 <InputMessage addMessage={this.props.addMessage}
@@ -172,5 +173,6 @@ ChatView.propTypes = {
   messageFilter: PropTypes.object.isRequired,
   filterMessage : PropTypes.func.isRequired,
   jumpMessage : PropTypes.func.isRequired,
+  log : PropTypes.object.isRequired,
 };
 export default ChatView;

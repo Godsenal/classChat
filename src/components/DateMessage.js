@@ -7,7 +7,7 @@ class DateMessage extends React.Component {
   constructor(){
     super();
   }
-  shouldComponentUpdate(nextProps){ // 필요한가? 
+  shouldComponentUpdate(nextProps){ // 필요한가?
     if(this.props.messages !== nextProps.messages){
       return true;
     }
@@ -38,6 +38,7 @@ class DateMessage extends React.Component {
                           scrollIntoJump={this.props.scrollIntoJump}
                           scrollIntoReceive={this.props.scrollIntoReceive}
                           scrollIntoDate={this.props.scrollIntoDate}
+                          lastDate={this.props.lastDate}
                           {...message} />;
         })}
       </div>

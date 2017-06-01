@@ -10,6 +10,12 @@ import {
     AUTH_GET_STATUS_FAILURE,
     AUTH_SIGNOUT,
     AUTH_SOCKET_RECEIVE,
+    AUTH_GET_CHANNELLOG,
+    AUTH_GET_CHANNELLOG_SUCCESS,
+    AUTH_GET_CHANNELLOG_FAILURE,
+    AUTH_POST_CHANNELLOG,
+    AUTH_POST_CHANNELLOG_SUCCESS,
+    AUTH_POST_CHANNELLOG_FAILURE,
 } from './ActionTypes';
 
 import axios from 'axios';
@@ -95,7 +101,28 @@ export function signoutRequest() {
   };*/
   };
 }
-
+export function getChannelLogs(username){
+  return (dispatch) => {
+    dispatch({type: AUTH_GET_CHANNELLOG});
+    return axios.get(`/api/account/get/channellogs/${username}`)
+            .then((res) => {
+              dispatch({type: AUTH_GET_CHANNELLOG_SUCCESS, channellogs:res.data.channellogs});
+            }).catch((err) => {
+              dispatch({type: AUTH_GET_CHANNELLOG_FAILURE, err: err.response.data.error});
+            });
+  };
+}
+export function postChannelLogs(username, channelID, lastAccess){
+  return (dispatch) => {
+    dispatch({type: AUTH_POST_CHANNELLOG});
+    return axios.post('/api/account/post/channellogs',{username,channelID,lastAccess})
+            .then((res) => {
+              dispatch({type: AUTH_POST_CHANNELLOG_SUCCESS, channelID, lastAccess});
+            }).catch((err) => {
+              dispatch({type: AUTH_POST_CHANNELLOG_FAILURE, err: err.response.data.error});
+            });
+  };
+}
 export function receiveSocket(socketID) {
   return {
     type: AUTH_SOCKET_RECEIVE,

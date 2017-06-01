@@ -106,7 +106,7 @@ class MessageList extends Component {
   scrollIntoReceive= (domNode) => {
     //domNode.scrollIntoView(true);
     if(domNode){
-      if(this.isReceived !== 'DONE'){
+      if(this.isReceived !== 'DONE' && !this.scrolled){
         this.isReceived = 'DONE';
         this.scrolled = true; // 안읽은 곳으로 scroll은 한번이면 되니 이것에 대한 flag 설정.
         domNode.scrollIntoView(true);
@@ -115,7 +115,7 @@ class MessageList extends Component {
   }
   scrollIntoDate = (domNode) => {
     if(domNode){
-      if(this.isLastDate !== 'DONE'){
+      if(this.isLastDate !== 'DONE' && !this.scrolled){
         this.isLastDate = 'DONE';
         this.scrolled = true;
         domNode.scrollIntoView(true);
@@ -131,6 +131,7 @@ class MessageList extends Component {
   }
   componentDidUpdate(prevProps, prevState) {//다른 채널 들어갈 때 && 들어왔던 채널에 들어올때 // 여기서 바꾸는 내용은 render다시 안함.
     const messagesContainer = this.messagesContainer;
+    console.log(this.scrolled);
     if(messagesContainer){
       if(prevProps.messages !== this.props.messages){
         if((prevProps.messageReceive.message !== this.props.messageReceive.message) && (messagesContainer.scrollHeight - messagesContainer.scrollTop > this.messagesContainer.offsetHeight * 2)){
@@ -147,7 +148,7 @@ class MessageList extends Component {
       }
       if(prevProps.activeChannel.id !== this.props.activeChannel.id){ //채널이 바뀔 때 이건 INIT해줘야함. 이렇게함으로써 메시지 add할 때 scrollbottom 가능.
         //scroll이 안읽은메시로 이동 후 cdu가 실행됨. 그러므로 여기서 삭제를 해줌.
-        if(!this.scrolled){
+        if(!this.scrolled ){
           this.scrollToBottom();
         }
       }
@@ -163,7 +164,7 @@ class MessageList extends Component {
   }
   render () {
     const isEmpty = (this.props.messages.length === 0 ? true : false);
-
+    const lastDate = (this.props.activeChannel.id in this.props.log.channellogs?this.props.log.channellogs[this.props.activeChannel.id]:null);
     //어디까지 읽었는지 확인하기 위해서 받은 메시지 중 첫번째 메시지 보내줌.
     const receivedMessage = this.props.activeChannel.id in this.props.messageReceive?this.props.messageReceive[this.props.activeChannel.id]:[];
     const messageList = ( isEmpty ?
@@ -185,6 +186,7 @@ class MessageList extends Component {
                          scrollIntoJump={this.scrollIntoJump}
                          scrollIntoReceive={this.scrollIntoReceive}
                          scrollIntoDate={this.scrollIntoDate}
+                         lastDate={lastDate}
                          {...message} />
           );
         }));
@@ -240,5 +242,6 @@ MessageList.propTypes = {
   activeChannel: PropTypes.object.isRequired,
   addGroup : PropTypes.func.isRequired,
   messageJumpID : PropTypes.string.isRequired,
+  log: PropTypes.object.isRequired,
 };
 export default MessageList;

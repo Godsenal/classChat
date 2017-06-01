@@ -16,7 +16,7 @@ import {addChannel,
         receiveRawChannel,
         receiveRawParticipant,
         receiveRawSignupParticipant} from '../actions/channel';
-import {receiveSocket, signoutRequest, getStatusRequest} from '../actions/authentication';
+import {receiveSocket, signoutRequest, getStatusRequest, getChannelLogs, postChannelLogs} from '../actions/authentication';
 import {addNotification} from '../actions/environment';
 import {Sidebar, SearchModal} from '../components';
 import {ChatView} from './';
@@ -55,9 +55,9 @@ class Chat extends React.Component {
   //App 에서의 getStatusRequest가 ComponentDidMount에서 실행이 되어야 여기서 sign data를 사용이 가능..
 
   onUnload = () => {
-
+    this.props.postChannelLogs(this.props.status.currentUser,this.props.activeChannel.id,moment().format());
     localStorage.setItem('lastAccess',moment().format());
-    this.props.socket.emit('disconnected',this.props.status);
+
   }
   notificationSound = () => {
     if(!this.state.isMute){
@@ -111,7 +111,6 @@ class Chat extends React.Component {
   }
   componentWillUnmount() {
     this.props.socket.emit('disconnected',this.props.status);
-    window.removeEventListener('beforeunload', this.onUnload);
   }
   getCookie(name) {
     var value = '; ' + document.cookie; //"; " + document.cookie;
@@ -161,15 +160,22 @@ class Chat extends React.Component {
       else{
         window.addEventListener('beforeunload', this.onUnload); // 브라우저 닫기 전에 실행할 것(lastAccess time저장)
         this.checkNotification();
+
         this.props.listChannel(this.props.status.currentUser)
           .then(()=>{
             //var findChannel = this.props.channelList.channels[.filter((channel) => {return channel.id === '1';});]
             var publicChannel = this.props.channelList.channels[0];
-            let lastAccess = localStorage.getItem('lastAccess')|| -1;
+            //let lastAccess = localStorage.getItem('lastAccess')|| -1;
             //console.log(localStorage.getObject('ffff'));
             //console.log(lastAccess[publicChannel.id]);
             this.props.changeChannel(publicChannel);
             document.title = this.props.activeChannel.name + ' | Class Chat'; // 브라우저 탭 타이틀 설정.
+            this.props.getChannelLogs(this.props.status.currentUser)
+              .then(()=>{
+                let lastAccess= '-1';
+                if(publicChannel.id in this.props.log.channellogs){
+                  lastAccess = this.props.log.channellogs[publicChannel.id];
+                }
             this.props.listMessage(this.props.activeChannel.id,true,lastAccess).then(()=>{
               this.props.socket.emit('chat mounted');
               this.props.socket.emit('storeClientInfo',this.props.status);
@@ -228,6 +234,7 @@ class Chat extends React.Component {
                 this.props.receiveSocket(socketID)
               );
             });
+            });
           });
       }
 
@@ -239,25 +246,24 @@ class Chat extends React.Component {
       document.title = this.props.activeChannel.name + ' | Class Chat';
     }
   }
-  changeActiveChannel(channel) { // leave가 true라면 this.props.socket전송할 participants를 보내줌.
+  changeActiveChannel(channel) {
     this.props.socket.emit('join channel',[channel], this.props.status.currentUser);
-
+    /**유저 로그 테스트**/
+    this.props.postChannelLogs(this.props.status.currentUser,this.props.activeChannel.id,moment().format());
 
 
 
     this.props.changeChannel(channel);
-    /** 테스트 **/
-    let username = this.props.status.currentUser;
-    let channelID = channel.id;
-    let lastAccess = moment().format();
-    axios.post('/api/account/postlog', {username,channelID,lastAccess});
-    /** 테스트 **/
     this.props.deleteLastDateID(this.props.activeChannel.id); // 마지막 접속 날짜 표시를 위한 데이터를 비움.
     this.props.deleteReceiveMessage(this.props.activeChannel.id); // 마지막 읽은 메시지 표시를 위한 데이터를 비움.
     var result = channel.id in this.props.messageList; //현재 세션에서 들어갔던 채널인지 아닌지.(state에 저장되어있는지 아닌지)
 
     if(!result){
-      let lastAccess = localStorage.getItem('lastAccess')|| '-1'; // get last Accessed time
+      //let lastAccess = localStorage.getItem('lastAccess')|| '-1'; // get last Accessed time
+      let lastAccess = '-1';
+      if(channel.id in this.props.log.channellogs){
+        lastAccess = this.props.log.channellogs[channel.id];
+      }
       this.props.listMessage(channel.id, true, lastAccess);
     }else{
       this.props.listMessage(channel.id, false, '-1');
@@ -435,7 +441,8 @@ class Chat extends React.Component {
                       addGroup={this.handleAddGroup}
                       handleMention={this.handleMention}
                       leaveChannel={this.handleLeaveChannel}
-                      currentUser={this.props.status.currentUser}/>
+                      currentUser={this.props.status.currentUser}
+                      log={this.props.log}/>
                   </div>
       </div>:isLoading}
     </div>
@@ -462,6 +469,7 @@ Chat.propTypes = {
   status: PropTypes.object.isRequired,
   environment: PropTypes.object.isRequired,
   socket: PropTypes.object.isRequired,
+  log: PropTypes.object.isRequired,
 
   receiveSocket: PropTypes.func.isRequired,
   getStatusRequest: PropTypes.func.isRequired,
@@ -486,6 +494,8 @@ Chat.propTypes = {
   receiveRawSignupParticipant: PropTypes.func.isRequired,
   resetFilter: PropTypes.func.isRequired,
   deleteMessage: PropTypes.func.isRequired,
+  getChannelLogs: PropTypes.func.isRequired,
+  postChannelLogs: PropTypes.func.isRequired,
 };
 const mapStateToProps = (state) => {
   return {
@@ -506,6 +516,7 @@ const mapStateToProps = (state) => {
     messageReceive: state.message.receive,
     messageFilter : state.message.filter,
     environment: state.environment,
+    log: state.authentication.log,
   };
 };
 
@@ -579,6 +590,12 @@ const mapDispatchToProps = (dispatch) => {
     },
     deleteMessage: (channelID) => {
       return dispatch(deleteMessage(channelID));
+    },
+    getChannelLogs: (username) => {
+      return dispatch(getChannelLogs(username));
+    },
+    postChannelLogs: (username, channelID, lastAccess) => {
+      return dispatch(postChannelLogs(username, channelID, lastAccess));
     }
   };
 };

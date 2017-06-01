@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 
 const userlogSchema = new Schema({
   username: String,
-  lastAccess: Array
+  channellogs: Object,
 });
 
 export default mongoose.model('userlog', userlogSchema);
