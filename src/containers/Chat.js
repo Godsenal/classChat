@@ -4,7 +4,7 @@ import {browserHistory} from 'react-router';
 import {Segment, Dimmer, Loader} from 'semantic-ui-react';
 import uuid from 'node-uuid';
 import moment from 'moment';
-
+import axios from 'axios';
 import {receiveRawMessage, addMessage, listMessage, filterMessage, jumpMessage, deleteReceiveMessage, deleteLastDateID, resetFilter, deleteMessage} from '../actions/message';
 import {addChannel,
         changeChannel,
@@ -21,6 +21,14 @@ import {addNotification} from '../actions/environment';
 import {Sidebar, SearchModal} from '../components';
 import {ChatView} from './';
 import styles from '../Style.css';
+
+Storage.prototype.setObject = function(key, value) {
+  this.setItem(key, JSON.stringify(value));
+};
+Storage.prototype.getObject = function(key) {
+  var value = this.getItem(key);
+  return value && JSON.parse(value);
+};
 
 class Chat extends React.Component {
   constructor(){
@@ -47,6 +55,7 @@ class Chat extends React.Component {
   //App 에서의 getStatusRequest가 ComponentDidMount에서 실행이 되어야 여기서 sign data를 사용이 가능..
 
   onUnload = () => {
+
     localStorage.setItem('lastAccess',moment().format());
     this.props.socket.emit('disconnected',this.props.status);
   }
@@ -151,12 +160,14 @@ class Chat extends React.Component {
       }
       else{
         window.addEventListener('beforeunload', this.onUnload); // 브라우저 닫기 전에 실행할 것(lastAccess time저장)
-        let lastAccess = localStorage.getItem('lastAccess') || -1;
         this.checkNotification();
         this.props.listChannel(this.props.status.currentUser)
           .then(()=>{
             //var findChannel = this.props.channelList.channels[.filter((channel) => {return channel.id === '1';});]
             var publicChannel = this.props.channelList.channels[0];
+            let lastAccess = localStorage.getItem('lastAccess')|| -1;
+            //console.log(localStorage.getObject('ffff'));
+            //console.log(lastAccess[publicChannel.id]);
             this.props.changeChannel(publicChannel);
             document.title = this.props.activeChannel.name + ' | Class Chat'; // 브라우저 탭 타이틀 설정.
             this.props.listMessage(this.props.activeChannel.id,true,lastAccess).then(()=>{
@@ -230,7 +241,17 @@ class Chat extends React.Component {
   }
   changeActiveChannel(channel) { // leave가 true라면 this.props.socket전송할 participants를 보내줌.
     this.props.socket.emit('join channel',[channel], this.props.status.currentUser);
+
+
+
+
     this.props.changeChannel(channel);
+    /** 테스트 **/
+    let username = this.props.status.currentUser;
+    let channelID = channel.id;
+    let lastAccess = moment().format();
+    axios.post('/api/account/postlog', {username,channelID,lastAccess});
+    /** 테스트 **/
     this.props.deleteLastDateID(this.props.activeChannel.id); // 마지막 접속 날짜 표시를 위한 데이터를 비움.
     this.props.deleteReceiveMessage(this.props.activeChannel.id); // 마지막 읽은 메시지 표시를 위한 데이터를 비움.
     var result = channel.id in this.props.messageList; //현재 세션에서 들어갔던 채널인지 아닌지.(state에 저장되어있는지 아닌지)

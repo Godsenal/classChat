@@ -7,6 +7,8 @@ import path from 'path';
 const router = express.Router();
 import passport from 'passport';
 
+import userlogs from '../models/userlog';
+
 const imgPath = path.resolve(__dirname,'../../public/assets/images/users/');
 router.post('/signup', (req, res, next) => {
     // CHECK USERNAME FORMAT
@@ -308,6 +310,65 @@ router.post('/signout', (req, res) => {
   return res.json({ success: true });
 });
 
+router.get('/getlog', (req, res) => {
+  var query = {$and:[{username: req.body.username}, {lastAccess: {[req.body.channelID] :{$exists: true}}}]};
+  userlogs.find(query,(err, userlog) => {
+    if(err){
+      return res.status(401).json({
+        error: 'MONGO ERROR',
+        code: 2
+      });
+    }
+    return res.json({userlog});
+  });
+});
+
+router.post('/postlog',(req, res) => {
+  userlogs.findOne({username: req.body.username}, (err,userlog) => {
+    if(err){
+      return res.status(401).json({
+        error: 'MONGO ERROR',
+        code: 2
+      });
+    }
+
+    if(!userlog){
+      var newlog = new userlogs({ username: req.body.username, lastAccess:[{channelID:req.body.channelID,lastAccess: req.body.lastAccess}]});
+      newlog.save(function (err) {
+        if(err){
+          return res.status(401).json({
+            error: 'MONGO ERROR',
+            code: 2
+          });
+        }
+      });
+    }
+    else{
+      var found = -1;
+      for(var i=0; i< userlog.lastAccess.length; i++){
+        if(userlog.lastAccess[i].channelID === req.body.channelID){
+          found = i;
+          userlog.lastAccess[i].lastAccess = req.body.lastAccess;
+          break;
+        }
+      }
+      if(found < 0){
+        userlog.lastAccess.push({channelID: req.body.channelID, lastAccess: req.body.lastAccess});
+      }
+
+      userlog.markModified('lastAccess'); // Schema 형식 때문에 이렇게 해줘야 바뀜.
+      userlog.save(function(err, updatedUserlog){
+        if(err){
+          return res.status(401).json({
+            error: 'MONGO ERROR',
+            code: 2
+          });
+        }
+        return res.json({updatedUserlog});
+      });
+    }
+  });
+});
 
 
 

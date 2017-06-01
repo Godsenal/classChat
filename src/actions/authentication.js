@@ -96,7 +96,6 @@ export function signoutRequest() {
   };
 }
 
-
 export function receiveSocket(socketID) {
   return {
     type: AUTH_SOCKET_RECEIVE,

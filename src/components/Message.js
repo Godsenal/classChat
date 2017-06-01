@@ -84,7 +84,8 @@ class Message extends Component {
                       </Modal>
                         <a href={`/api/download/${this.props.types}/${this.props.url}/${this.props.contents}`} download><Icon size='large' name='download' link /></a>
                       </Segment>;
-    const lastDateMessage = this.props.lastDateID === this.props.id?<Divider horizontal >마지막 접속일 {moment(localStorage.getItem('lastAccess')).format('MMMM Do YYYY, h:mm:ss a')} 이후 메시지.</Divider>:null;
+    const lastAccess = localStorage.getItem('lastAccess');
+    const lastDateMessage = (this.props.lastDateID === this.props.id)&&lastAccess?<Divider horizontal >마지막 접속일 {moment(lastAccess).format('MMMM Do YYYY, h:mm:ss a')} 이후 메시지.</Divider>:null;
     const unReadMessage = this.props.isReceived&&!lastDateMessage?<Divider horizontal>여기까지 읽으셨습니다.</Divider>:null;
     return(
       <div ref = {ref => this.message = ref}>

@@ -186,7 +186,7 @@ class InputMessage extends React.Component {
     });
   }
   handleAddDirect = () => {
-    var sortParticipants = [this.props.currentUser, this.state.selected].sort();
+    var sortParticipants = [this.props.currentUser, this.state.selected[0]].sort();
     var group ={
       name: (sortParticipants[0] + '+' + sortParticipants[1]),
       participants : sortParticipants,
