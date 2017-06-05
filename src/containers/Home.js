@@ -1,12 +1,18 @@
 import React,{Component, PropTypes} from 'react';
 import {connect} from 'react-redux';
-import {Icon,Segment, Menu, Button, Image, Divider} from 'semantic-ui-react';
+import {Icon,Segment, Card, Button, Image,} from 'semantic-ui-react';
 import NotificationSystem from 'react-notification-system';
-
+import {spring,
+Motion,
+StaggeredMotion,
+TransitionMotion,
+presets} from 'react-motion';
 import {Signup, Signin} from '../components';
 import {signinRequest, getStatusRequest, signupRequest} from '../actions/authentication';
 import {joinChannel, searchChannel} from '../actions/channel';
 import styles from '../Style.css';
+
+
 
 class Home extends Component{
   constructor(){
@@ -16,6 +22,7 @@ class Home extends Component{
       activeItem : '',
       signinOpen : false,
       signupOpen : false,
+      showButton : false,
     };
     this.addNotification = this.addNotification.bind(this);
   }
@@ -27,7 +34,11 @@ class Home extends Component{
       autoDismiss: 2,
     });
   }
-
+  showButton = () => {
+    this.setState({
+      showButton: true,
+    });
+  }
   handleChange = (e) => {
     if(e.target.name === 'email')
       this.setState({email: e.target.value});
@@ -70,26 +81,23 @@ class Home extends Component{
 
     return(
       <div className={styles.homeContainer }>
-          <a href='/' className={styles.logo}><Image size='mini' inline src='/assets/images/logo/favicon-96x96.png'/>클래스 챗</a>
-        <div >
-          <div className={styles.homeBlackbox + ' ' + styles.fadeInAnimation}>
-          <div>
-            <div className={styles.homeHeader}>클래스&nbsp;챗</div>
-            <div className={styles.homeMain}>대학생을 위한 메신저 웹</div>
+          <Motion defaultStyle={{left: 0, }} style={{left: spring(50,{stiffness: 120, damping: 30})}} onRest={this.showButton}>
+            {interpolatingStyle =><div className={styles.homeMain} style={{'left':interpolatingStyle.left +'%'}}>
+              ClassChat
+            </div>}
+          </Motion>
+          {this.state.showButton? <div className={styles.homeBtn} >
+              <Motion defaultStyle={{width: 500,opacity:0}} style={{opacity:spring(1,{stiffness: 50, damping: 15}),width: spring(200,{stiffness: 50, damping: 15})}}>
+                  {interpolatingStyle => <Button basic style={{'width':interpolatingStyle.width,'opacity':interpolatingStyle.opacity}} color='brown' onClick={this.handleSigninOpen}>시작하기</Button>}
+              </Motion>
 
-          </div>
-          <div className={styles.homeButtonContainer} >
-            <Button style={{'width':'15rem', 'borderRadius':0}} color='brown' onClick={this.handleSigninOpen}>시작하기</Button>
-            <br/><br/>
-            <Button style={{'width':'15rem','borderRadius':0}} color='facebook' onClick={this.handleSigninFacebook}>
-              <Icon name='facebook' /> 페이스북으로 시작
-            </Button>
-          </div>
-        </div>
-          <Segment style={{'width':'100%','color':'white', 'position':'absolute','bottom':0,'borderRadius':0, 'textAlign': 'right'}} basic padded>
-            <span>Copyright © Taehee Lee. All Rights Reserved.</span>
-          </Segment>
-        </div>
+              <br/><br/>
+              <Motion defaultStyle={{width: 500, opacity:0}} style={{opacity:spring(1,{stiffness: 50, damping: 15}),width: spring(200,{stiffness: 50, damping: 15})}}>
+              {interpolatingStyle =><Button style={interpolatingStyle} color='facebook' onClick={this.handleSigninFacebook}>
+                <Icon name='facebook' /> 페이스북으로 시작
+              </Button>}
+              </Motion>
+            </div>:undefined}
         {signinOpen ? <Signin signinOpen={signinOpen}
                               signin={this.props.signin}
                               status={this.props.status}

@@ -14,6 +14,7 @@ class Message extends Component {
     };
   }
   componentDidMount() {
+    /**message 단위로 mount하기 때문에 lastDate 선도 나오고 안 읽은메시지 선도 나옴 해결 필요*/
     if(this.props.lastDateID === this.props.id){
       if(this.unReadMessage){
         var unReadNode = ReactDOM.findDOMNode(this.unReadMessage);
@@ -84,8 +85,7 @@ class Message extends Component {
                       </Modal>
                         <a href={`/api/download/${this.props.types}/${this.props.url}/${this.props.contents}`} download><Icon size='large' name='download' link /></a>
                       </Segment>;
-    const lastAccess = localStorage.getItem('lastAccess');
-    const lastDateMessage = (this.props.lastDateID === this.props.id)&&lastAccess?<Divider horizontal >마지막 접속일 {moment(lastAccess).format('MMMM Do YYYY, h:mm:ss a')} 이후 메시지.</Divider>:null;
+    const lastDateMessage = (this.props.lastDateID === this.props.id)?<Divider horizontal >마지막 접속일 {moment(this.props.lastDate).format('MMMM Do YYYY, h:mm:ss a')} 이후 메시지.</Divider>:null;
     const unReadMessage = this.props.isReceived&&!lastDateMessage?<Divider horizontal>여기까지 읽으셨습니다.</Divider>:null;
     return(
       <div ref = {ref => this.message = ref}>
